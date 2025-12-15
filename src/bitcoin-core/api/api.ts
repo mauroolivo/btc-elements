@@ -106,11 +106,20 @@ export async function getwalletinfo(wallet: string): Promise<Getwalletinfo> {
 }
 
 export async function listtransactions(
-  wallet: string
+  wallet: string,
+  label: string,
+  count: number,
+  skip: number,
+  include_watchonly: boolean
 ): Promise<Listtransactions> {
   return (await fetcher(
     'listtransactions',
-    { label: '*', count: 5, skip: 0, include_watchonly: true },
+    {
+      label: label,
+      count: count,
+      skip: skip,
+      include_watchonly: include_watchonly,
+    },
     wallet
   )) as Promise<Listtransactions>;
 }

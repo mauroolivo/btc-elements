@@ -103,7 +103,8 @@ export function Wallet() {
           ) : (
             <>
               <div className="text-xl font-bold">
-                Balance: {walletInfo.result.balance}
+                Balance: {walletInfo.result.balance}, total transactions:{' '}
+                {walletInfo.result.txcount}
               </div>
               {txsJSX()}
             </>

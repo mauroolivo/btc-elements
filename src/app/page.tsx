@@ -2,8 +2,8 @@
 // import { getrawtransaction } from '@/bitcoin-core/api/api';
 // import { listwalletdir } from '@/bitcoin-core/api/api';
 // import { listwallets } from '@/bitcoin-core/api/api';
+import { Header } from '@/bitcoin-core/components/Header';
 import { Wallet } from '@/bitcoin-core/components/Wallet';
-import { WalletConnect } from '@/bitcoin-core/components/WalletConnect';
 
 export default async function Page() {
   // const blockchainInfo = await getblockchaininfo();
@@ -17,8 +17,10 @@ export default async function Page() {
   // const balance = await getbalance('fabric');
   return (
     <div>
-      <WalletConnect />
-      <Wallet />
+      <Header />
+      <div className='pt-20'>
+        <Wallet />
+      </div>
       {/* <h1 className="mb-4 text-2xl font-semibold">Bitcoin Core Info</h1>
       <pre className="rounded-lg bg-zinc-900 p-4 text-sm text-zinc-100">
         {JSON.stringify(blockchainInfo, null, 2)}

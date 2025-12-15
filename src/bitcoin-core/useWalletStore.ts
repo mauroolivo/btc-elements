@@ -99,15 +99,37 @@ export const useWalletStore = create<WalletState>((set, get) => ({
     }
     set({ loading: false });
   },
-  listTransactions: async () => {
+  listTransactions: async (
+    label = '*',
+    count = 5,
+    skip = 0,
+    include_watchonly = true
+  ) => {
     set({ loading: true });
     const { currentWallet } = get();
     if (currentWallet === null) {
       set({ loading: false });
       return;
     } else {
-      const data = await listtransactions(currentWallet);
-      set({ transactionList: data });
+      const data = await listtransactions(
+        currentWallet,
+        label,
+        count,
+        skip,
+        include_watchonly
+      );
+      const current = get().transactionList
+      if (skip === 0) {
+        set({ transactionList: data });
+      } else {
+        set({ transactionList: {
+          ...data,
+          result: [
+            ...(current ? current.result : []),
+            ...data.result
+          ]
+        } });
+      }
     }
     set({ loading: false });
   },
