@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import useSWR, { mutate as swrMutate } from 'swr';
+import useSWRMutation from 'swr/mutation';
+import useSWRInfinite from 'swr/infinite';
 
 import {
   Getwalletinfo,
@@ -18,119 +21,161 @@ import {
 
 export type WalletState = {
   currentWallet: string | null;
-  listwalletdir: Listwalletdir;
-  listwallets: Listwallets;
-  loading: boolean;
-  walletInfo: Getwalletinfo | null;
-  transactionList: Listtransactions | null;
-  listwalletdirFetch: () => Promise<Listwalletdir>;
-  listwalletsFetch: () => Promise<Listwallets>;
-  loadWallet: (wallet: string) => Promise<void>;
-  unloadWallet: (wallet: string) => Promise<void>;
-  connectWallet: (wallet: string) => Promise<void>;
-  getBalance: () => Promise<void>;
-  getWalletinfo: () => Promise<void>;
-  listTransactions: () => Promise<void>;
+  setCurrentWallet: (wallet: string) => void;
 };
 
-export const useWalletStore = create<WalletState>((set, get) => ({
+export const useWalletStore = create<WalletState>((set) => ({
   currentWallet: null,
-  listwalletdir: {
-    result: { wallets: [] },
-    error: null,
-    id: '',
-  },
-  listwallets: {
-    result: [],
-    error: null,
-    id: '',
-  },
-  loading: false,
-  walletInfo: null,
-  transactionList: null,
-  listwalletdirFetch: async () => {
-    set({ loading: true });
-    const data = await listwalletdir();
-    set({ listwalletdir: data, loading: false });
-    return data;
-  },
-  listwalletsFetch: async () => {
-    set({ loading: true });
-    const data = await listwallets();
-    set({ listwallets: data, loading: false });
-    return data;
-  },
-  loadWallet: async (wallet: string) => {
-    set({ loading: true });
-    await loadwallet(wallet);
-    await get().listwalletsFetch();
-    set({ loading: false });
-  },
-  unloadWallet: async (wallet: string) => {
-    set({ loading: true });
-    await unloadwallet(wallet);
-    await get().listwalletsFetch();
-    set({ loading: false });
-  },
-  connectWallet: async (wallet: string) => {
-    set({ currentWallet: wallet, loading: false });
-    get().getWalletinfo();
-    get().listTransactions();
-  },
-  getBalance: async () => {
-    set({ loading: true });
-    const { currentWallet } = get();
-    if (currentWallet === null) {
-      set({ loading: false });
-      return;
-    } else {
-      // const data = await getbalance(currentWallet);
-    }
-    set({ loading: false });
-  },
-  getWalletinfo: async () => {
-    set({ loading: true });
-    const { currentWallet } = get();
-    if (currentWallet === null) {
-      set({ loading: false });
-      return;
-    } else {
-      set({ walletInfo: await getwalletinfo(currentWallet) });
-    }
-    set({ loading: false });
-  },
-  listTransactions: async (
-    label = '*',
-    count = 5,
-    skip = 0,
-    include_watchonly = true
-  ) => {
-    set({ loading: true });
-    const { currentWallet } = get();
-    if (currentWallet === null) {
-      set({ loading: false });
-      return;
-    } else {
-      const data = await listtransactions(
-        currentWallet,
-        label,
-        count,
-        skip,
-        include_watchonly
-      );
-      const current = get().transactionList
-      if (skip === 0) {
-        set({ transactionList: data });
-      } else {
-        set({ transactionList: {
-          ...data,
-          result: [
-            ...(current ? current.result : []),
-            ...data.result
-          ]
-        } });
-      }
-    }
-    set({ loading: false });
+  setCurrentWallet: (wallet: string) => {
+    set({ currentWallet: wallet });
   },
 }));
+
+// SWR hooks for wallet directory and loaded wallets
+export function useWalletsDir() {
+  const { data, error, isLoading, mutate } = useSWR(
+    'listwalletdir',
+    () => listwalletdir(),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+  return {
+    listwalletdir: (data as Listwalletdir) ?? {
+      result: { wallets: [] },
+      error: null,
+      id: '',
+    },
+    error,
+    isLoading,
+    refresh: () => mutate(),
+  };
+}
+
+export function useWalletsList() {
+  const { data, error, isLoading, mutate } = useSWR(
+    'listwallets',
+    () => listwallets(),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+  return {
+    listwallets: (data as Listwallets) ?? { result: [], error: null, id: '' },
+    error,
+    isLoading,
+    refresh: () => mutate(),
+  };
+}
+
+// SWR hook for wallet info based on currentWallet from the store
+export function useWalletInfo() {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const shouldFetch = currentWallet !== null;
+  const { data, error, isLoading, mutate } = useSWR(
+    shouldFetch ? ['getwalletinfo', currentWallet] : null,
+    () => getwalletinfo(currentWallet as string),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+  return {
+    walletInfo: (data as Getwalletinfo) ?? null,
+    error,
+    isLoading,
+    refresh: () => mutate(),
+  };
+}
+
+// SWR mutation hooks for load/unload wallet actions
+export function useLoadWallet() {
+  const { trigger, isMutating, error } = useSWRMutation(
+    'loadwallet',
+    async (_key, { arg }: { arg: string }) => {
+      await loadwallet(arg);
+      await swrMutate('listwallets');
+    }
+  );
+  return {
+    load: (wallet: string) => trigger(wallet),
+    isLoading: isMutating,
+    error,
+  };
+}
+
+export function useUnloadWallet() {
+  const { trigger, isMutating, error } = useSWRMutation(
+    'unloadwallet',
+    async (_key, { arg }: { arg: string }) => {
+      await unloadwallet(arg);
+      await swrMutate('listwallets');
+    }
+  );
+  return {
+    unload: (wallet: string) => trigger(wallet),
+    isLoading: isMutating,
+    error,
+  };
+}
+
+// SWR Infinite hook for transactions with pagination
+export function useTransactions(options?: {
+  label?: string;
+  pageSize?: number;
+  include_watchonly?: boolean;
+}) {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const label = options?.label ?? '*';
+  const pageSize = options?.pageSize ?? 5;
+  const include_watchonly = options?.include_watchonly ?? true;
+
+  const getKey = (
+    pageIndex: number,
+    previousPageData: Listtransactions | null
+  ) => {
+    if (currentWallet === null) return null;
+    if (previousPageData && previousPageData.result.length < pageSize)
+      return null;
+    return [
+      'listtransactions',
+      currentWallet,
+      label,
+      pageSize,
+      pageIndex * pageSize,
+      include_watchonly,
+    ];
+  };
+
+  const { data, error, isLoading, isValidating, size, setSize, mutate } =
+    useSWRInfinite<Listtransactions>(
+      getKey,
+      async ([, wallet, lbl, count, skip, watch]) =>
+        await listtransactions(
+          wallet as string,
+          lbl as string,
+          count as number,
+          skip as number,
+          watch as boolean
+        ),
+      { revalidateOnFocus: false }
+    );
+
+  const pages = data ?? [];
+  const transactions = pages.flatMap((p) => p.result);
+  const hasMore =
+    pages.length === 0
+      ? false
+      : pages[pages.length - 1].result.length === pageSize;
+
+  return {
+    pages,
+    transactions,
+    error,
+    isLoading,
+    isValidating,
+    hasMore,
+    loadMore: () => setSize(size + 1),
+    refresh: () => mutate(),
+    reset: () => setSize(0),
+  };
+}

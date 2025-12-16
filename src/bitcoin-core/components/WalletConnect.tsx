@@ -1,21 +1,34 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useWalletStore } from '../useWalletStore';
+import {
+  useWalletStore,
+  useWalletsDir,
+  useWalletsList,
+  useLoadWallet,
+  useUnloadWallet,
+} from '../useWalletStore';
 
 export function WalletConnect() {
   const [open, setOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<{
+    name: string;
+    type: 'load' | 'unload';
+  } | null>(null);
+
+  const { setCurrentWallet, currentWallet } = useWalletStore();
+  const { load: loadWallet, isLoading: loadLoading } = useLoadWallet();
+  const { unload: unloadWallet, isLoading: unloadLoading } = useUnloadWallet();
+
   const {
     listwalletdir,
+    isLoading: dirLoading,
+    refresh: refreshDir,
+  } = useWalletsDir();
+  const {
     listwallets,
-    listwalletdirFetch,
-    listwalletsFetch,
-    loading,
-    connectWallet,
-    currentWallet,
-    loadWallet,
-    unloadWallet,
-    walletInfo,
-  } = useWalletStore();
+    isLoading: walletsLoading,
+    refresh: refreshWallets,
+  } = useWalletsList();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!open) return;
@@ -38,20 +51,32 @@ export function WalletConnect() {
   }, [open]);
   function toggleOpen() {
     if (!open) {
-      console.log('Fetching wallet info');
-      listwalletdirFetch();
-      listwalletsFetch();
+      // Revalidate SWR data when opening the menu
+      refreshDir();
+      refreshWallets();
     }
     setOpen(!open);
   }
   function handleConnect(wallet: string) {
-    connectWallet(wallet);
+    setCurrentWallet(wallet);
   }
-  function handleLoad(wallet: string) {
-    loadWallet(wallet);
+  async function handleLoad(wallet: string) {
+    setPendingAction({ name: wallet, type: 'load' });
+    try {
+      await loadWallet(wallet);
+      await refreshWallets();
+    } finally {
+      setPendingAction(null);
+    }
   }
-  function handleUnload(wallet: string) {
-    unloadWallet(wallet);
+  async function handleUnload(wallet: string) {
+    setPendingAction({ name: wallet, type: 'unload' });
+    try {
+      await unloadWallet(wallet);
+      await refreshWallets();
+    } finally {
+      setPendingAction(null);
+    }
   }
   const names = listwalletdir.result.wallets.map((wallet) => wallet.name);
   function getStatus(name: string) {
@@ -109,10 +134,16 @@ export function WalletConnect() {
                 {names.map((name) => {
                   const status = getStatus(name);
                   const displayName = name === '' ? 'default' : name;
+                  const itemLoading =
+                    pendingAction?.name === name &&
+                    ((pendingAction.type === 'load' && loadLoading) ||
+                      (pendingAction.type === 'unload' && unloadLoading));
+
                   return (
                     <div
                       key={displayName}
-                      className="flex items-center justify-between px-3 py-2 hover:bg-gray-800"
+                      className={`flex items-center justify-between px-3 py-2 hover:bg-gray-800 ${itemLoading ? 'opacity-75' : ''}`}
+                      aria-busy={itemLoading}
                     >
                       <div className="flex items-center gap-2">
                         <StatusIcon
@@ -123,19 +154,43 @@ export function WalletConnect() {
                         </span>
                         <span className="text-xs text-gray-400">{status}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {status === 'connected' ? (
+
+                      <div className="flex min-w-30 items-center justify-end gap-2">
+                        {itemLoading ? (
+                          <svg
+                            className="h-4 w-4 animate-spin text-white"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                            />
+                          </svg>
+                        ) : status === 'connected' ? (
                           <span className="text-green-400">Connected</span>
                         ) : status === 'loaded' ? (
                           <>
                             <button
                               onClick={() => handleConnect(name)}
+                              disabled={loadLoading || unloadLoading}
                               className="rounded bg-gray-700 px-2 py-1 text-xs text-white hover:bg-gray-600 focus:ring-0 focus:outline-none"
                             >
                               Connect
                             </button>
                             <button
                               onClick={() => handleUnload(name)}
+                              disabled={loadLoading || unloadLoading}
                               className="rounded bg-gray-700 px-2 py-1 text-xs text-white hover:bg-gray-600 focus:ring-0 focus:outline-none"
                             >
                               Unload
@@ -144,6 +199,7 @@ export function WalletConnect() {
                         ) : (
                           <button
                             onClick={() => handleLoad(name)}
+                            disabled={loadLoading || unloadLoading}
                             className="rounded bg-gray-700 px-2 py-1 text-xs text-white hover:bg-gray-600 focus:ring-0 focus:outline-none"
                           >
                             Load
@@ -163,11 +219,13 @@ export function WalletConnect() {
         <button
           onClick={toggleOpen}
           type="button"
-          disabled={loading}
-          className="inline-flex min-w-[180px] items-center justify-between rounded bg-gray-800 px-4 py-2 text-sm font-medium text-white shadow hover:bg-gray-700 focus:outline-none"
+          disabled={
+            dirLoading || walletsLoading || loadLoading || unloadLoading
+          }
+          className="inline-flex min-w-45 items-center justify-between rounded bg-gray-800 px-4 py-2 text-sm font-medium text-white shadow hover:bg-gray-700 focus:outline-none"
         >
           {walletString()}
-          {loading ? (
+          {dirLoading || walletsLoading || loadLoading || unloadLoading ? (
             // Spinner
             <svg
               className="h-4 w-4 animate-spin"

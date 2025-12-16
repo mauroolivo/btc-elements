@@ -1,22 +1,32 @@
 'use client';
-import { useWalletStore } from '../useWalletStore';
+import { useWalletInfo, useTransactions } from '../useWalletStore';
 import { Getwalletinfo } from '../model/wallet';
 
 export function Wallet() {
-  const { walletInfo, transactionList } = useWalletStore();
+  const {
+    transactions,
+    isLoading: txLoading,
+    isValidating: txValidating,
+    hasMore,
+    loadMore,
+  } = useTransactions({ pageSize: 5 });
+  const { walletInfo, isLoading: infoLoading } = useWalletInfo();
 
   function txsJSX(): React.JSX.Element {
-    if (transactionList === null) {
+    if (txLoading && transactions.length === 0) {
+      return <div>Loading transactions...</div>;
+    }
+    if (transactions.length === 0) {
       return <div>No transactions available</div>;
     }
-    const list_items = transactionList?.result.map((tx, idx) => {
+    const list_items = transactions.map((tx, idx) => {
       const isPositive = Number(tx.amount) > 0;
       const amountColor = isPositive ? 'text-green-400' : 'text-red-400';
       const amountBg = 'bg-gray-800';
       const amountSign = isPositive ? '+' : '';
       return (
         <div
-          key={idx}
+          key={`${tx.txid}-${idx}`}
           className="mx-auto flex max-w-xl items-center justify-between gap-4 border-b py-3"
         >
           <div className={`flex-1 ${amountBg} rounded px-3 py-2`}>
@@ -91,14 +101,30 @@ export function Wallet() {
         </div>
       );
     });
-    return <div>{list_items}</div>;
+    return (
+      <div>
+        {list_items}
+        {hasMore && (
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={loadMore}
+              disabled={txValidating}
+              className="rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700 disabled:opacity-50"
+            >
+              {txValidating ? 'Loading…' : 'Load more'}
+            </button>
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (
     <div className="">
       {(walletInfo as Getwalletinfo) && (
         <>
-          {walletInfo === null ? (
+          {infoLoading || walletInfo === null ? (
             <div>Loading wallet info...</div>
           ) : (
             <>
