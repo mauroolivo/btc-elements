@@ -6,7 +6,7 @@ import {
   useWalletsList,
   useLoadWallet,
   useUnloadWallet,
-} from '../useWalletStore';
+} from '../../useWalletStore';
 
 export function WalletConnect() {
   const [open, setOpen] = useState(false);

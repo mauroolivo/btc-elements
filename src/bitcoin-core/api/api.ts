@@ -123,3 +123,17 @@ export async function listtransactions(
     wallet
   )) as Promise<Listtransactions>;
 }
+
+export async function getnewaddress(
+  wallet: string,
+  addressType: string
+): Promise<string> {
+  const res = await fetcher(
+    'getnewaddress',
+    {
+      address_type: addressType,
+    },
+    wallet
+  );
+  return res.result as string;
+}

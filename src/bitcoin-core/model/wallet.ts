@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+export const RpcErrorSchema = z.object({
+  code: z.number(),
+  message: z.string(),
+});
+export type RpcErrorType = z.infer<typeof RpcErrorSchema>;
+
 export const ListwalletdirSchema = z.object({
   result: z.object({
     wallets: z.array(
@@ -8,35 +14,35 @@ export const ListwalletdirSchema = z.object({
       })
     ),
   }),
-  error: z.any(),
+  error: z.object(RpcErrorSchema).optional(),
   id: z.string(),
 });
 export type Listwalletdir = z.infer<typeof ListwalletdirSchema>;
 
 export const ListwalletsSchema = z.object({
   result: z.array(z.string()),
-  error: z.any(),
+  error: z.object(RpcErrorSchema).optional(),
   id: z.string(),
 });
 export type Listwallets = z.infer<typeof ListwalletsSchema>;
 
 export const LoadwalletSchema = z.object({
   result: z.object({}),
-  error: z.any(),
+  error: z.object(RpcErrorSchema).optional(),
   id: z.string(),
 });
 export type Loadwallet = z.infer<typeof LoadwalletSchema>;
 
 export const UnloadwalletSchema = z.object({
   result: z.object({}),
-  error: z.any(),
+  error: z.object(RpcErrorSchema).optional(),
   id: z.string(),
 });
 export type Unloadwallet = z.infer<typeof UnloadwalletSchema>;
 
 export const GetbalanceSchema = z.object({
   result: z.number(),
-  error: z.any(),
+  error: z.object(RpcErrorSchema).optional(),
   id: z.string(),
 });
 export type Getbalance = z.infer<typeof GetbalanceSchema>;
@@ -68,7 +74,7 @@ export type GetwalletinfoResult = z.infer<typeof GetwalletinfoResultSchema>;
 
 export const GetwalletinfoSchema = z.object({
   result: GetwalletinfoResultSchema,
-  error: z.any(),
+  error: z.object(RpcErrorSchema).optional(),
   id: z.string(),
 });
 export type Getwalletinfo = z.infer<typeof GetwalletinfoSchema>;
@@ -99,7 +105,14 @@ export type ListtransactionsResult = z.infer<typeof ListtransactionsResultSchema
 
 export const ListtransactionsSchema = z.object({
   result: z.array(ListtransactionsResultSchema),
-  error: z.any(),
+  error: z.object(RpcErrorSchema).optional(),
   id: z.string(),
 });
 export type Listtransactions = z.infer<typeof ListtransactionsSchema>;
+
+export const NewaddressSchema = z.object({
+  result: z.string(),
+  error: z.object(RpcErrorSchema).optional(),
+  id: z.string(),
+});
+export type Newaddress = z.infer<typeof NewaddressSchema>;

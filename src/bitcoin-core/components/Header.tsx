@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import ThemeSelector from '@/bitcoin-core/components/ThemeSelector';
-import { WalletConnect } from './WalletConnect';
+import { WalletConnect } from './Wallet/WalletConnect';
 
 export function Header() {
   return (
@@ -16,9 +16,8 @@ export function Header() {
             </div>
 
             <div className="flex items-center gap-6 max-md:hidden">
-
               <WalletConnect />
-              
+
               <Link href="/layouts" className="text-text text-sm/6">
                 layouts
               </Link>

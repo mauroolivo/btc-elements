@@ -1,8 +1,8 @@
 'use client';
-import { useWalletInfo, useTransactions } from '../useWalletStore';
-import { Getwalletinfo } from '../model/wallet';
+import { useWalletInfo, useTransactions } from '@/bitcoin-core/useWalletStore';
+import { Getwalletinfo } from '@/bitcoin-core/model/wallet';
 
-export function Wallet() {
+export function WalletHome() {
   const {
     transactions,
     isLoading: txLoading,
@@ -136,6 +136,44 @@ export function Wallet() {
             </>
           )}
         </>
+      )}
+      {walletInfo === null && (
+        <div className="flex min-h-screen items-center justify-center bg-gray-950/50">
+          <div
+            id="pippo"
+            className="mx-4 w-full max-w-md rounded-lg border border-gray-700 bg-gray-900 p-6 text-center shadow-lg"
+          >
+            <div className="mx-auto mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-800 text-gray-300">
+              {/* Wallet icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 7a3 3 0 013-3h12a3 3 0 013 3v10a3 3 0 01-3 3H6a3 3 0 01-3-3V7z"
+                />
+                <path
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16 12h3"
+                />
+              </svg>
+            </div>
+            <h2 className="mb-1 text-lg font-semibold text-white">
+              No wallet connected
+            </h2>
+            <p className="mb-4 text-sm text-gray-400">
+              Please open Connect Wallet and select a wallet to continue.
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

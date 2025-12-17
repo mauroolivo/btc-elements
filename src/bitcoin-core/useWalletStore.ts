@@ -17,6 +17,7 @@ import {
   unloadwallet,
   getwalletinfo,
   listtransactions,
+  getnewaddress,
 } from '@/bitcoin-core/api/api';
 
 export type WalletState = {
@@ -118,6 +119,28 @@ export function useUnloadWallet() {
   };
 }
 
+// SWR mutation hook to generate a new receiving address
+export function useNewAddress(
+  addressType?: string,
+  enabled: boolean = false,
+  requestId: number = 0
+) {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const shouldFetch = enabled && currentWallet !== null && !!addressType;
+  const { data, error, isLoading, mutate } = useSWR(
+    shouldFetch
+      ? ['getnewaddress', currentWallet, addressType, requestId]
+      : null,
+    () => getnewaddress(currentWallet as string, addressType as string),
+    { revalidateOnFocus: false }
+  );
+  return {
+    address: (data as string) ?? null,
+    error,
+    isLoading,
+    refresh: () => mutate(),
+  };
+}
 // SWR Infinite hook for transactions with pagination
 export function useTransactions(options?: {
   label?: string;
