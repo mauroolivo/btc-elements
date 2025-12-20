@@ -8,6 +8,7 @@ import {
   Listtransactions,
   Listwalletdir,
   Listwallets,
+  Newaddress,
 } from '@/bitcoin-core/model/wallet';
 import {
   // getbalance,
@@ -120,25 +121,24 @@ export function useUnloadWallet() {
 }
 
 // SWR mutation hook to generate a new receiving address
-export function useNewAddress(
-  addressType?: string,
-  enabled: boolean = false,
-  requestId: number = 0
-) {
+export function useNewAddress() {
   const currentWallet = useWalletStore((s) => s.currentWallet);
-  const shouldFetch = enabled && currentWallet !== null && !!addressType;
-  const { data, error, isLoading, mutate } = useSWR(
-    shouldFetch
-      ? ['getnewaddress', currentWallet, addressType, requestId]
-      : null,
-    () => getnewaddress(currentWallet as string, addressType as string),
-    { revalidateOnFocus: false }
+
+  const { trigger, data, error, isMutating } = useSWRMutation(
+    'getnewaddress',
+    async (_key, { arg }: { arg: { wallet: string; addressType: string } }) => {
+      return getnewaddress(arg.wallet, arg.addressType);
+    }
   );
+
   return {
-    address: (data as string) ?? null,
+    address: (data as Newaddress) ?? null,
     error,
-    isLoading,
-    refresh: () => mutate(),
+    isLoading: isMutating,
+    generate: (addressType: string) => {
+      if (!currentWallet) throw new Error('No wallet selected');
+      return trigger({ wallet: currentWallet, addressType });
+    },
   };
 }
 // SWR Infinite hook for transactions with pagination

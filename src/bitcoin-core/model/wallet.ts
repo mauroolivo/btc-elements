@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ADDRESS_TYPES } from '../constants';
 
 export const RpcErrorSchema = z.object({
   code: z.number(),
@@ -101,7 +102,9 @@ export const ListtransactionsResultSchema = z.object({
   parent_descs: z.array(z.string()).optional(),
   label: z.string().optional(),
 });
-export type ListtransactionsResult = z.infer<typeof ListtransactionsResultSchema>;
+export type ListtransactionsResult = z.infer<
+  typeof ListtransactionsResultSchema
+>;
 
 export const ListtransactionsSchema = z.object({
   result: z.array(ListtransactionsResultSchema),
@@ -112,7 +115,13 @@ export type Listtransactions = z.infer<typeof ListtransactionsSchema>;
 
 export const NewaddressSchema = z.object({
   result: z.string(),
-  error: z.object(RpcErrorSchema).optional(),
+  error: RpcErrorSchema.optional(),
   id: z.string(),
 });
 export type Newaddress = z.infer<typeof NewaddressSchema>;
+
+export const FormNewAddressSchema = z.object({
+  addressType: z.string().refine((v) => ADDRESS_TYPES.some((t) => t.value === v), {
+    message: 'Invalid address type',
+  }),
+});

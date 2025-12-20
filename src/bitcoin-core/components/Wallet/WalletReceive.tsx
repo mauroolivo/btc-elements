@@ -1,25 +1,37 @@
 import { useState } from 'react';
 import { useNewAddress, useWalletStore } from '@/bitcoin-core/useWalletStore';
+import { ADDRESS_TYPES } from '@/bitcoin-core/constants';
 import QRCode from 'react-qr-code';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { FormNewAddressSchema } from '@/bitcoin-core/model/wallet';
 
 export default function WalletReceive() {
-  const avail_items = ['legacy', 'p2sh-segwit', 'bech32', 'bech32m'];
-  const [addressType, setAddressType] = useState('no-value');
   const currentWallet = useWalletStore((s) => s.currentWallet);
 
-  const [enabled, setEnabled] = useState(false);
-  const [requestId, setRequestId] = useState(0);
+  type FormFields = z.infer<typeof FormNewAddressSchema>;
+
   const [copied, setCopied] = useState(false);
-  const { address, isLoading, error, refresh } = useNewAddress(
-    addressType !== 'no-value' ? addressType : undefined,
-    enabled,
-    requestId
-  );
+  const { address, isLoading, error: rpcError, generate } = useNewAddress();
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    watch,
+    formState: { errors /* isSubmitting */ },
+  } = useForm<FormFields>({
+    defaultValues: {
+      addressType: 'no-value',
+    },
+    resolver: zodResolver(FormNewAddressSchema),
+  });
 
   function select(): React.JSX.Element {
-    const list_items = avail_items.map((name, idx) => (
-      <option key={idx + 1} value={name}>
-        {name}
+    const list_items = ADDRESS_TYPES.map(({ value, label }) => (
+      <option key={value} value={value}>
+        {label}
       </option>
     ));
     const list = [
@@ -27,30 +39,25 @@ export default function WalletReceive() {
         -- select address type --
       </option>,
     ].concat(list_items);
-    return (
-      <select
-        onChange={(e) => {
-          setAddressType(e.currentTarget.value);
-        }}
-        name={'address-type'}
-      >
-        {list}
-      </select>
-    );
+    return <select {...register('addressType')}>{list}</select>;
   }
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const walletType = formData.get('address-type');
-    if (walletType === 'no-value') {
-      alert('Please select an address type');
-      return;
+  const onSubmit = handleSubmit(async ({ addressType }) => {
+    // if (addressType === 'no-value') {
+    //   alert('Please select an address type');
+    //   return;
+    // }
+
+    try {
+      await generate(addressType);
+      //throw new Error('Simulated sign-up error');
+    } catch (error) {
+      setError('root', {
+        message: `${(error as Error).message}. Please try again.`,
+      });
     }
-    if (!enabled) setEnabled(true);
-    setRequestId((n) => n + 1);
-  }
+  });
+
   return (
     <div className="min-h-screen w-full bg-gray-950/30">
       <div className="mx-auto flex max-w-md items-center justify-center px-4 py-10">
@@ -58,12 +65,22 @@ export default function WalletReceive() {
           <div className={'pb-3 text-base font-semibold'}>
             Generate a new receiving address
           </div>
-          <form onSubmit={onSubmit}>
+          <form noValidate onSubmit={onSubmit}>
             <div className={'mt-2 mb-2'}>{select()}</div>
+            {errors.addressType && (
+              <div className="mb-2 text-xs text-red-300">
+                {errors.addressType.message?.toString()}
+              </div>
+            )}
+            {errors.root && (
+              <div className="mb-2 text-xs text-red-300">
+                {errors.root.message?.toString()}
+              </div>
+            )}
             <button
               type="submit"
               disabled={
-                addressType === 'no-value' ||
+                watch('addressType') === 'no-value' ||
                 isLoading ||
                 currentWallet === null
               }
@@ -79,20 +96,25 @@ export default function WalletReceive() {
             </div>
           )}
 
-          {error && (
+          {rpcError && (
             <div className="mt-4 rounded border border-red-700 bg-red-900/30 p-3 text-sm text-red-200">
-              Failed to generate address. {String(error.message)}
+              Failed to generate address. {String(rpcError.message)}
             </div>
           )}
-
-          {address && (
+          {address !== null && address.error && (
+            <div className="mt-4 rounded border border-red-700 bg-red-900/30 p-3 text-sm text-red-200">
+              Failed to generate address.{' '}
+              {String(address.error !== null ? address.error?.message : '')}
+            </div>
+          )}
+          {address !== null && address.result && (
             <div className="mt-5">
               <div className="mb-3 w-full rounded bg-gray-800 px-3 py-2 font-mono text-sm break-all text-gray-100">
-                {address}
+                {address.result}
               </div>
               <div className="inline-block rounded bg-white p-3">
                 <QRCode
-                  value={address}
+                  value={address.result}
                   size={160}
                   fgColor="#000000"
                   bgColor="#ffffff"
@@ -101,7 +123,7 @@ export default function WalletReceive() {
               <div className="mt-3">
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(address);
+                    navigator.clipboard.writeText(address.result);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 1500);
                   }}

@@ -19,7 +19,15 @@ export function WalletHome() {
     if (transactions.length === 0) {
       return <div>No transactions available</div>;
     }
-    const list_items = transactions.map((tx, idx) => {
+
+    const sorted = [...transactions].sort((a, b) => {
+      const ta = a.blocktime as number;
+      const tb = b.blocktime as number;
+      // Newest first within each batch
+      return tb - ta;
+    });
+
+    const list_items = sorted.map((tx, idx) => {
       const isPositive = Number(tx.amount) > 0;
       const amountColor = isPositive ? 'text-green-400' : 'text-red-400';
       const amountBg = 'bg-gray-800';
@@ -36,13 +44,13 @@ export function WalletHome() {
                 {tx.amount}
               </span>
             </div>
-            <div className="mt-1 text-xs text-gray-500">
+            <div className="mt-1 text-xs text-gray-200">
               {new Date(tx.blocktime * 1000).toLocaleString()}
             </div>
           </div>
           <div className="flex min-w-0 flex-2 flex-col">
             <div className="truncate text-sm font-medium">{tx.address}</div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-gray-400">
               {tx.category} · {tx.confirmations} confirmations
             </div>
             <div className="truncate text-xs text-gray-400">{tx.txid}</div>

@@ -10,6 +10,7 @@ import {
   Listwallets,
   Loadwallet,
   Unloadwallet,
+  Newaddress,
 } from '@/bitcoin-core/model/wallet';
 import { ParamsDictionary } from '@/bitcoin-core/params';
 
@@ -127,13 +128,12 @@ export async function listtransactions(
 export async function getnewaddress(
   wallet: string,
   addressType: string
-): Promise<string> {
-  const res = await fetcher(
+): Promise<Newaddress> {
+  return (await fetcher(
     'getnewaddress',
     {
       address_type: addressType,
     },
     wallet
-  );
-  return res.result as string;
+  )) as Promise<Newaddress>;
 }
