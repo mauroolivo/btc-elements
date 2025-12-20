@@ -136,7 +136,7 @@ export function useNewAddress() {
     error,
     isLoading: isMutating,
     generate: (addressType: string) => {
-      if (!currentWallet) throw new Error('No wallet selected');
+      if (currentWallet === undefined || currentWallet === null) throw new Error('No wallet selected');
       return trigger({ wallet: currentWallet, addressType });
     },
   };

@@ -21,10 +21,10 @@ export function WalletHome() {
     }
 
     const sorted = [...transactions].sort((a, b) => {
-      const ta = a.blocktime as number;
-      const tb = b.blocktime as number;
+      const ta = a.confirmations as number;
+      const tb = b.confirmations as number;
       // Newest first within each batch
-      return tb - ta;
+      return  ta - tb;
     });
 
     const list_items = sorted.map((tx, idx) => {
