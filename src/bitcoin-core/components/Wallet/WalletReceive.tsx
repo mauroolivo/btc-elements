@@ -13,7 +13,7 @@ export default function WalletReceive() {
   type FormFields = z.infer<typeof FormNewAddressSchema>;
 
   const [copied, setCopied] = useState(false);
-  const { address, isLoading, error: rpcError, generate } = useNewAddress();
+  const { response, isLoading, error: mutError, generate } = useNewAddress();
 
   const {
     register,
@@ -96,25 +96,25 @@ export default function WalletReceive() {
             </div>
           )}
 
-          {rpcError && (
+          {mutError && (
             <div className="mt-4 rounded border border-red-700 bg-red-900/30 p-3 text-sm text-red-200">
-              Failed to generate address. {String(rpcError.message)}
+              Failed to generate address. {String(mutError.message)}
             </div>
           )}
-          {address !== null && address.error && (
+          {response !== null && response.error && (
             <div className="mt-4 rounded border border-red-700 bg-red-900/30 p-3 text-sm text-red-200">
               Failed to generate address.{' '}
-              {String(address.error !== null ? address.error?.message : '')}
+              {String(response.error !== null ? response.error?.message : '')}
             </div>
           )}
-          {address !== null && address.result && (
+          {response !== null && response.result && (
             <div className="mt-5">
               <div className="mb-3 w-full rounded bg-gray-800 px-3 py-2 font-mono text-sm break-all text-gray-100">
-                {address.result}
+                {response.result}
               </div>
               <div className="inline-block rounded bg-white p-3">
                 <QRCode
-                  value={address.result}
+                  value={response.result}
                   size={160}
                   fgColor="#000000"
                   bgColor="#ffffff"
@@ -123,7 +123,7 @@ export default function WalletReceive() {
               <div className="mt-3">
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(address.result);
+                    navigator.clipboard.writeText(response.result);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 1500);
                   }}

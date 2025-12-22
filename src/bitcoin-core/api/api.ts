@@ -11,6 +11,7 @@ import {
   Loadwallet,
   Unloadwallet,
   Newaddress,
+  Sendtoaddress,
 } from '@/bitcoin-core/model/wallet';
 import { ParamsDictionary } from '@/bitcoin-core/params';
 
@@ -136,4 +137,15 @@ export async function getnewaddress(
     },
     wallet
   )) as Promise<Newaddress>;
+}
+
+export async function sendtoaddress(
+  payload: ParamsDictionary,
+  wallet: string
+): Promise<Sendtoaddress> {
+  return (await fetcher(
+    'sendtoaddress',
+    payload,
+    wallet
+  )) as Promise<Sendtoaddress>;
 }

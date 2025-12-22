@@ -12,6 +12,11 @@ export function WalletHome() {
   } = useTransactions({ pageSize: 5 });
   const { walletInfo, isLoading: infoLoading } = useWalletInfo();
 
+  function date(blocktime: number): string {
+    const res = new Date(blocktime * 1000).toLocaleString();
+    return res.valueOf() === 'Invalid Date' ? 'mining ...' : res;
+  }
+  
   function txsJSX(): React.JSX.Element {
     if (txLoading && transactions.length === 0) {
       return <div>Loading transactions...</div>;
@@ -21,10 +26,10 @@ export function WalletHome() {
     }
 
     const sorted = [...transactions].sort((a, b) => {
-      const ta = a.confirmations as number;
-      const tb = b.confirmations as number;
+      const ta = a.confirmations;
+      const tb = b.confirmations;
       // Newest first within each batch
-      return  ta - tb;
+      return ta - tb;
     });
 
     const list_items = sorted.map((tx, idx) => {
@@ -45,7 +50,7 @@ export function WalletHome() {
               </span>
             </div>
             <div className="mt-1 text-xs text-gray-200">
-              {new Date(tx.blocktime * 1000).toLocaleString()}
+              {date(tx.blocktime)}
             </div>
           </div>
           <div className="flex min-w-0 flex-2 flex-col">

@@ -9,9 +9,9 @@ import {
   Listwalletdir,
   Listwallets,
   Newaddress,
+  Sendtoaddress,
 } from '@/bitcoin-core/model/wallet';
 import {
-  // getbalance,
   listwalletdir,
   listwallets,
   loadwallet,
@@ -19,7 +19,9 @@ import {
   getwalletinfo,
   listtransactions,
   getnewaddress,
+  sendtoaddress,
 } from '@/bitcoin-core/api/api';
+import { ParamsDictionary } from '@/bitcoin-core/params';
 
 export type WalletState = {
   currentWallet: string | null;
@@ -38,9 +40,7 @@ export function useWalletsDir() {
   const { data, error, isLoading, mutate } = useSWR(
     'listwalletdir',
     () => listwalletdir(),
-    {
-      revalidateOnFocus: false,
-    }
+    { revalidateOnFocus: false }
   );
   return {
     listwalletdir: (data as Listwalletdir) ?? {
@@ -58,9 +58,7 @@ export function useWalletsList() {
   const { data, error, isLoading, mutate } = useSWR(
     'listwallets',
     () => listwallets(),
-    {
-      revalidateOnFocus: false,
-    }
+    { revalidateOnFocus: false }
   );
   return {
     listwallets: (data as Listwallets) ?? { result: [], error: null, id: '' },
@@ -77,9 +75,7 @@ export function useWalletInfo() {
   const { data, error, isLoading, mutate } = useSWR(
     shouldFetch ? ['getwalletinfo', currentWallet] : null,
     () => getwalletinfo(currentWallet as string),
-    {
-      revalidateOnFocus: false,
-    }
+    { revalidateOnFocus: false }
   );
   return {
     walletInfo: (data as Getwalletinfo) ?? null,
@@ -123,24 +119,51 @@ export function useUnloadWallet() {
 // SWR mutation hook to generate a new receiving address
 export function useNewAddress() {
   const currentWallet = useWalletStore((s) => s.currentWallet);
-
   const { trigger, data, error, isMutating } = useSWRMutation(
     'getnewaddress',
     async (_key, { arg }: { arg: { wallet: string; addressType: string } }) => {
       return getnewaddress(arg.wallet, arg.addressType);
     }
   );
-
   return {
-    address: (data as Newaddress) ?? null,
+    response: (data as Newaddress) ?? null,
     error,
     isLoading: isMutating,
     generate: (addressType: string) => {
-      if (currentWallet === undefined || currentWallet === null) throw new Error('No wallet selected');
+      if (currentWallet === undefined || currentWallet === null)
+        throw new Error('No wallet selected');
       return trigger({ wallet: currentWallet, addressType });
     },
   };
 }
+
+// SWR mutation hook to send to address (submit transaction)
+export function useSendtoaddress() {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const { trigger, data, error, isMutating, reset } = useSWRMutation(
+    'sendtoaddress',
+    async (
+      _key,
+      { arg }: { arg: { wallet: string; payload: ParamsDictionary } }
+    ) => {
+      return sendtoaddress(arg.payload, arg.wallet);
+    }
+  );
+  return {
+    response: (data as Sendtoaddress) ?? null,
+    error,
+    isLoading: isMutating,
+    send: (payload: ParamsDictionary) => {
+      if (currentWallet === undefined || currentWallet === null)
+        throw new Error('No wallet selected');
+      return trigger({ wallet: currentWallet, payload });
+    },
+    clear: () => {
+      reset();
+    },
+  };
+}
+
 // SWR Infinite hook for transactions with pagination
 export function useTransactions(options?: {
   label?: string;

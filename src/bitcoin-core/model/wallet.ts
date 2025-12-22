@@ -121,7 +121,29 @@ export const NewaddressSchema = z.object({
 export type Newaddress = z.infer<typeof NewaddressSchema>;
 
 export const FormNewAddressSchema = z.object({
-  addressType: z.string().refine((v) => ADDRESS_TYPES.some((t) => t.value === v), {
-    message: 'Invalid address type',
-  }),
+  addressType: z
+    .string()
+    .refine((v) => ADDRESS_TYPES.some((t) => t.value === v), {
+      message: 'Invalid address type',
+    }),
 });
+
+export const FormSendSchema = z.object({
+  address: z.string().min(1, { message: 'Address is required' }),
+  amount: z
+    .number({ message: 'Amount must be a number' })
+    .positive({ message: 'Amount must be greater than zero' }),
+  fee_rate: z
+    .number({ message: 'Fee Rate must be a number' })
+    .positive({ message: 'Fee Rate must be greater than zero' }),
+  replaceable: z.boolean(),
+  subtractFeeFromAmount: z.boolean(),
+});
+export type FormSendType = z.infer<typeof FormSendSchema>;
+
+export const SendtoaddressSchema = z.object({
+  result: z.string().optional(), // txid
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type Sendtoaddress = z.infer<typeof SendtoaddressSchema>;

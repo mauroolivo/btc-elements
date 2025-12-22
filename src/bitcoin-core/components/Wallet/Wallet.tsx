@@ -3,6 +3,7 @@ import { WalletHome } from './WalletHome';
 import { useState } from 'react';
 import WalletReceive from './WalletReceive';
 import { useWalletStore } from '@/bitcoin-core/useWalletStore';
+import WalletSend from './WalletSend';
 export default function Wallet() {
   enum Tab {
     TRANSACTIONS,
@@ -56,7 +57,7 @@ export default function Wallet() {
       ) : currentTab === Tab.RECEIVE ? (
         <WalletReceive />
       ) : currentTab === Tab.SEND ? (
-        <div>Send Tab Content</div>
+        <WalletSend showTxs={() => setCurrentTab(Tab.TRANSACTIONS)} />
       ) : (
         <div>ERROR</div>
       )}
