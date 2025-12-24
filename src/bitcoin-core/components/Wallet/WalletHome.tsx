@@ -1,8 +1,15 @@
 'use client';
+import { useState } from 'react';
 import { useWalletInfo, useTransactions } from '@/bitcoin-core/useWalletStore';
-import { Getwalletinfo } from '@/bitcoin-core/model/wallet';
+import {
+  Getwalletinfo,
+  ListtransactionsResult,
+} from '@/bitcoin-core/model/wallet';
 
 export function WalletHome() {
+  const [selectedTx, setSelectedTx] = useState<ListtransactionsResult | null>(
+    null
+  );
   const {
     transactions,
     isLoading: txLoading,
@@ -16,7 +23,7 @@ export function WalletHome() {
     const res = new Date(blocktime * 1000).toLocaleString();
     return res.valueOf() === 'Invalid Date' ? 'mining ...' : res;
   }
-  
+
   function txsJSX(): React.JSX.Element {
     if (txLoading && transactions.length === 0) {
       return <div>Loading transactions...</div>;
@@ -65,9 +72,7 @@ export function WalletHome() {
               type="button"
               aria-label="Open full transaction"
               className="inline-flex items-center rounded bg-gray-800 p-2 text-white hover:bg-gray-700"
-              onClick={() => {
-                console.log('Open full transaction', tx.txid);
-              }}
+              onClick={() => setSelectedTx(tx)}
             >
               {/* Eye icon */}
               <svg
@@ -84,30 +89,6 @@ export function WalletHome() {
                   d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"
                 />
                 <circle cx="12" cy="12" r="3" strokeWidth="2" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              aria-label="Open minimal transaction"
-              className="inline-flex items-center rounded bg-gray-800 p-2 text-white hover:bg-gray-700"
-              onClick={() => {
-                console.log('Open minimal transaction', tx.txid);
-              }}
-            >
-              {/* List icon */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                className="h-4 w-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h12M4 18h8"
-                />
               </svg>
             </button>
           </div>
@@ -140,22 +121,140 @@ export function WalletHome() {
           {infoLoading || walletInfo === null ? (
             <div>Loading wallet info...</div>
           ) : (
-            <>
-              <div className="text-xl font-bold">
-                Balance: {walletInfo.result.balance}, total transactions:{' '}
-                {walletInfo.result.txcount}
-              </div>
-              {txsJSX()}
-            </>
+            <>{txsJSX()}</>
           )}
         </>
       )}
+      {selectedTx && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="w-full max-w-xl rounded-lg border border-gray-700 bg-gray-900 p-6 text-white shadow-xl">
+            <div className="mb-3 text-base font-semibold">
+              Transaction details
+            </div>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-start justify-between">
+                <span className="text-gray-300">TxID</span>
+                <span className="max-w-[70%] text-right font-mono break-all whitespace-normal">
+                  {selectedTx.txid}
+                </span>
+              </div>
+              <div className="flex items-start justify-between">
+                <span className="text-gray-300">WTxID</span>
+                <span className="max-w-[70%] text-right font-mono break-all whitespace-normal">
+                  {selectedTx.wtxid}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Address</span>
+                <span className="max-w-[70%] text-right font-mono break-all whitespace-normal">
+                  {selectedTx.address}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Category</span>
+                <span className="text-right">{selectedTx.category}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Amount</span>
+                <span className="text-right">{selectedTx.amount}</span>
+              </div>
+              {typeof selectedTx.fee !== 'undefined' && (
+                <div className="flex justify-between">
+                  <span className="text-gray-300">Fee</span>
+                  <span className="text-right">{selectedTx.fee}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-gray-300">Confirmations</span>
+                <span className="text-right">{selectedTx.confirmations}</span>
+              </div>
+              <div className="flex items-start justify-between">
+                <span className="text-gray-300">Block Hash</span>
+                <span className="max-w-[70%] text-right font-mono break-all whitespace-normal">
+                  {selectedTx.blockhash}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Block Height</span>
+                <span className="text-right">{selectedTx.blockheight}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Block Index</span>
+                <span className="text-right">{selectedTx.blockindex}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Block Time</span>
+                <span className="text-right">{date(selectedTx.blocktime)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Time</span>
+                <span className="text-right">{date(selectedTx.time)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Time Received</span>
+                <span className="text-right">
+                  {date(selectedTx.timereceived)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">BIP125 Replaceable</span>
+                <span className="text-right">
+                  {selectedTx['bip125-replaceable']}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-300">Abandoned</span>
+                <span className="text-right">
+                  {selectedTx.abandoned ? 'Yes' : 'No'}
+                </span>
+              </div>
+              {selectedTx.label && (
+                <div className="flex justify-between">
+                  <span className="text-gray-300">Label</span>
+                  <span className="text-right">{selectedTx.label}</span>
+                </div>
+              )}
+              {selectedTx.walletconflicts.length > 0 && (
+                <div className="flex items-start justify-between">
+                  <span className="text-gray-300">Wallet Conflicts</span>
+                  <span className="max-w-[70%] text-right font-mono break-all whitespace-normal">
+                    {selectedTx.walletconflicts.join(', ')}
+                  </span>
+                </div>
+              )}
+              {selectedTx.mempoolconflicts.length > 0 && (
+                <div className="flex items-start justify-between">
+                  <span className="text-gray-300">Mempool Conflicts</span>
+                  <span className="max-w-[70%] text-right font-mono break-all whitespace-normal">
+                    {selectedTx.mempoolconflicts.join(', ')}
+                  </span>
+                </div>
+              )}
+              {selectedTx.parent_descs &&
+                selectedTx.parent_descs.length > 0 && (
+                  <div className="flex items-start justify-between">
+                    <span className="text-gray-300">Parent Descriptors</span>
+                    <span className="max-w-[70%] text-right font-mono break-all whitespace-normal">
+                      {selectedTx.parent_descs.join(', ')}
+                    </span>
+                  </div>
+                )}
+            </div>
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setSelectedTx(null)}
+                className="inline-flex items-center rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {walletInfo === null && (
         <div className="flex min-h-screen items-center justify-center bg-gray-950/50">
-          <div
-            id="pippo"
-            className="mx-4 w-full max-w-md rounded-lg border border-gray-700 bg-gray-900 p-6 text-center shadow-lg"
-          >
+          <div className="mx-4 w-full max-w-md rounded-lg border border-gray-700 bg-gray-900 p-6 text-center shadow-lg">
             <div className="mx-auto mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-800 text-gray-300">
               {/* Wallet icon */}
               <svg
