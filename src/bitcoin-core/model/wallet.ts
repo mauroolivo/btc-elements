@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ADDRESS_TYPES } from '../constants';
+// import { ADDRESS_TYPES } from '../constants';
 
 export const RpcErrorSchema = z.object({
   code: z.number(),
@@ -120,30 +120,63 @@ export const NewaddressSchema = z.object({
 });
 export type Newaddress = z.infer<typeof NewaddressSchema>;
 
-export const FormNewAddressSchema = z.object({
-  addressType: z
-    .string()
-    .refine((v) => ADDRESS_TYPES.some((t) => t.value === v), {
-      message: 'Invalid address type',
-    }),
-});
-
-export const FormSendSchema = z.object({
-  address: z.string().min(1, { message: 'Address is required' }),
-  amount: z
-    .number({ message: 'Amount must be a number' })
-    .positive({ message: 'Amount must be greater than zero' }),
-  fee_rate: z
-    .number({ message: 'Fee Rate must be a number' })
-    .positive({ message: 'Fee Rate must be greater than zero' }),
-  replaceable: z.boolean(),
-  subtractFeeFromAmount: z.boolean(),
-});
-export type FormSendType = z.infer<typeof FormSendSchema>;
-
 export const SendtoaddressSchema = z.object({
   result: z.string().optional(), // txid
   error: RpcErrorSchema.optional(),
   id: z.string(),
 });
 export type Sendtoaddress = z.infer<typeof SendtoaddressSchema>;
+
+export const UtxoSchema = z.object({
+  txid: z.string(),
+  vout: z.number(),
+  address: z.string(),
+  amount: z.number(),
+  confirmations: z.number(),
+  spendable: z.boolean(),
+  solvable: z.boolean(),
+  desc: z.string(),
+  safe: z.boolean(),
+  label: z.string().optional(),
+});
+export type Utxo = z.infer<typeof UtxoSchema>;
+export const ListunspentSchema = z.object({
+  result: z.array(UtxoSchema).optional(),
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type Listunspent = z.infer<typeof ListunspentSchema>;
+
+// Get Raw Change Address
+export const GetrawchangeaddressSchema = z.object({
+  result: z.string().optional(),
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type Getrawchangeaddress = z.infer<typeof GetrawchangeaddressSchema>;
+
+export const CreaterawtransactionSchema = z.object({
+  result: z.string().optional(),
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type Createrawtransaction = z.infer<typeof CreaterawtransactionSchema>;
+
+export const SignrawtransactionwithwalletSchema = z.object({
+  result: z.object({
+    hex: z.string(),
+    complete: z.boolean(),
+  }).optional(),
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type Signrawtransactionwithwallet = z.infer<
+  typeof SignrawtransactionwithwalletSchema
+>;
+
+export const BroadcastResponseSchena = z.object({
+  result: z.string().optional(),
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type BroadcastResponse = z.infer<typeof BroadcastResponseSchena>;

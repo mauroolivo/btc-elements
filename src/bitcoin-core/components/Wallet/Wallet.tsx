@@ -5,11 +5,14 @@ import WalletReceive from './WalletReceive';
 import { useWalletInfo, useWalletStore } from '@/bitcoin-core/useWalletStore';
 import WalletSend from './WalletSend';
 import { Getwalletinfo } from '@/bitcoin-core/model/wallet';
+import WalletSendAdvanced from './(WalletSendAdvanced)/WalletSendAdvanced';
+
 export default function Wallet() {
   enum Tab {
     TRANSACTIONS,
     RECEIVE,
     SEND,
+    SEND_ADVANCED,
   }
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.TRANSACTIONS);
   const { currentWallet } = useWalletStore();
@@ -66,6 +69,20 @@ export default function Wallet() {
             }`}
           >
             SEND
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={currentTab === Tab.SEND_ADVANCED}
+            tabIndex={currentTab === Tab.SEND_ADVANCED ? 0 : -1}
+            onClick={() => setCurrentTab(Tab.SEND_ADVANCED)}
+            className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+              currentTab === Tab.SEND_ADVANCED
+                ? 'bg-orange-400 text-white shadow'
+                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+            }`}
+          >
+            SEND ADVANCED
           </button>
         </div>
       </div>
@@ -128,6 +145,8 @@ export default function Wallet() {
         <WalletReceive />
       ) : currentTab === Tab.SEND ? (
         <WalletSend showTxs={() => setCurrentTab(Tab.TRANSACTIONS)} />
+      ) : currentTab === Tab.SEND_ADVANCED ? (
+        <WalletSendAdvanced showTxs={() => setCurrentTab(Tab.TRANSACTIONS)} />
       ) : (
         <div>ERROR</div>
       )}

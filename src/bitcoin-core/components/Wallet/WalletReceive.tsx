@@ -5,7 +5,7 @@ import QRCode from 'react-qr-code';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { FormNewAddressSchema } from '@/bitcoin-core/model/wallet';
+import { FormNewAddressSchema } from '@/bitcoin-core/model/forms';
 
 export default function WalletReceive() {
   const currentWallet = useWalletStore((s) => s.currentWallet);

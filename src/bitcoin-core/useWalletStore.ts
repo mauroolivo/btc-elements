@@ -10,6 +10,8 @@ import {
   Listwallets,
   Newaddress,
   Sendtoaddress,
+  Listunspent,
+  Getrawchangeaddress,
 } from '@/bitcoin-core/model/wallet';
 import {
   listwalletdir,
@@ -20,6 +22,11 @@ import {
   listtransactions,
   getnewaddress,
   sendtoaddress,
+  listUnspent,
+  getrawchangeaddress,
+  createrawtransaction,
+  signrawtransactionwithwallet,
+  sendrawtransaction,
 } from '@/bitcoin-core/api/api';
 import { ParamsDictionary } from '@/bitcoin-core/params';
 
@@ -223,5 +230,77 @@ export function useTransactions(options?: {
     loadMore: () => setSize(size + 1),
     refresh: () => mutate(),
     reset: () => setSize(0),
+  };
+}
+
+// SWR hook to fetch unspent outputs (UTXOs)
+export function useUnspent() {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const shouldFetch = currentWallet !== null;
+  const { data, error, isLoading, mutate } = useSWR(
+    shouldFetch ? ['listunspent', currentWallet] : null,
+    () => listUnspent(currentWallet as string),
+    { revalidateOnFocus: false }
+  );
+  return {
+    listunspent: (data as Listunspent) ?? { result: [], error: null, id: '' },
+    error,
+    isLoading,
+    refresh: () => mutate(),
+  };
+}
+
+// SWR hook to fetch change address (raw change address)
+export function useChangeAddress() {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const shouldFetch = currentWallet !== null;
+  const { data, error, isLoading, mutate } = useSWR(
+    shouldFetch ? ['getrawchangeaddress', currentWallet] : null,
+    () => getrawchangeaddress(currentWallet as string),
+    { revalidateOnFocus: false }
+  );
+  const response = (data as Getrawchangeaddress) ?? null;
+  return {
+    changeAddress: response?.result ?? '',
+    error,
+    isLoading,
+    refresh: () => mutate(),
+  };
+}
+
+
+export function useSendAdvanced() {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const { trigger, data, error, isMutating, reset } = useSWRMutation(
+    'send-advanced',
+    async (
+      _key,
+      { arg }: { arg: { wallet: string; payload: ParamsDictionary } }
+    ) => {
+      const { wallet, payload } = arg;
+      const res1 = await createrawtransaction(payload, wallet);
+      console.log('createrawtransaction result:', res1);
+      const signPayload: ParamsDictionary = { hexstring: res1.result ?? '' };
+      const res2 = await signrawtransactionwithwallet(signPayload, wallet);
+      console.log('signrawtransactionwithwallet result:', res2);
+
+      const res3 = await sendrawtransaction({ hexstring: res2.result?.hex ?? '' }, wallet);
+      console.log('sendrawtransaction result:', res3);
+      const txid = res3.result ?? '';
+      return txid;
+    }
+  );
+  return {
+    result: (data as string) ?? null,
+    error,
+    isLoading: isMutating,
+    run: (payload: ParamsDictionary) => {
+      if (currentWallet === undefined || currentWallet === null)
+        throw new Error('No wallet selected');
+      return trigger({ wallet: currentWallet, payload });
+    },
+    clear: () => {
+      reset();
+    },
   };
 }

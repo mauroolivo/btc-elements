@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { FormSendSchema, Sendtoaddress } from '@/bitcoin-core/model/wallet';
+import { Sendtoaddress } from '@/bitcoin-core/model/wallet';
 import {
   useSendtoaddress,
   useWalletStore,
 } from '@/bitcoin-core/useWalletStore';
+import { FormSendSchema } from '@/bitcoin-core/model/forms';
 
 type WalletSendProps = {
   showTxs?: () => void;
@@ -185,11 +186,7 @@ export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
                 </div>
                 <button
                   onClick={() => {
-                    //setSuccessTxid(null);
-                    //clear();
-                    if (showTxs) {
-                      showTxs();
-                    }
+                    showTxs?.();
                   }}
                   className="ml-4 inline-flex items-center rounded bg-green-800 px-3 py-1 text-xs text-white hover:bg-green-700"
                 >

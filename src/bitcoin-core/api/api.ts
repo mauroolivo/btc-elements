@@ -12,6 +12,11 @@ import {
   Unloadwallet,
   Newaddress,
   Sendtoaddress,
+  Listunspent,
+  Getrawchangeaddress,
+  Createrawtransaction,
+  Signrawtransactionwithwallet,
+  BroadcastResponse,
 } from '@/bitcoin-core/model/wallet';
 import { ParamsDictionary } from '@/bitcoin-core/params';
 
@@ -148,4 +153,46 @@ export async function sendtoaddress(
     payload,
     wallet
   )) as Promise<Sendtoaddress>;
+}
+
+export async function listUnspent(wallet: string): Promise<Listunspent> {
+  return (await fetcher('listunspent', {}, wallet)) as Promise<Listunspent>;
+}
+
+export async function getrawchangeaddress(
+  wallet: string
+): Promise<Getrawchangeaddress> {
+  return (await fetcher(
+    'getrawchangeaddress',
+    {},
+    wallet
+  )) as Promise<Getrawchangeaddress>;
+}
+
+export async function createrawtransaction(
+  payload: ParamsDictionary,
+  wallet: string
+): Promise<Createrawtransaction> {
+  return await fetcher('createrawtransaction', payload, wallet);
+}
+
+export async function signrawtransactionwithwallet(
+  payload: ParamsDictionary,
+  wallet: string
+): Promise<Signrawtransactionwithwallet> {
+  return (await fetcher(
+    'signrawtransactionwithwallet',
+    payload,
+    wallet
+  )) as Promise<Signrawtransactionwithwallet>;
+}
+export async function sendrawtransaction(
+  payload: ParamsDictionary,
+  wallet: string
+): Promise<BroadcastResponse> {
+  return (await fetcher(
+    'sendrawtransaction',
+    payload,
+    wallet
+  )) as Promise<BroadcastResponse>;
 }
