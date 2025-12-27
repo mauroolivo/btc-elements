@@ -268,7 +268,6 @@ export function useChangeAddress() {
   };
 }
 
-
 export function useSendAdvanced() {
   const currentWallet = useWalletStore((s) => s.currentWallet);
   const { trigger, data, error, isMutating, reset } = useSWRMutation(
@@ -280,12 +279,29 @@ export function useSendAdvanced() {
       const { wallet, payload } = arg;
       const res1 = await createrawtransaction(payload, wallet);
       console.log('createrawtransaction result:', res1);
+      if (res1 && res1.error) {
+        const msg = res1.error.message ?? JSON.stringify(res1.error);
+        throw new Error(`createrawtransaction failed: ${msg}`);
+      }
       const signPayload: ParamsDictionary = { hexstring: res1.result ?? '' };
       const res2 = await signrawtransactionwithwallet(signPayload, wallet);
       console.log('signrawtransactionwithwallet result:', res2);
-
-      const res3 = await sendrawtransaction({ hexstring: res2.result?.hex ?? '' }, wallet);
+      if (res2 && res2.error) {
+        const msg = res2.error.message ?? JSON.stringify(res2.error);
+        throw new Error(`signrawtransactionwithwallet failed: ${msg}`);
+      }
+      if (!res2?.result?.hex) {
+        throw new Error('signrawtransactionwithwallet returned no hex');
+      }
+      const res3 = await sendrawtransaction(
+        { hexstring: res2.result?.hex ?? '' },
+        wallet
+      );
       console.log('sendrawtransaction result:', res3);
+      if (res3 && res3.error) {
+        const msg = res3.error.message ?? JSON.stringify(res3.error);
+        throw new Error(`sendrawtransaction failed: ${msg}`);
+      }
       const txid = res3.result ?? '';
       return txid;
     }
@@ -293,6 +309,17 @@ export function useSendAdvanced() {
   return {
     result: (data as string) ?? null,
     error,
+    errorMessage: error
+      ? error instanceof Error
+        ? error.message
+        : (() => {
+            try {
+              return JSON.stringify(error);
+            } catch {
+              return String(error);
+            }
+          })()
+      : null,
     isLoading: isMutating,
     run: (payload: ParamsDictionary) => {
       if (currentWallet === undefined || currentWallet === null)

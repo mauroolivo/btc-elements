@@ -64,6 +64,7 @@ export default function WalletSendAdvanced({
   const {
     run,
     error: sendError,
+    errorMessage: sendErrorMessage,
     isLoading: sendLoading,
     clear,
   } = useSendAdvanced();
@@ -110,20 +111,23 @@ export default function WalletSendAdvanced({
   async function confirmSend() {
     if (!pending) return;
     try {
-      console.log("Preparing to send transaction...");
+      console.log('Preparing to send transaction...');
       const data = payload();
-      console.log("Payload prepared:", data);
-      console.log("Current wallet:", currentWallet);
+      console.log('Payload prepared:', data);
+      console.log('Current wallet:', currentWallet);
       if (!data || currentWallet === null || currentWallet === undefined) {
         throw new Error('Missing payload or wallet');
       }
-      console.log("Sending payload:", data);
+      console.log('Sending payload:', data);
       const res = await run(data);
       setOpen(false);
       setPending(null);
       setSuccessTxid(res);
-      clear();
+      // clear();
     } catch (error) {
+      // Dismiss confirm panel on error
+      setOpen(false);
+      setPending(null);
       setError('root', {
         message: `${(error as Error).message}. Please try again.`,
       });
@@ -134,10 +138,10 @@ export default function WalletSendAdvanced({
     <div className="mx-auto w-full max-w-2xl rounded-lg border border-gray-700 bg-gray-900 p-6 text-white shadow-lg">
       <div className="mb-4 flex items-center justify-between">
         <div className="text-base font-semibold">Build Transaction</div>
-        <div className="text-xs text-gray-400">Step {step} of 3</div>
+        <div className="text-xs text-gray-400">Step {step} of 2</div>
       </div>
       {!successTxid && (
-        <form noValidate onSubmit={onSubmit}>
+        <form noValidate onSubmit={onSubmit} onChange={() => clear()}>
           {step === 1 && (
             <div>
               <p className="mb-2 text-sm text-gray-300">
@@ -353,9 +357,13 @@ export default function WalletSendAdvanced({
         </div>
       )}
 
-      {sendError && (
+      {(sendError || sendErrorMessage) && (
         <div className="mt-4 rounded border border-red-700 bg-red-900/30 p-3 text-sm text-red-200">
-          Failed to send transaction. {String(sendError.message)}
+          Failed to send transaction.{' '}
+          {sendErrorMessage ??
+            (sendError instanceof Error
+              ? sendError.message
+              : String(sendError))}
         </div>
       )}
       {successTxid && (
