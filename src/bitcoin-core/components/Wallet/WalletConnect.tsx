@@ -118,7 +118,7 @@ export function WalletConnect() {
       <div className="relative" ref={dropdownRef}>
         <div className="inline-block text-left">
           {open && (
-            <div className="absolute z-20 mt-2 w-80 rounded-md border border-gray-700 bg-gray-900 text-white shadow-lg">
+            <div className="absolute right-0 z-20 mt-2 w-80 rounded-md border border-gray-700 bg-gray-900 text-white shadow-lg">
               <div className="flex items-center justify-between border-b px-3 py-2">
                 <span className="text-sm font-semibold">Wallets</span>
                 <button
