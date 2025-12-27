@@ -1,4 +1,5 @@
-import { z } from "zod";
+import { z } from 'zod';
+import { RpcErrorSchema } from './wallet';
 
 export const GetrawtransactionSchema = z.object({
   result: z.object({
@@ -40,7 +41,7 @@ export const GetrawtransactionSchema = z.object({
     time: z.number(),
     blocktime: z.number(),
   }),
-  error: z.any(),
+  error: RpcErrorSchema.optional(),
   id: z.string(),
 });
 

@@ -3,10 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Sendtoaddress } from '@/bitcoin-core/model/wallet';
-import {
-  useSendtoaddress,
-  useWalletStore,
-} from '@/bitcoin-core/useWalletStore';
+import { useSendtoaddress } from '@/bitcoin-core/components/Wallet/hooks';
+import { useWalletStore } from '@/bitcoin-core/useWalletStore';
 import { FormSendSchema } from '@/bitcoin-core/model/forms';
 
 type WalletSendProps = {

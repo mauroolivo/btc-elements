@@ -1,12 +1,12 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import {
-  useWalletStore,
   useWalletsDir,
   useWalletsList,
   useLoadWallet,
   useUnloadWallet,
-} from '../../useWalletStore';
+} from './hooks';
+import { useWalletStore } from '@/bitcoin-core/useWalletStore';
 
 export function WalletConnect() {
   const [open, setOpen] = useState(false);

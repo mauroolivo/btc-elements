@@ -7,6 +7,7 @@ export function Header() {
   const pathname = usePathname();
   const isWallet = pathname?.startsWith('/wallet');
   const isHome = pathname === '/' || pathname === undefined;
+  const isExplorer = pathname?.startsWith('/explorer');
 
   function navLinkClass(active: boolean) {
     const base =
@@ -32,6 +33,13 @@ export function Header() {
                 aria-current={isWallet ? 'page' : undefined}
               >
                 Wallet
+              </Link>
+              <Link
+                href="/explorer"
+                className={navLinkClass(!!isExplorer)}
+                aria-current={isExplorer ? 'page' : undefined}
+              >
+                Explorer
               </Link>
             </div>
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNewAddress, useWalletStore } from '@/bitcoin-core/useWalletStore';
+import { useNewAddress } from '@/bitcoin-core/components/Wallet/hooks';
+import { useWalletStore } from '@/bitcoin-core/useWalletStore';
 import { ADDRESS_TYPES } from '@/bitcoin-core/constants';
 import QRCode from 'react-qr-code';
 import { zodResolver } from '@hookform/resolvers/zod';

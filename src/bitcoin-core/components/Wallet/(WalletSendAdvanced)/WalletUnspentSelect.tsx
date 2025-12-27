@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { useUnspent } from '@/bitcoin-core/useWalletStore';
+import { useUnspent } from '@/bitcoin-core/components/Wallet/hooks';
 import { Utxo } from '@/bitcoin-core/model/wallet';
 
 export type WalletUnspentSelectProps = {

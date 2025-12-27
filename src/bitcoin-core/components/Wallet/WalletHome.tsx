@@ -1,6 +1,9 @@
 'use client';
 import { useState } from 'react';
-import { useWalletInfo, useTransactions } from '@/bitcoin-core/useWalletStore';
+import {
+  useWalletInfo,
+  useTransactions,
+} from '@/bitcoin-core/components/Wallet/hooks';
 import {
   Getwalletinfo,
   ListtransactionsResult,

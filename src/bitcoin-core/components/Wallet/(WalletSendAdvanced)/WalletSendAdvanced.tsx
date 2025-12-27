@@ -7,10 +7,10 @@ import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { FormSendAdvancedSchema } from '@/bitcoin-core/model/forms';
 import {
-  useWalletStore,
   useChangeAddress,
   useSendAdvanced,
-} from '@/bitcoin-core/useWalletStore';
+} from '@/bitcoin-core/components/Wallet/hooks';
+import { useWalletStore } from '@/bitcoin-core/useWalletStore';
 import { ParamsDictionary } from '@/bitcoin-core/params';
 
 export default function WalletSendAdvanced({

@@ -2,7 +2,8 @@
 import { WalletHome } from './WalletHome';
 import { useState } from 'react';
 import WalletReceive from './WalletReceive';
-import { useWalletInfo, useWalletStore } from '@/bitcoin-core/useWalletStore';
+import { useWalletInfo } from '@/bitcoin-core/components/Wallet/hooks';
+import { useWalletStore } from '@/bitcoin-core/useWalletStore';
 import WalletSend from './WalletSend';
 import { Getwalletinfo } from '@/bitcoin-core/model/wallet';
 import WalletSendAdvanced from './(WalletSendAdvanced)/WalletSendAdvanced';
@@ -52,8 +53,7 @@ export default function Wallet() {
           </p>
         </div>
       </div>
-    )
-    
+    );
   }
   return (
     <div className="">
