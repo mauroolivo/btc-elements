@@ -1,7 +1,15 @@
 'use server';
 
-import { Getblockchaininfo } from '@/bitcoin-core/model/blockchain';
-import { Getrawtransaction } from '@/bitcoin-core/model/transaction';
+import {
+  Getblockchaininfo,
+  Getmempoolinfo,
+  Getmininginfo,
+  Getnetworkinfo,
+} from '@/bitcoin-core/model/blockchain';
+import {
+  Getrawtransaction,
+  Rawmempool,
+} from '@/bitcoin-core/model/transaction';
 import {
   Getbalance,
   Getwalletinfo,
@@ -17,6 +25,9 @@ import {
   Createrawtransaction,
   Signrawtransactionwithwallet,
   BroadcastResponse,
+  Listaddressgroupings,
+  Getaddressinfo,
+  Getdescriptorinfo,
 } from '@/bitcoin-core/model/wallet';
 import { ParamsDictionary } from '@/bitcoin-core/params';
 import { Getblock, Getblockhash } from '../model/block';
@@ -212,4 +223,50 @@ export async function getblockhash(height: number): Promise<Getblockhash> {
   return (await fetcher('getblockhash', {
     height: height,
   })) as Promise<Getblockhash>;
+}
+
+export async function getRawmempool(verbose: boolean): Promise<Rawmempool> {
+  return (await fetcher('getrawmempool', {
+    verbose: verbose,
+  })) as Promise<Rawmempool>;
+}
+
+export async function getmempoolinfo(): Promise<Getmempoolinfo> {
+  return (await fetcher('getmempoolinfo', {})) as Promise<Getmempoolinfo>;
+}
+
+export async function getmininginfo(): Promise<Getmininginfo> {
+  return (await fetcher('getmininginfo', {})) as Promise<Getmininginfo>;
+}
+
+export async function getnetworkinfo(): Promise<Getnetworkinfo> {
+  return (await fetcher('getnetworkinfo', {})) as Promise<Getnetworkinfo>;
+}
+
+export async function listaddressgroupings(
+  wallet: string
+): Promise<Listaddressgroupings> {
+  return (await fetcher(
+    'listaddressgroupings',
+    {},
+    wallet
+  )) as Promise<Listaddressgroupings>;
+}
+
+export async function getaddressinfo(
+  address: string,
+  wallet: string
+): Promise<Getaddressinfo> {
+  return (await fetcher(
+    'getaddressinfo',
+    { address: address },
+    wallet
+  )) as Promise<Getaddressinfo>;
+}
+
+export async function getdescriptorinfo(
+  descriptor: string,
+  wallet: string
+): Promise<Getdescriptorinfo> {
+  return await fetcher('getdescriptorinfo', { descriptor: descriptor }, wallet);
 }

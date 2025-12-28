@@ -163,10 +163,12 @@ export const CreaterawtransactionSchema = z.object({
 export type Createrawtransaction = z.infer<typeof CreaterawtransactionSchema>;
 
 export const SignrawtransactionwithwalletSchema = z.object({
-  result: z.object({
-    hex: z.string(),
-    complete: z.boolean(),
-  }).optional(),
+  result: z
+    .object({
+      hex: z.string(),
+      complete: z.boolean(),
+    })
+    .optional(),
   error: RpcErrorSchema.optional(),
   id: z.string(),
 });
@@ -180,3 +182,60 @@ export const BroadcastResponseSchena = z.object({
   id: z.string(),
 });
 export type BroadcastResponse = z.infer<typeof BroadcastResponseSchena>;
+
+export const ListaddressgroupingsSchema = z.object({
+  result: z.array(
+    z.array(z.array(z.union([z.string(), z.number(), z.string()])))
+  ),
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type Listaddressgroupings = z.infer<typeof ListaddressgroupingsSchema>;
+
+export const GetaddressinfoSchema = z.object({
+  result: z.object({
+    address: z.string(),
+    scriptPubKey: z.string(),
+    ismine: z.boolean(),
+    solvable: z.boolean(),
+    desc: z.string(),
+    parent_desc: z.string(),
+    iswatchonly: z.boolean(),
+    isscript: z.boolean(),
+    iswitness: z.boolean(),
+    script: z.string(),
+    hex: z.string(),
+    pubkey: z.string(),
+    embedded: z.object({
+      isscript: z.boolean(),
+      iswitness: z.boolean(),
+      witness_version: z.number(),
+      witness_program: z.string(),
+      pubkey: z.string(),
+      address: z.string(),
+      scriptPubKey: z.string(),
+    }),
+    ischange: z.boolean(),
+    timestamp: z.number(),
+    hdkeypath: z.string(),
+    hdseedid: z.string(),
+    hdmasterfingerprint: z.string(),
+    labels: z.array(z.any()),
+  }),
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type Getaddressinfo = z.infer<typeof GetaddressinfoSchema>;
+
+const GetdescriptorinfoSchema = z.object({
+  result: z.object({
+    descriptor: z.string(),
+    checksum: z.string(),
+    isrange: z.boolean(),
+    issolvable: z.boolean(),
+    hasprivatekeys: z.boolean(),
+  }),
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type Getdescriptorinfo = z.infer<typeof GetdescriptorinfoSchema>;

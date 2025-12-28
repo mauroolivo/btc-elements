@@ -1,6 +1,37 @@
 import { z } from 'zod';
 import { RpcErrorSchema } from './wallet';
 
+
+export const RawMempoolTxSchema = z.object({
+  vsize: z.number(),
+  weight: z.number(),
+  time: z.number(),
+  height: z.number(),
+  descendantcount: z.number(),
+  descendantsize: z.number(),
+  ancestorcount: z.number(),
+  ancestorsize: z.number(),
+  wtxid: z.string(),
+  fees: z.object({
+    base: z.number(),
+    modified: z.number(),
+    ancestor: z.number(),
+    descendant: z.number(),
+  }),
+  depends: z.array(z.any()),
+  spentby: z.array(z.any()),
+  'bip125-replaceable': z.boolean(),
+  unbroadcast: z.boolean(),
+});
+export type RawMempoolTx = z.infer<typeof RawMempoolTxSchema>;
+
+export const GetrawmempoolSchema = z.object({
+  result: z.record(z.string(), RawMempoolTxSchema),
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type Rawmempool = z.infer<typeof GetrawmempoolSchema>;
+
 export const GetrawtransactionSchema = z.object({
   result: z.object({
     txid: z.string(),

@@ -1,9 +1,5 @@
 import useSWR from 'swr';
-import {
-  getrawtransaction,
-  getblock,
-  getblockhash,
-} from '@/bitcoin-core/api/api';
+import { getrawtransaction, getblock, getblockhash } from '@/bitcoin-core/api/api';
 import { Getrawtransaction } from '@/bitcoin-core/model/transaction';
 import { Getblock, Getblockhash } from '@/bitcoin-core/model/block';
 

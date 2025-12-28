@@ -1,12 +1,14 @@
 'use client';
 import { WalletHome } from './WalletHome';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import WalletReceive from './WalletReceive';
 import { useWalletInfo } from '@/bitcoin-core/components/Wallet/hooks';
+import WalletDescriptor from './WalletDescriptor';
 import { useWalletStore } from '@/bitcoin-core/useWalletStore';
 import WalletSend from './WalletSend';
+import WaletAddress from './WalletAddress/WaletAddress';
 import { Getwalletinfo } from '@/bitcoin-core/model/wallet';
-import WalletSendAdvanced from './(WalletSendAdvanced)/WalletSendAdvanced';
+import WalletSendAdvanced from './WalletSendAdvanced/WalletSendAdvanced';
 
 export default function Wallet() {
   enum Tab {
@@ -14,10 +16,27 @@ export default function Wallet() {
     RECEIVE,
     SEND,
     SEND_ADVANCED,
+    ADDRESSES,
+    DESCRIPTORS,
   }
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.TRANSACTIONS);
+  const [isMoreOpen, setIsMoreOpen] = useState<boolean>(false);
+  const moreRef = useRef<HTMLDivElement | null>(null);
   const { currentWallet } = useWalletStore();
   const { walletInfo, isLoading: infoLoading } = useWalletInfo();
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (!isMoreOpen) return;
+      const el = moreRef.current;
+      if (el && !el.contains(e.target as Node)) {
+        setIsMoreOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMoreOpen]);
   if (currentWallet === null) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-950/50">
@@ -69,7 +88,7 @@ export default function Wallet() {
             aria-selected={currentTab === Tab.TRANSACTIONS}
             tabIndex={currentTab === Tab.TRANSACTIONS ? 0 : -1}
             onClick={() => setCurrentTab(Tab.TRANSACTIONS)}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+            className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               currentTab === Tab.TRANSACTIONS
                 ? 'bg-orange-400 text-white shadow'
                 : 'text-gray-300 hover:bg-gray-700 hover:text-white'
@@ -83,7 +102,7 @@ export default function Wallet() {
             aria-selected={currentTab === Tab.RECEIVE}
             tabIndex={currentTab === Tab.RECEIVE ? 0 : -1}
             onClick={() => setCurrentTab(Tab.RECEIVE)}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+            className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               currentTab === Tab.RECEIVE
                 ? 'bg-orange-400 text-white shadow'
                 : 'text-gray-300 hover:bg-gray-700 hover:text-white'
@@ -97,7 +116,7 @@ export default function Wallet() {
             aria-selected={currentTab === Tab.SEND}
             tabIndex={currentTab === Tab.SEND ? 0 : -1}
             onClick={() => setCurrentTab(Tab.SEND)}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+            className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               currentTab === Tab.SEND
                 ? 'bg-orange-400 text-white shadow'
                 : 'text-gray-300 hover:bg-gray-700 hover:text-white'
@@ -111,7 +130,7 @@ export default function Wallet() {
             aria-selected={currentTab === Tab.SEND_ADVANCED}
             tabIndex={currentTab === Tab.SEND_ADVANCED ? 0 : -1}
             onClick={() => setCurrentTab(Tab.SEND_ADVANCED)}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+            className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               currentTab === Tab.SEND_ADVANCED
                 ? 'bg-orange-400 text-white shadow'
                 : 'text-gray-300 hover:bg-gray-700 hover:text-white'
@@ -119,6 +138,57 @@ export default function Wallet() {
           >
             SEND ADVANCED
           </button>
+          <div className="relative" ref={moreRef}>
+            <button
+              type="button"
+              role="tab"
+              aria-haspopup="menu"
+              aria-expanded={isMoreOpen}
+              onClick={() => setIsMoreOpen((v) => !v)}
+              className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
+                [Tab.ADDRESSES, Tab.DESCRIPTORS].includes(currentTab)
+                  ? 'bg-orange-400 text-white shadow'
+                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+              }`}
+            >
+              <span className="inline-flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-4 w-4"
+                  aria-hidden="true"
+                >
+                  <path d="M10 3a2 2 0 110 4 2 2 0 010-4zM10 9a2 2 0 110 4 2 2 0 010-4zM10 15a2 2 0 110 4 2 2 0 010-4z" />
+                </svg>
+                <span className="sr-only">More options</span>
+              </span>
+            </button>
+            {isMoreOpen && (
+              <div className="absolute right-0 z-20 mt-2 w-44 rounded-lg border border-gray-700 bg-gray-800 shadow-lg">
+                <button
+                  type="button"
+                  className="block w-full px-3 py-2 text-left text-sm text-gray-200 hover:bg-gray-700"
+                  onClick={() => {
+                    setCurrentTab(Tab.ADDRESSES);
+                    setIsMoreOpen(false);
+                  }}
+                >
+                  ADDRESSES
+                </button>
+                <button
+                  type="button"
+                  className="block w-full px-3 py-2 text-left text-sm text-gray-200 hover:bg-gray-700"
+                  onClick={() => {
+                    setCurrentTab(Tab.DESCRIPTORS);
+                    setIsMoreOpen(false);
+                  }}
+                >
+                  DESCRIPTORS
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       {(walletInfo as Getwalletinfo) && (
@@ -182,6 +252,10 @@ export default function Wallet() {
         <WalletSend showTxs={() => setCurrentTab(Tab.TRANSACTIONS)} />
       ) : currentTab === Tab.SEND_ADVANCED ? (
         <WalletSendAdvanced showTxs={() => setCurrentTab(Tab.TRANSACTIONS)} />
+      ) : currentTab === Tab.ADDRESSES ? (
+        <WaletAddress />
+      ) : currentTab === Tab.DESCRIPTORS ? (
+        <WalletDescriptor />
       ) : (
         <div>ERROR</div>
       )}

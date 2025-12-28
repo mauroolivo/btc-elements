@@ -15,6 +15,9 @@ import {
   Createrawtransaction,
   Signrawtransactionwithwallet,
   BroadcastResponse,
+  Listaddressgroupings,
+  Getaddressinfo,
+  Getdescriptorinfo,
 } from '@/bitcoin-core/model/wallet';
 import {
   listwalletdir,
@@ -30,6 +33,9 @@ import {
   createrawtransaction,
   signrawtransactionwithwallet,
   sendrawtransaction,
+  listaddressgroupings as rpcListAddressGroupings,
+  getaddressinfo as rpcGetAddressInfo,
+  getdescriptorinfo as rpcGetDescriptorInfo,
 } from '@/bitcoin-core/api/api';
 import { ParamsDictionary } from '@/bitcoin-core/params';
 
@@ -235,6 +241,58 @@ export function useUnspent() {
   );
   return {
     listunspent: (data as Listunspent) ?? { result: [], error: null, id: '' },
+    error,
+    isLoading,
+    refresh: () => mutate(),
+  };
+}
+
+// SWR hook to fetch listaddressgroupings for the current wallet
+export function useAddressGroupings() {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const shouldFetch = currentWallet !== null;
+  const { data, error, isLoading, mutate } = useSWR(
+    shouldFetch ? ['listaddressgroupings', currentWallet] : null,
+    () => rpcListAddressGroupings(currentWallet as string),
+    { revalidateOnFocus: false }
+  );
+  return {
+    groupings: (data as Listaddressgroupings) ?? null,
+    error,
+    isLoading,
+    refresh: () => mutate(),
+  };
+}
+
+// SWR hook to fetch detailed address info
+export function useAddressInfo(address: string | null | undefined) {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const shouldFetch = !!address && address.length > 0 && currentWallet !== null;
+  const { data, error, isLoading, mutate } = useSWR(
+    shouldFetch ? ['getaddressinfo', currentWallet, address] : null,
+    () => rpcGetAddressInfo(address as string, currentWallet as string),
+    { revalidateOnFocus: false }
+  );
+  return {
+    addressInfo: (data as Getaddressinfo) ?? null,
+    error,
+    isLoading,
+    refresh: () => mutate(),
+  };
+}
+
+// SWR hook to fetch descriptor info for a given descriptor string
+export function useDescriptorInfo(descriptor: string | null | undefined) {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const shouldFetch =
+    !!descriptor && descriptor.length > 0 && currentWallet !== null;
+  const { data, error, isLoading, mutate } = useSWR(
+    shouldFetch ? ['getdescriptorinfo', currentWallet, descriptor] : null,
+    () => rpcGetDescriptorInfo(descriptor as string, currentWallet as string),
+    { revalidateOnFocus: false }
+  );
+  return {
+    descriptorInfo: (data as Getdescriptorinfo) ?? null,
     error,
     isLoading,
     refresh: () => mutate(),
