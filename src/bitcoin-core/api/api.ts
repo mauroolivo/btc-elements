@@ -19,6 +19,7 @@ import {
   BroadcastResponse,
 } from '@/bitcoin-core/model/wallet';
 import { ParamsDictionary } from '@/bitcoin-core/params';
+import { Getblock, Getblockhash } from '../model/block';
 
 const url = process.env.PUBLIC_NODE_URL || '';
 const API_USER = process.env.PUBLIC_RPC_USER;
@@ -195,4 +196,20 @@ export async function sendrawtransaction(
     payload,
     wallet
   )) as Promise<BroadcastResponse>;
+}
+
+export async function getblock(
+  blockid: string,
+  verbosity: number
+): Promise<Getblock> {
+  return (await fetcher('getblock', {
+    blockhash: blockid,
+    verbosity: verbosity,
+  })) as Promise<Getblock>;
+}
+
+export async function getblockhash(height: number): Promise<Getblockhash> {
+  return (await fetcher('getblockhash', {
+    height: height,
+  })) as Promise<Getblockhash>;
 }
