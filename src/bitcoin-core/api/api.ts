@@ -31,6 +31,7 @@ import {
 } from '@/bitcoin-core/model/wallet';
 import { ParamsDictionary } from '@/bitcoin-core/params';
 import { Getblock, Getblockhash } from '../model/block';
+import { Help } from '../model/help';
 
 const url = process.env.PUBLIC_NODE_URL || '';
 const API_USER = process.env.PUBLIC_RPC_USER;
@@ -243,6 +244,13 @@ export async function getnetworkinfo(): Promise<Getnetworkinfo> {
   return (await fetcher('getnetworkinfo', {})) as Promise<Getnetworkinfo>;
 }
 
+export async function gethelp(command?: string): Promise<Help> {
+  if (command && command.length > 0) {
+    return (await fetcher('help', { command })) as Promise<Help>;
+  }
+  return (await fetcher('help', {})) as Promise<Help>;
+}
+
 export async function listaddressgroupings(
   wallet: string
 ): Promise<Listaddressgroupings> {
@@ -269,4 +277,8 @@ export async function getdescriptorinfo(
   wallet: string
 ): Promise<Getdescriptorinfo> {
   return await fetcher('getdescriptorinfo', { descriptor: descriptor }, wallet);
+}
+
+export async function help(): Promise<Help> {
+  return await fetcher('help', {});
 }

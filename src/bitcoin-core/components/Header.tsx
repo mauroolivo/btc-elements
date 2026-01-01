@@ -9,6 +9,7 @@ export function Header() {
   const isHome = pathname === '/' || pathname === undefined;
   const isExplorer = pathname?.startsWith('/explorer');
   const isMempool = pathname?.startsWith('/mempool');
+  const isHelp = pathname?.startsWith('/help');
 
   function navLinkClass(active: boolean) {
     const base =
@@ -48,6 +49,13 @@ export function Header() {
                 aria-current={isMempool ? 'page' : undefined}
               >
                 Mempool
+              </Link>
+              <Link
+                href="/help"
+                className={navLinkClass(!!isHelp)}
+                aria-current={isHelp ? 'page' : undefined}
+              >
+                Help
               </Link>
             </div>
 
