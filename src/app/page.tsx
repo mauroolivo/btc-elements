@@ -38,6 +38,19 @@ function formatHashrate(hs?: number) {
 }
 
 export default async function Page() {
+  try {
+    await getblockchaininfo();
+  } catch (e) {
+    return (
+      <div className="mx-auto max-w-2xl px-6 pt-24 pb-8">
+        <div className="rounded border border-red-700 bg-red-900/30 p-4 text-sm text-red-200">
+          Unable to connect to the Bitcoin node. Please ensure that your node is
+          running and that the application is properly configured to connect to it ({e instanceof Error ? e.message : String(e)}).
+        </div>
+      </div>
+    );
+  }
+
   const blockchainInfo = await getblockchaininfo();
   const mempoolInfo = await getmempoolinfo();
   const miningInfo = await getmininginfo();

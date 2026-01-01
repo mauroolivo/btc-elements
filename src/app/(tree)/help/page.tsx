@@ -9,24 +9,6 @@ export default function HelpPage() {
   const rpcError = help?.error ?? null;
   const result = help?.result ?? null;
 
-  function parseGeneralHelp(text: string) {
-    const lines = text.split('\n');
-    const items: Array<{ command: string; args?: string }> = [];
-    for (const raw of lines) {
-      const line = raw.trim();
-      if (!line) continue;
-      if (line.startsWith('==') && line.endsWith('==')) continue; // section headers
-      // Match: command followed by optional args
-      const m = line.match(/^([a-zA-Z0-9_]+)(?:\s+(.*))?$/);
-      if (m) {
-        const command = m[1];
-        const args = m[2]?.trim();
-        items.push({ command, args });
-      }
-    }
-    return items;
-  }
-
   // Parse help output into sections using '== Section ==' headers
   function parseGeneralHelpSections(text: string) {
     const lines = text.split('\n');

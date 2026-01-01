@@ -227,7 +227,7 @@ export const GetaddressinfoSchema = z.object({
 });
 export type Getaddressinfo = z.infer<typeof GetaddressinfoSchema>;
 
-const GetdescriptorinfoSchema = z.object({
+export const GetdescriptorinfoSchema = z.object({
   result: z.object({
     descriptor: z.string(),
     checksum: z.string(),
