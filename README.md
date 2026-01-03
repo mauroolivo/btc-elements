@@ -1,6 +1,6 @@
 # BTC Elements
 
-A modern, modular Bitcoin Core wallet and blockchain explorer built with Next.js, React, and TypeScript.
+A Modern Web Interface for Bitcoin Core - Visual Companion to Learning Bitcoin from the Command Line
 
 ## Features
 
