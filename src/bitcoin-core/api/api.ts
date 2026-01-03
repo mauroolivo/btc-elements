@@ -28,6 +28,7 @@ import {
   Listaddressgroupings,
   Getaddressinfo,
   Getdescriptorinfo,
+  Bumpfee,
 } from '@/bitcoin-core/model/wallet';
 import { ParamsDictionary } from '@/bitcoin-core/params';
 import { Getblock, Getblockhash } from '../model/block';
@@ -281,4 +282,11 @@ export async function getdescriptorinfo(
 
 export async function help(): Promise<Help> {
   return await fetcher('help', {});
+}
+
+export async function bumpfee(
+  payload: ParamsDictionary,
+  wallet: string
+): Promise<Bumpfee> {
+  return await fetcher('bumpfee', payload, wallet);
 }

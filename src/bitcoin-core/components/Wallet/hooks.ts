@@ -18,6 +18,7 @@ import {
   Listaddressgroupings,
   Getaddressinfo,
   Getdescriptorinfo,
+  Bumpfee,
 } from '@/bitcoin-core/model/wallet';
 import {
   listwalletdir,
@@ -36,6 +37,7 @@ import {
   listaddressgroupings as rpcListAddressGroupings,
   getaddressinfo as rpcGetAddressInfo,
   getdescriptorinfo as rpcGetDescriptorInfo,
+  bumpfee,
 } from '@/bitcoin-core/api/api';
 import { ParamsDictionary } from '@/bitcoin-core/params';
 
@@ -373,6 +375,33 @@ export function useSendAdvanced() {
       : null,
     isLoading: isMutating,
     run: (payload: ParamsDictionary) => {
+      if (currentWallet === undefined || currentWallet === null)
+        throw new Error('No wallet selected');
+      return trigger({ wallet: currentWallet, payload });
+    },
+    clear: () => {
+      reset();
+    },
+  };
+}
+
+// SWR mutation hook to bump transaction fee
+export function useBumpfee() {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const { trigger, data, error, isMutating, reset } = useSWRMutation(
+    'bumpfee',
+    async (
+      _key,
+      { arg }: { arg: { wallet: string; payload: ParamsDictionary } }
+    ) => {
+      return bumpfee(arg.payload, arg.wallet);
+    }
+  );
+  return {
+    response: (data as Bumpfee) ?? null,
+    error,
+    isLoading: isMutating,
+    bump: (payload: ParamsDictionary) => {
       if (currentWallet === undefined || currentWallet === null)
         throw new Error('No wallet selected');
       return trigger({ wallet: currentWallet, payload });

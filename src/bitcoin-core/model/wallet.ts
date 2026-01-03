@@ -239,3 +239,28 @@ export const GetdescriptorinfoSchema = z.object({
   id: z.string(),
 });
 export type Getdescriptorinfo = z.infer<typeof GetdescriptorinfoSchema>;
+
+export const BumpfeeSchema = z.object({
+  result: z.object({
+    psbt: z.string().optional(),
+    txid: z.string().optional(),
+    origfee: z.number(),
+    fee: z.number(),
+    errors: z.array(z.string()),
+  }),
+  error: RpcErrorSchema.optional(),
+  id: z.string(),
+});
+export type Bumpfee = z.infer<typeof BumpfeeSchema>;
+
+// {                    (json object)
+//   "psbt" : "str",    (string) The base64-encoded unsigned PSBT of the new transaction. Only returned when wallet private keys are disabled. (DEPRECATED)
+//   "txid" : "hex",    (string) The id of the new transaction. Only returned when wallet private keys are enabled.
+//   "origfee" : n,     (numeric) The fee of the replaced transaction.
+//   "fee" : n,         (numeric) The fee of the new transaction.
+//   "errors" : [       (json array) Errors encountered during processing (may be empty).
+//     "str",           (string)
+//     ...
+//   ]
+// }
+

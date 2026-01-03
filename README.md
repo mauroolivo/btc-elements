@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BTC Elements
+
+A modern, modular Bitcoin Core wallet and blockchain explorer built with Next.js, React, and TypeScript.
+
+## Features
+
+- **Wallet Management**: View balances, transaction history, receive and send Bitcoin, and manage addresses.
+- **Transaction Details**: Inspect transaction details, including BIP125 Replace-by-Fee (RBF) support.
+- **Replace-by-Fee (RBF)**: Easily bump transaction fees for replaceable transactions.
+- **Blockchain Explorer**: Explore blocks, transactions, and mempool data.
+- **Mempool Visualization**: View unconfirmed transactions and mempool statistics.
+- **Help & Documentation**: Integrated help section for Bitcoin Core concepts.
+
+## Tech Stack
+
+- [Next.js 16](https://nextjs.org/)
+- [React 19](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Zustand](https://zustand-demo.pmnd.rs/) (state management)
+- [SWR](https://swr.vercel.app/) (data fetching)
+- [Zod](https://zod.dev/) (schema validation)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- Bitcoin Core node (with RPC enabled)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone the repository
+$ git clone https://github.com/yourusername/btc-elements.git
+$ cd btc-elements
+
+# Install dependencies
+$ npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Configuration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Copy your Bitcoin Core RPC credentials to an `.env` file:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+PUBLIC_NODE_URL=http://192.168.1.XX:3000/bitcoin-proxy
+PUBLIC_RPC_USER=your_rpc_user
+PUBLIC_RPC_PASS=your_rpc_password
+```
 
-## Learn More
+### Running the App
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Start the development server
+$ npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Open http://localhost:3000 in your browser
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## CORS Issue & Proxy Setup
 
-## Deploy on Vercel
+If you are accessing the Bitcoin Core node from another machine in a LAN, you need to run a simple proxy to fix the CORS issue. Here is an example using Node.js, Express, and http-proxy-middleware:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```js
+const express = require('express');
+const cors = require('cors');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+const app = express();
+const port = 3000;
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+app.use(cors());
+
+app.use(
+  '/bitcoin-proxy',
+  createProxyMiddleware({
+    target: 'http://localhost:8332', // Bitcoin RPC endpoint
+    changeOrigin: true,
+    pathRewrite: {
+      '^/bitcoin-proxy': '', // Remove /bitcoin-proxy prefix
+    },
+  })
+);
+
+app.listen(port, () => {
+  console.log(`Proxy server listening on port ${port}`);
+});
+```
+
+This proxy allows you to bypass CORS restrictions when connecting to your Bitcoin Core node from another device on your local network. Adjust the authentication and endpoint as needed for your setup.
+
+## Project Structure
+
+```
+/ (root)
+├── src/
+│   ├── app/                # Next.js app directory (routing, pages)
+│   │   └── (tree)/         # App routes: explorer, help, mempool, wallet
+│   ├── bitcoin-core/       # Core wallet logic, API, components, models
+│   │   ├── api/            # Bitcoin Core RPC API wrappers
+│   │   ├── components/     # React UI components (Wallet, Explorer, etc.)
+│   │   ├── model/          # TypeScript models & schemas
+│   │   └── params.ts       # Network/config params
+├── public/                 # Static assets
+├── package.json            # Project metadata & scripts
+├── next.config.ts          # Next.js config
+├── tsconfig.json           # TypeScript config
+└── README.md               # This file
+```
+
+## Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+MIT
+
+## Acknowledgments
+
+- [Bitcoin Core](https://bitcoincore.org/)
+- [Next.js](https://nextjs.org/)
+- [React](https://react.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)

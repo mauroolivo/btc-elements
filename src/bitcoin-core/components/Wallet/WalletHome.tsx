@@ -201,8 +201,34 @@ export function WalletHome() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-300">BIP125 Replaceable</span>
-                <span className="text-right">
+                <span className="flex items-center gap-2 text-right">
                   {selectedTx['bip125-replaceable']}
+                  {selectedTx['bip125-replaceable'] === 'yes' && (
+                    <button
+                      type="button"
+                      title="Replace by Fee (RBF)"
+                      className="ml-2 inline-flex items-center rounded bg-yellow-700 p-1 hover:bg-yellow-600"
+                      onClick={() => {
+                        /* TODO: Implement RBF action */
+                      }}
+                    >
+                      {/* Lightning bolt SVG icon */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="h-4 w-4 text-white"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
+                      </svg>
+                    </button>
+                  )}
                 </span>
               </div>
               <div className="flex justify-between">
