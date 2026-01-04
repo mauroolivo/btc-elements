@@ -1,5 +1,5 @@
 'use client';
-import { WalletHome } from './WalletHome';
+import { WalletHome } from './WalletHome/WalletHome';
 import { useState, useEffect, useRef } from 'react';
 import WalletReceive from './WalletReceive';
 import { useWalletInfo } from '@/bitcoin-core/components/Wallet/hooks';
