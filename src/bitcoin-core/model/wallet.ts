@@ -80,7 +80,7 @@ export const GetwalletinfoSchema = z.object({
 });
 export type Getwalletinfo = z.infer<typeof GetwalletinfoSchema>;
 
-export const ListtransactionsResultSchema = z.object({
+export const ListTransactionSchema = z.object({
   address: z.string(),
   category: z.string(),
   amount: z.number(),
@@ -102,12 +102,10 @@ export const ListtransactionsResultSchema = z.object({
   parent_descs: z.array(z.string()).optional(),
   label: z.string().optional(),
 });
-export type ListtransactionsResult = z.infer<
-  typeof ListtransactionsResultSchema
->;
+export type ListTransaction = z.infer<typeof ListTransactionSchema>;
 
 export const ListtransactionsSchema = z.object({
-  result: z.array(ListtransactionsResultSchema),
+  result: z.array(ListTransactionSchema),
   error: z.object(RpcErrorSchema).optional(),
   id: z.string(),
 });
@@ -263,4 +261,3 @@ export type Bumpfee = z.infer<typeof BumpfeeSchema>;
 //     ...
 //   ]
 // }
-

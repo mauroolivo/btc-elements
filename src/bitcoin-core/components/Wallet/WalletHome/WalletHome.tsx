@@ -4,22 +4,18 @@ import {
   useWalletInfo,
   useTransactions,
 } from '@/bitcoin-core/components/Wallet/hooks';
-import {
-  Getwalletinfo,
-  ListtransactionsResult,
-} from '@/bitcoin-core/model/wallet';
+import { Getwalletinfo, ListTransaction } from '@/bitcoin-core/model/wallet';
 import WalletHomeTxList from './WalletHomeTxList';
 
 export function WalletHome() {
-  const [selectedTx, setSelectedTx] = useState<ListtransactionsResult | null>(
-    null
-  );
+  const [selectedTx, setSelectedTx] = useState<ListTransaction | null>(null);
   const {
     transactions,
     isLoading: txLoading,
     isValidating: txValidating,
     hasMore,
     loadMore,
+    refresh,
   } = useTransactions({ pageSize: 5 });
   const { walletInfo, isLoading: infoLoading } = useWalletInfo();
 
@@ -36,6 +32,7 @@ export function WalletHome() {
               txValidating={txValidating}
               hasMore={hasMore}
               loadMore={loadMore}
+              txRefresh={refresh}
               selectedTx={selectedTx}
               setSelectedTx={setSelectedTx}
             />

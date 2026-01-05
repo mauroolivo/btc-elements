@@ -36,3 +36,10 @@ export const FormSendAdvancedSchema = z.object({
     .optional(),
 });
 export type FormSendAdvancedType = z.infer<typeof FormSendAdvancedSchema>;
+
+export const FormBumpFeeSchema = z.object({
+  fee_rate: z
+    .number({ message: 'Fee Rate must be a number' })
+    .positive({ message: 'Fee Rate must be greater than zero' }),
+});
+export type FormBumpFeeType = z.infer<typeof FormBumpFeeSchema>;
