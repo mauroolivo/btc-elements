@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ListTransaction } from '@/bitcoin-core/model/wallet';
 import WalletHomeTxDetail from './WalletHomeTxDetail';
 import WalletHomeBumpFee from './WalletHomeBumpFee';
+import WalletHomeCPFP from './WalletHomeCPFP';
 
 type Props = {
   transactions: ListTransaction[];
@@ -26,6 +27,7 @@ export default function WalletHomeTxList({
 }: Props) {
   const [bumpingTx, setBumpingTx] = useState<ListTransaction | null>(null);
   const [tooltipTx, setTooltipTx] = useState<string | null>(null);
+  const [isCPFP, setIsCPFP] = useState<boolean>(false);
 
   function date(blocktime: number, confirmations?: number): string {
     if (typeof confirmations === 'number' && confirmations < 0)
@@ -38,6 +40,11 @@ export default function WalletHomeTxList({
   }
   if (transactions.length === 0) {
     return <div>No transactions available</div>;
+  }
+
+  function handleCPFP(tx: ListTransaction) {
+    setIsCPFP(true);
+    console.log('CPFP selected for tx:', tx);
   }
 
   const sorted = [...transactions].sort((a, b) => {
@@ -227,6 +234,7 @@ export default function WalletHomeTxList({
                     setSelectedTx(null);
                     setBumpingTx(null);
                     setTooltipTx(null);
+                    setIsCPFP(false);
                   }}
                   className="inline-flex items-center rounded bg-gray-800 px-3 py-1 text-sm text-white hover:bg-gray-700"
                 >
@@ -234,7 +242,17 @@ export default function WalletHomeTxList({
                 </button>
               </div>
             </div>
-            {bumpingTx && selectedTx && bumpingTx.txid === selectedTx.txid ? (
+            {isCPFP ? (
+              <WalletHomeCPFP
+                tx={selectedTx}
+                onBack={() => setIsCPFP(false)}
+                onSuccess={() => {
+                  setIsCPFP(false);
+                  setSelectedTx(null);
+                  if (typeof txRefresh === 'function') txRefresh();
+                }}
+              />
+            ) : bumpingTx && bumpingTx.txid === selectedTx.txid ? (
               <WalletHomeBumpFee
                 tx={bumpingTx}
                 onBack={() => setBumpingTx(null)}
@@ -249,6 +267,9 @@ export default function WalletHomeTxList({
                 tx={selectedTx}
                 date={(t) => date(t, selectedTx.confirmations)}
                 onRBF={(t) => setBumpingTx(t)}
+                onCPFP={(t) => {
+                  handleCPFP(t);
+                }}
               />
             )}
           </div>

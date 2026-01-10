@@ -43,3 +43,13 @@ export const FormBumpFeeSchema = z.object({
     .positive({ message: 'Fee Rate must be greater than zero' }),
 });
 export type FormBumpFeeType = z.infer<typeof FormBumpFeeSchema>;
+
+export const FormCPFPSendAdvancedSchema = z.object({
+  address: z.string().min(1, { message: 'Address is required' }),
+  amount: z
+    .number({ message: 'Amount must be a number' })
+    .positive({ message: 'Amount must be greater than zero' }),
+});
+export type FormCPFPSendAdvancedType = z.infer<
+  typeof FormCPFPSendAdvancedSchema
+>;

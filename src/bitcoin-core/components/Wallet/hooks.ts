@@ -170,6 +170,18 @@ export function useSendtoaddress() {
   };
 }
 
+// If one transaction involves multiple wallet addresses, Bitcoin Core will return multiple
+// entries for the same txid — one entry per wallet-related output (or input).
+// DO NOT assume txid is unique in the listtransactions result.
+
+// How listtransactions works
+// listtransactions is wallet-centric, not transaction-centric.
+// Each entry represents one wallet-related “accounting event”, not one blockchain transaction.
+// That means:
+// One blockchain transaction (txid)
+// Can generate multiple rows
+// If the wallet is involved in multiple inputs and/or outputs
+
 // SWR Infinite hook for transactions with pagination
 export function useTransactions(options?: {
   label?: string;
