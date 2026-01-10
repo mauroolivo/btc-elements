@@ -8,6 +8,7 @@ export function Header() {
   const isWallet = pathname?.startsWith('/wallet');
   const isHome = pathname === '/' || pathname === undefined;
   const isExplorer = pathname?.startsWith('/explorer');
+  const isChart = pathname?.startsWith('/chart');
   const isMempool = pathname?.startsWith('/mempool');
   const isHelp = pathname?.startsWith('/help');
 
@@ -56,6 +57,13 @@ export function Header() {
                 aria-current={isHelp ? 'page' : undefined}
               >
                 Help
+              </Link>
+              <Link
+                href="/chart"
+                className={navLinkClass(!!isChart)}
+                aria-current={isChart ? 'page' : undefined}
+              >
+                Chart
               </Link>
             </div>
 
