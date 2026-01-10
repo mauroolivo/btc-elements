@@ -125,7 +125,7 @@ export default function HelpPage() {
                     ? section.items.filter((item) =>
                         item.command
                           .toLowerCase()
-                          .startsWith(filter.toLowerCase())
+                          .includes(filter.toLowerCase())
                       )
                     : section.items;
                   if (filteredItems.length === 0) return null;
