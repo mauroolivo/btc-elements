@@ -124,8 +124,8 @@ export default function SignInPage() {
       <div className="mb-8 max-w-2xl">
         <h1 className="text-3xl font-semibold text-white">Sign In</h1>
         <p className="mt-3 text-sm leading-6 text-gray-300">
-          Access your Firebase account. If you do not have one yet, create it
-          from the sign up page.
+          Access your account. If you do not have one yet, create it from the
+          sign up page.
         </p>
       </div>
 

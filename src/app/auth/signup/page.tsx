@@ -130,8 +130,8 @@ export default function SignUpPage() {
       <div className="mb-8 max-w-2xl">
         <h1 className="text-3xl font-semibold text-white">Sign Up</h1>
         <p className="mt-3 text-sm leading-6 text-gray-300">
-          Create a Firebase account for future user-specific features, then sign
-          in anywhere in the app.
+          Create an account for future user-specific features, then sign in
+          anywhere in the app.
         </p>
       </div>
 

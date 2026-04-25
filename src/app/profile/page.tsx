@@ -11,8 +11,7 @@ export default function ProfilePage() {
       <div className="mb-8 max-w-2xl">
         <h1 className="text-3xl font-semibold text-white">Profile</h1>
         <p className="mt-3 text-sm leading-6 text-gray-300">
-          Your Firebase account information and the current authenticated
-          session state.
+          Your account information and the current authenticated session state.
         </p>
       </div>
 
@@ -24,7 +23,7 @@ export default function ProfilePage() {
         <div className="max-w-2xl rounded-2xl border border-white/10 bg-white/5 p-6 text-white">
           <h2 className="text-xl font-semibold">No active session</h2>
           <p className="mt-3 text-sm leading-6 text-gray-300">
-            Sign in or create an account to view your Firebase profile.
+            Sign in or create an account to view your profile.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
@@ -49,7 +48,7 @@ export default function ProfilePage() {
                 Authenticated
               </div>
               <h2 className="mt-3 text-2xl font-semibold text-white">
-                {user.displayName || user.email || 'Firebase user'}
+                {user.displayName || user.email || 'Authenticated user'}
               </h2>
             </div>
 

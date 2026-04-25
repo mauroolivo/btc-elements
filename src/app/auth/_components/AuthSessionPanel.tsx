@@ -19,7 +19,7 @@ export function AuthSessionPanel() {
         {user.email ?? 'Authenticated user'}
       </div>
       <p className="mt-3 text-sm leading-6 text-emerald-100/80">
-        Your Firebase session is active. Public routes remain accessible, and
+        Your session is active. Public routes remain accessible, and
         authenticated features can now rely on this state.
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
