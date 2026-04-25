@@ -2,10 +2,13 @@
 import Link from 'next/link';
 import { WalletConnect } from './Wallet/WalletConnect';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/components/auth/useAuth';
 
 export function Header() {
   const pathname = usePathname();
+  const { user, loading, logout } = useAuth();
   const isHome = pathname === '/' || pathname === undefined;
+  const isAuth = pathname?.startsWith('/auth');
   const isWallet = pathname?.startsWith('/wallet');
   const isStatus = pathname?.startsWith('/status');
   const isExplorer = pathname?.startsWith('/explorer');
@@ -73,9 +76,44 @@ export function Header() {
               >
                 Chart
               </Link>
+              <Link
+                href="/auth/signin"
+                className={navLinkClass(!!isAuth)}
+                aria-current={isAuth ? 'page' : undefined}
+              >
+                Auth
+              </Link>
             </div>
 
-            <div className="flex items-center gap-6 max-md:hidden">
+            <div className="flex items-center gap-4 max-md:hidden">
+              <div className="flex items-center gap-3 text-sm text-gray-300">
+                {loading ? (
+                  <span className="text-xs text-gray-400">Auth loading...</span>
+                ) : user ? (
+                  <>
+                    <Link
+                      href="/auth/signin"
+                      className="rounded px-2 py-1 text-sm text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
+                    >
+                      {user.email ?? 'Signed in'}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => void logout()}
+                      className="rounded border border-white/10 px-2 py-1 text-xs text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
+                    >
+                      Log out
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/auth/signin"
+                    className="rounded border border-white/10 px-2 py-1 text-xs text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
+                  >
+                    Login / Register
+                  </Link>
+                )}
+              </div>
               {isWallet && <WalletConnect />}
               {/* <ThemeSelector /> */}
             </div>
