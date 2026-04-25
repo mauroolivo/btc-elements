@@ -5,8 +5,9 @@ import { usePathname } from 'next/navigation';
 
 export function Header() {
   const pathname = usePathname();
-  const isWallet = pathname?.startsWith('/wallet');
   const isHome = pathname === '/' || pathname === undefined;
+  const isWallet = pathname?.startsWith('/wallet');
+  const isStatus = pathname?.startsWith('/status');
   const isExplorer = pathname?.startsWith('/explorer');
   const isChart = pathname?.startsWith('/chart');
   const isMempool = pathname?.startsWith('/mempool');
@@ -29,6 +30,13 @@ export function Header() {
                 aria-current={isHome ? 'page' : undefined}
               >
                 Home
+              </Link>
+              <Link
+                href="/status"
+                className={navLinkClass(!!isStatus)}
+                aria-current={isStatus ? 'page' : undefined}
+              >
+                Status
               </Link>
               <Link
                 href="/wallet"

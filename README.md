@@ -58,54 +58,48 @@ $ npm run dev
 # Open http://localhost:3000 in your browser
 ```
 
-## CORS Issue & Proxy Setup
-
-If you are accessing the Bitcoin Core node from another machine in a LAN, you need to run a simple proxy to fix the CORS issue. Here is an example using Node.js, Express, and http-proxy-middleware:
-
-```js
-const express = require('express');
-const cors = require('cors');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const app = express();
-const port = 3000;
-
-app.use(cors());
-
-app.use(
-  '/bitcoin-proxy',
-  createProxyMiddleware({
-    target: 'http://localhost:8332', // Bitcoin RPC endpoint
-    changeOrigin: true,
-    pathRewrite: {
-      '^/bitcoin-proxy': '', // Remove /bitcoin-proxy prefix
-    },
-  })
-);
-
-app.listen(port, () => {
-  console.log(`Proxy server listening on port ${port}`);
-});
-```
-
-This proxy allows you to bypass CORS restrictions when connecting to your Bitcoin Core node from another device on your local network. Adjust the authentication and endpoint as needed for your setup.
-
 ## Project Structure
 
+This project uses the Next.js app router and keeps Bitcoin-related logic inside `src/bitcoin-core`.
+
 ```
-/ (root)
+/(root)
 ├── src/
-│   ├── app/                # Next.js app directory (routing, pages)
-│   │   └── (tree)/         # App routes: explorer, help, mempool, wallet
-│   ├── bitcoin-core/       # Core wallet logic, API, components, models
-│   │   ├── api/            # Bitcoin Core RPC API wrappers
-│   │   ├── components/     # React UI components (Wallet, Explorer, etc.)
-│   │   ├── model/          # TypeScript models & schemas
-│   │   └── params.ts       # Network/config params
-├── public/                 # Static assets
-├── package.json            # Project metadata & scripts
-├── next.config.ts          # Next.js config
-├── tsconfig.json           # TypeScript config
-└── README.md               # This file
+│   ├── app/                        # Next.js app directory (routes & UI pages)
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── (tree)/                  # Feature routes
+│   │       ├── chart/page.tsx       # BTC price chart page (ChartCoinGecko)
+│   │       ├── explorer/page.tsx
+│   │       ├── help/page.tsx
+│   │       ├── mempool/page.tsx
+│   │       └── wallet/page.tsx
+│   ├── app/api/                     # Server (Edge / Route) API endpoints
+│   │   └── coin-gecko/route.ts      # Proxy to CoinGecko for price history
+│   └── bitcoin-core/                # Bitcoin Core domain code and UI primitives
+│       ├── constants.ts
+│       ├── params.ts
+│       ├── useWalletStore.ts
+│       ├── api/
+│       │   └── api.ts               # RPC helpers and client wrappers
+│       ├── components/              # React components (Header, Wallet, Chart, etc.)
+│       │   ├── Header.tsx
+│       │   ├── ThemeSelector.tsx
+│       │   ├── ChartCoinGecko.tsx   # Chart component used by /chart
+│       │   └── Wallet/              # Wallet-related components and subfolders
+│       └── model/                   # TypeScript models & domain types
+│           ├── block.ts
+│           ├── blockchain.ts
+│           ├── forms.ts
+│           ├── help.ts
+│           ├── transaction.ts
+│           └── wallet.ts
+├── public/                          # Static assets
+├── package.json                     # Project metadata & scripts
+├── next.config.ts                   # Next.js configuration
+├── tsconfig.json                    # TypeScript configuration
+└── README.md                        # This file
 ```
 
 ## Contributing
