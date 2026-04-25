@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -37,6 +38,7 @@ function mapFirebaseError(message: string) {
 
 export default function SignInPage() {
   const { user, loading, login, loginWithGithub, loginWithGoogle } = useAuth();
+  const router = useRouter();
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authAction, setAuthAction] = useState('Signing you in...');
@@ -59,6 +61,7 @@ export default function SignInPage() {
     try {
       await login(values.email, values.password);
       loginForm.reset();
+      router.replace('/');
     } catch (error) {
       setLoginError(mapFirebaseError((error as Error).message));
     } finally {
@@ -80,6 +83,7 @@ export default function SignInPage() {
 
     try {
       await loginWithGoogle();
+      router.replace('/');
     } catch (error) {
       setLoginError(mapFirebaseError((error as Error).message));
     } finally {
@@ -101,6 +105,7 @@ export default function SignInPage() {
 
     try {
       await loginWithGithub();
+      router.replace('/');
     } catch (error) {
       setLoginError(mapFirebaseError((error as Error).message));
     } finally {

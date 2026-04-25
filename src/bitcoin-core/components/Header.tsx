@@ -8,7 +8,7 @@ export function Header() {
   const pathname = usePathname();
   const { user, loading, logout } = useAuth();
   const isHome = pathname === '/' || pathname === undefined;
-  const isAuth = pathname?.startsWith('/auth');
+  const isProfile = pathname?.startsWith('/profile');
   const isWallet = pathname?.startsWith('/wallet');
   const isStatus = pathname?.startsWith('/status');
   const isExplorer = pathname?.startsWith('/explorer');
@@ -77,11 +77,11 @@ export function Header() {
                 Chart
               </Link>
               <Link
-                href="/auth/signin"
-                className={navLinkClass(!!isAuth)}
-                aria-current={isAuth ? 'page' : undefined}
+                href="/profile"
+                className={navLinkClass(!!isProfile)}
+                aria-current={isProfile ? 'page' : undefined}
               >
-                Auth
+                Profile
               </Link>
             </div>
 
@@ -92,7 +92,7 @@ export function Header() {
                 ) : user ? (
                   <>
                     <Link
-                      href="/auth/signin"
+                      href="/profile"
                       className="rounded px-2 py-1 text-sm text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
                     >
                       {user.email ?? 'Signed in'}
