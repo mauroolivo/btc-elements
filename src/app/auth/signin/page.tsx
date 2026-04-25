@@ -10,6 +10,7 @@ import {
   type FormAuthLoginType,
 } from '@/bitcoin-core/model/forms';
 import { AuthButtonSpinner } from '../_components/AuthButtonSpinner';
+import { AuthGoogleButton } from '../_components/AuthGoogleButton';
 import { AuthSessionPanel } from '../_components/AuthSessionPanel';
 import { PasswordField } from '../_components/PasswordField';
 
@@ -22,13 +23,22 @@ function mapFirebaseError(message: string) {
     return 'Too many attempts. Please try again later.';
   }
 
+  if (message.includes('auth/popup-closed-by-user')) {
+    return 'Google sign-in was cancelled.';
+  }
+
+  if (message.includes('auth/account-exists-with-different-credential')) {
+    return 'An account already exists with a different sign-in method.';
+  }
+
   return message;
 }
 
 export default function SignInPage() {
-  const { user, loading, login } = useAuth();
+  const { user, loading, login, loginWithGoogle } = useAuth();
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [authAction, setAuthAction] = useState('Signing you in...');
   const loginForm = useForm<FormAuthLoginType>({
     mode: 'onChange',
     reValidateMode: 'onChange',
@@ -41,6 +51,7 @@ export default function SignInPage() {
 
   const onLogin = loginForm.handleSubmit(async (values) => {
     setLoginError(null);
+    setAuthAction('Signing you in...');
     setIsAuthenticating(true);
     const startedAt = Date.now();
 
@@ -59,6 +70,27 @@ export default function SignInPage() {
       setIsAuthenticating(false);
     }
   });
+
+  async function onGoogleLogin() {
+    setLoginError(null);
+    setAuthAction('Connecting to Google...');
+    setIsAuthenticating(true);
+    const startedAt = Date.now();
+
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      setLoginError(mapFirebaseError((error as Error).message));
+    } finally {
+      const elapsed = Date.now() - startedAt;
+
+      if (elapsed < 400) {
+        await new Promise((resolve) => setTimeout(resolve, 400 - elapsed));
+      }
+
+      setIsAuthenticating(false);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-6 pt-24 pb-8">
@@ -82,7 +114,7 @@ export default function SignInPage() {
             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-[2px]">
               <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white">
                 <AuthButtonSpinner />
-                <span>Signing you in...</span>
+                <span>{authAction}</span>
               </div>
             </div>
           )}
@@ -120,6 +152,18 @@ export default function SignInPage() {
               </div>
             )}
 
+            <AuthGoogleButton
+              onClick={() => void onGoogleLogin()}
+              disabled={isAuthenticating || loginForm.formState.isSubmitting}
+              label="Continue with Google"
+            />
+
+            <div className="flex items-center gap-3 text-xs text-gray-500">
+              <div className="h-px flex-1 bg-white/10" />
+              <span>or</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+
             <div className="flex items-center gap-3">
               <button
                 type="submit"
@@ -129,7 +173,7 @@ export default function SignInPage() {
                 {isAuthenticating ? (
                   <>
                     <AuthButtonSpinner />
-                    <span className="ml-2">Signing in...</span>
+                    <span className="ml-2">Please wait...</span>
                   </>
                 ) : (
                   'Sign in'
