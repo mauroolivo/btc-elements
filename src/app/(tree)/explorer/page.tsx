@@ -77,18 +77,15 @@ export default function Page() {
           <input
             {...register('ref')}
             placeholder="Enter TxID, Blockhash, or Block Height"
-            className="w-full rounded-lg border border-gray-700 bg-gray-900 p-4 font-mono text-lg text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+            className="core-input w-full rounded-2xl p-4 font-mono text-lg text-white placeholder-gray-500 focus:outline-none"
           />
-          <button
-            type="submit"
-            className="rounded-lg bg-blue-600 px-4 py-3 text-white hover:bg-blue-500"
-          >
+          <button type="submit" className="core-button-primary px-4 py-3">
             Search
           </button>
           <button
             type="button"
             onClick={onClear}
-            className="rounded-lg bg-gray-700 px-4 py-3 text-white hover:bg-gray-600"
+            className="core-button-secondary px-4 py-3"
           >
             Clear
           </button>
@@ -97,7 +94,7 @@ export default function Page() {
 
       <div className="mx-auto mt-6 w-full max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl">
         {(isLoadingTx || isLoadingBlockHash || isLoadingBlockHeight) && (
-          <div className="rounded border border-gray-700 bg-gray-900 p-4 text-sm text-gray-200">
+          <div className="core-surface rounded-2xl p-4 text-sm text-gray-200">
             Fetching data...
           </div>
         )}
@@ -112,7 +109,7 @@ export default function Page() {
         {blockData &&
           blockData.result &&
           !(isLoadingBlockHash || isLoadingBlockHeight) && (
-            <div className="space-y-4 rounded-lg border border-gray-700 bg-gray-900 p-5 text-white">
+            <div className="core-surface rounded-3xl p-5 text-white">
               <div className="text-base font-medium">Block Details</div>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div>
@@ -174,7 +171,7 @@ export default function Page() {
             </div>
           )}
         {!blockData && raw && raw.result && !isLoadingTx && (
-          <div className="space-y-4 rounded-lg border border-gray-700 bg-gray-900 p-5 text-white">
+          <div className="core-surface rounded-3xl p-5 text-white">
             <div className="text-base font-medium">Transaction Details</div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>
@@ -222,10 +219,7 @@ export default function Page() {
                 </div>
                 <div className="mt-2 space-y-2">
                   {raw.result.vin.map((vin, i) => (
-                    <div
-                      key={i}
-                      className="rounded border border-gray-700 bg-gray-800 p-3"
-                    >
+                    <div key={i} className="core-panel-muted rounded-xl p-3">
                       <div className="text-xs text-gray-400">
                         Prev TxID / vout
                       </div>
@@ -275,10 +269,7 @@ export default function Page() {
                 </div>
                 <div className="mt-2 space-y-2">
                   {raw.result.vout.map((vout, i) => (
-                    <div
-                      key={i}
-                      className="rounded border border-gray-700 bg-gray-800 p-3"
-                    >
+                    <div key={i} className="core-panel-muted rounded-xl p-3">
                       <div className="text-xs text-gray-400">Index / Value</div>
                       <div className="font-mono text-xs">
                         {vout.n} / {vout.value} BTC
@@ -350,7 +341,7 @@ function BlockTransactions({
         <div className="flex items-center gap-2 text-xs text-gray-300">
           <button
             type="button"
-            className="rounded border border-gray-700 px-2 py-1 hover:bg-gray-800 disabled:opacity-50"
+            className="core-button-secondary px-2 py-1"
             onClick={() => onPageChange(Math.max(0, current - 1))}
             disabled={current === 0}
           >
@@ -361,7 +352,7 @@ function BlockTransactions({
           </div>
           <button
             type="button"
-            className="rounded border border-gray-700 px-2 py-1 hover:bg-gray-800 disabled:opacity-50"
+            className="core-button-secondary px-2 py-1"
             onClick={() => onPageChange(Math.min(totalPages - 1, current + 1))}
             disabled={current >= totalPages - 1}
           >
@@ -387,7 +378,7 @@ function TxSummary({ txid }: { txid: string }) {
 
   if (isLoading) {
     return (
-      <div className="rounded border border-gray-700 bg-gray-800 p-3">
+      <div className="core-panel-muted rounded-xl p-3">
         <div className="h-4 w-1/2 animate-pulse rounded bg-gray-700" />
         <div className="mt-2 h-3 w-1/3 animate-pulse rounded bg-gray-700" />
       </div>
@@ -395,7 +386,7 @@ function TxSummary({ txid }: { txid: string }) {
   }
   if (error || !raw || !raw.result) {
     return (
-      <div className="rounded border border-gray-700 bg-gray-800 p-3 text-xs text-red-300">
+      <div className="core-panel-muted rounded-xl p-3 text-xs text-red-300">
         Failed to load transaction
       </div>
     );
@@ -407,7 +398,7 @@ function TxSummary({ txid }: { txid: string }) {
     : 0;
 
   return (
-    <div className="rounded border border-gray-700 bg-gray-800 p-3">
+    <div className="core-panel-muted rounded-xl p-3">
       <div className="text-xs text-gray-400">TxID</div>
       <div className="font-mono text-xs break-all">{r.txid}</div>
       <div className="mt-2 grid grid-cols-2 gap-2 text-xs">

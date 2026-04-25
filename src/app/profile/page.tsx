@@ -16,33 +16,27 @@ export default function ProfilePage() {
       </div>
 
       {loading ? (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-gray-300">
+        <div className="core-surface rounded-2xl p-6 text-sm text-gray-300">
           Checking your current session...
         </div>
       ) : !user ? (
-        <div className="max-w-2xl rounded-2xl border border-white/10 bg-white/5 p-6 text-white">
+        <div className="core-surface max-w-2xl rounded-2xl p-6 text-white">
           <h2 className="text-xl font-semibold">No active session</h2>
           <p className="mt-3 text-sm leading-6 text-gray-300">
             Sign in or create an account to view your profile.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href="/auth/signin"
-              className="inline-flex rounded-md border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/15"
-            >
+            <Link href="/auth/signin" className="core-button-primary">
               Sign in
             </Link>
-            <Link
-              href="/auth/signup"
-              className="inline-flex rounded-md border border-white/10 bg-black/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black/30"
-            >
+            <Link href="/auth/signup" className="core-button-secondary">
               Sign up
             </Link>
           </div>
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
-          <section className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <section className="core-surface rounded-2xl p-6">
             <div className="mb-5">
               <div className="text-sm tracking-[0.2em] text-emerald-200/80 uppercase">
                 Authenticated
@@ -53,7 +47,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="core-panel-muted rounded-xl p-4">
                 <div className="text-xs tracking-[0.16em] text-gray-400 uppercase">
                   Email
                 </div>
@@ -61,7 +55,7 @@ export default function ProfilePage() {
                   {user.email || 'Not available'}
                 </div>
               </div>
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="core-panel-muted rounded-xl p-4">
                 <div className="text-xs tracking-[0.16em] text-gray-400 uppercase">
                   Display name
                 </div>
@@ -69,7 +63,7 @@ export default function ProfilePage() {
                   {user.displayName || 'Not set'}
                 </div>
               </div>
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="core-panel-muted rounded-xl p-4">
                 <div className="text-xs tracking-[0.16em] text-gray-400 uppercase">
                   UID
                 </div>
@@ -77,7 +71,7 @@ export default function ProfilePage() {
                   {user.uid}
                 </div>
               </div>
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="core-panel-muted rounded-xl p-4">
                 <div className="text-xs tracking-[0.16em] text-gray-400 uppercase">
                   Email verified
                 </div>
@@ -88,13 +82,13 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <aside className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <aside className="core-surface rounded-2xl p-6">
             <h2 className="text-xl font-semibold text-white">Providers</h2>
             <div className="mt-4 space-y-3">
               {user.providerData.map((provider) => (
                 <div
                   key={`${provider.providerId}-${provider.uid}`}
-                  className="rounded-xl border border-white/10 bg-black/20 p-4"
+                  className="core-panel-muted rounded-xl p-4"
                 >
                   <div className="text-xs tracking-[0.16em] text-gray-400 uppercase">
                     {provider.providerId}
@@ -110,14 +104,11 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={() => void logout()}
-                className="inline-flex rounded-md border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/15"
+                className="core-button-secondary"
               >
                 Log out
               </button>
-              <Link
-                href="/"
-                className="inline-flex rounded-md border border-white/10 bg-black/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black/30"
-              >
+              <Link href="/" className="core-button-primary">
                 Go home
               </Link>
             </div>

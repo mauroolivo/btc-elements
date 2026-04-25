@@ -83,7 +83,7 @@ export function PasswordField({
           id={inputId}
           type={visible ? 'text' : 'password'}
           {...registration}
-          className="w-full rounded border border-gray-600 bg-gray-800 p-2 pr-11 text-white focus:border-blue-500 focus:outline-none"
+          className="core-input w-full rounded-xl p-2 pr-11 text-white focus:outline-none"
         />
         <button
           type="button"

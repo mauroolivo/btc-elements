@@ -16,8 +16,8 @@ export default async function Page() {
   // const listWallets = await listwallets();
   // const balance = await getbalance('fabric');
   return (
-    <div>
-      <div className="pt-20">
+    <div className="mx-auto max-w-7xl px-6 pt-24 pb-8">
+      <div>
         <Wallet />
       </div>
       {/* <h1 className="mb-4 text-2xl font-semibold">Bitcoin Core Info</h1>

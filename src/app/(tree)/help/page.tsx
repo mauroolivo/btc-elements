@@ -63,7 +63,7 @@ export default function HelpPage() {
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               placeholder="Filter commands by prefix..."
-              className="w-full rounded border border-gray-700 bg-gray-900 px-3 py-1.5 pr-10 text-sm text-gray-100 placeholder-gray-500 focus:border-orange-400 focus:outline-none"
+              className="core-input w-full rounded-xl px-3 py-1.5 pr-10 text-sm text-gray-100 placeholder-gray-500 focus:outline-none"
             />
             {filter && (
               <button
@@ -81,7 +81,7 @@ export default function HelpPage() {
           <button
             type="button"
             onClick={() => setQuery('')}
-            className="rounded bg-gray-700 px-3 py-1.5 text-sm text-white hover:bg-gray-600"
+            className="core-button-secondary px-3 py-1.5"
           >
             Back to list
           </button>
@@ -90,7 +90,7 @@ export default function HelpPage() {
 
       <div className="mt-4">
         {isLoading ? (
-          <div className="rounded border border-gray-700 bg-gray-800 p-3 text-center text-sm text-gray-300">
+          <div className="core-surface rounded-2xl p-3 text-center text-sm text-gray-300">
             Loading…
           </div>
         ) : rpcError ? (
@@ -114,7 +114,7 @@ export default function HelpPage() {
                 const sections = parseGeneralHelpSections(result);
                 if (sections.length === 0) {
                   return (
-                    <div className="rounded border border-gray-700 bg-gray-800 p-3 text-sm text-gray-300">
+                    <div className="core-surface rounded-2xl p-3 text-sm text-gray-300">
                       No commands found in help output.
                     </div>
                   );
@@ -132,7 +132,7 @@ export default function HelpPage() {
                   return (
                     <div
                       key={section.header || sidx}
-                      className="mb-4 rounded border border-gray-700 bg-gray-800 p-4"
+                      className="core-surface mb-4 rounded-2xl p-4"
                     >
                       {section.header && (
                         <div className="mb-2 text-sm font-semibold tracking-wide text-orange-300 uppercase">
@@ -184,7 +184,7 @@ export default function HelpPage() {
             <CommandHelpDetail result={result} />
           )
         ) : (
-          <div className="rounded border border-gray-700 bg-gray-800 p-3 text-sm text-gray-300">
+          <div className="core-surface rounded-2xl p-3 text-sm text-gray-300">
             Submit to fetch general help or a specific command.
           </div>
         )}
@@ -322,7 +322,7 @@ function CommandHelpDetail({ result }: { result: string }) {
   if (current) blocks.push(current);
 
   return (
-    <div className="rounded border border-gray-700 bg-gray-800 p-4 text-gray-100">
+    <div className="core-surface rounded-2xl p-4 text-gray-100">
       <div className="mb-1 text-lg font-bold text-orange-200">{title}</div>
       {subtitle && <div className="mb-3 text-sm text-gray-300">{subtitle}</div>}
       <div className="space-y-1 text-sm">

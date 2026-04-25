@@ -26,7 +26,7 @@ export function AuthGithubButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center justify-center rounded border border-white/10 bg-[#111827] px-4 py-2 text-sm text-white transition-colors hover:bg-[#1f2937] disabled:opacity-50"
+      className="core-button-secondary"
     >
       <GithubIcon />
       <span className="ml-2">{label}</span>

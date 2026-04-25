@@ -39,9 +39,9 @@ export default function Wallet() {
   }, [isMoreOpen]);
   if (currentWallet === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-950/50">
-        <div className="mx-4 w-full max-w-md rounded-lg border border-gray-700 bg-gray-900 p-6 text-center shadow-lg">
-          <div className="mx-auto mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-800 text-gray-300">
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="core-surface mx-4 w-full max-w-md rounded-3xl p-6 text-center shadow-lg">
+          <div className="core-panel-muted mx-auto mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-300">
             {/* Wallet icon */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +78,7 @@ export default function Wallet() {
     <div className="">
       <div className="mb-6 flex w-full items-center justify-center">
         <div
-          className="inline-flex rounded-xl bg-gray-800/60 p-1 shadow-sm ring-1 ring-gray-700/50"
+          className="core-tab-strip inline-flex rounded-xl p-1 shadow-sm"
           role="tablist"
           aria-label="Wallet sections"
         >
@@ -90,8 +90,8 @@ export default function Wallet() {
             onClick={() => setCurrentTab(Tab.TRANSACTIONS)}
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               currentTab === Tab.TRANSACTIONS
-                ? 'bg-orange-400 text-white shadow'
-                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                ? 'core-tab-active text-white shadow'
+                : 'core-tab'
             }`}
           >
             TRANSACTIONS
@@ -104,8 +104,8 @@ export default function Wallet() {
             onClick={() => setCurrentTab(Tab.RECEIVE)}
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               currentTab === Tab.RECEIVE
-                ? 'bg-orange-400 text-white shadow'
-                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                ? 'core-tab-active text-white shadow'
+                : 'core-tab'
             }`}
           >
             RECEIVE
@@ -118,8 +118,8 @@ export default function Wallet() {
             onClick={() => setCurrentTab(Tab.SEND)}
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               currentTab === Tab.SEND
-                ? 'bg-orange-400 text-white shadow'
-                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                ? 'core-tab-active text-white shadow'
+                : 'core-tab'
             }`}
           >
             SEND
@@ -132,8 +132,8 @@ export default function Wallet() {
             onClick={() => setCurrentTab(Tab.SEND_ADVANCED)}
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               currentTab === Tab.SEND_ADVANCED
-                ? 'bg-orange-400 text-white shadow'
-                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                ? 'core-tab-active text-white shadow'
+                : 'core-tab'
             }`}
           >
             SEND ADVANCED
@@ -147,8 +147,8 @@ export default function Wallet() {
               onClick={() => setIsMoreOpen((v) => !v)}
               className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
                 [Tab.ADDRESSES, Tab.DESCRIPTORS].includes(currentTab)
-                  ? 'bg-orange-400 text-white shadow'
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                  ? 'core-tab-active text-white shadow'
+                  : 'core-tab'
               }`}
             >
               <span className="inline-flex items-center">
@@ -165,10 +165,10 @@ export default function Wallet() {
               </span>
             </button>
             {isMoreOpen && (
-              <div className="absolute right-0 z-20 mt-2 w-44 rounded-lg border border-gray-700 bg-gray-800 shadow-lg">
+              <div className="core-surface absolute right-0 z-20 mt-2 w-44 rounded-2xl shadow-lg">
                 <button
                   type="button"
-                  className="block w-full px-3 py-2 text-left text-sm text-gray-200 hover:bg-gray-700"
+                  className="core-tab block w-full rounded-t-2xl px-3 py-2 text-left text-sm text-gray-200"
                   onClick={() => {
                     setCurrentTab(Tab.ADDRESSES);
                     setIsMoreOpen(false);
@@ -178,7 +178,7 @@ export default function Wallet() {
                 </button>
                 <button
                   type="button"
-                  className="block w-full px-3 py-2 text-left text-sm text-gray-200 hover:bg-gray-700"
+                  className="core-tab block w-full rounded-b-2xl px-3 py-2 text-left text-sm text-gray-200"
                   onClick={() => {
                     setCurrentTab(Tab.DESCRIPTORS);
                     setIsMoreOpen(false);
@@ -199,7 +199,7 @@ export default function Wallet() {
             </div>
           ) : (
             <div className="my-3 flex w-full items-center justify-center">
-              <div className="w-full max-w-md rounded-2xl bg-gray-800 p-6 shadow-lg ring-1 ring-gray-600/30">
+              <div className="core-surface w-full max-w-md rounded-3xl p-6 shadow-lg">
                 <div className="flex flex-col items-center">
                   <div className="text-[11px] font-semibold tracking-widest text-gray-300">
                     BALANCE
@@ -213,7 +213,7 @@ export default function Wallet() {
                     </span>
                   </div>
                   <div className="mt-3 grid w-full grid-cols-3 gap-2 text-center">
-                    <div className="rounded-lg bg-gray-800/40 px-3 py-2">
+                    <div className="core-panel-muted rounded-lg px-3 py-2">
                       <div className="text-[10px] tracking-wider text-gray-400">
                         UNCONF
                       </div>

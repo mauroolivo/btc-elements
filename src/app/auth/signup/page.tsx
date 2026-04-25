@@ -136,13 +136,13 @@ export default function SignUpPage() {
       </div>
 
       {loading ? (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-gray-300">
+        <div className="core-surface rounded-2xl p-6 text-sm text-gray-300">
           Checking your current session...
         </div>
       ) : user ? (
         <AuthSessionPanel />
       ) : (
-        <section className="relative max-w-xl rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <section className="core-surface relative max-w-xl rounded-2xl p-6">
           {isAuthenticating && (
             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-[2px]">
               <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white">
@@ -163,7 +163,7 @@ export default function SignUpPage() {
                 id="signup-email"
                 type="email"
                 {...registerForm.register('email')}
-                className="w-full rounded border border-gray-600 bg-gray-800 p-2 text-white focus:border-blue-500 focus:outline-none"
+                className="core-input w-full rounded-xl p-2 text-white focus:outline-none"
               />
               {registerForm.formState.errors.email && (
                 <p className="mt-1 text-xs text-red-400">
@@ -187,7 +187,7 @@ export default function SignUpPage() {
             />
 
             {registerError && (
-              <div className="rounded border border-red-700 bg-red-900/30 p-3 text-sm text-red-200">
+              <div className="core-surface rounded-2xl p-3 text-sm text-red-200">
                 {registerError}
               </div>
             )}
@@ -221,7 +221,7 @@ export default function SignUpPage() {
                 disabled={
                   registerForm.formState.isSubmitting || isAuthenticating
                 }
-                className="inline-flex items-center rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700 disabled:opacity-50"
+                className="core-button-primary"
               >
                 {isAuthenticating ? (
                   <>

@@ -63,18 +63,15 @@ export default function Page() {
           <input
             {...register('ref')}
             placeholder="Filter by TxID or wtxid"
-            className="w-full rounded-lg border border-gray-700 bg-gray-900 p-4 font-mono text-lg text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+            className="core-input w-full rounded-2xl p-4 font-mono text-lg text-white placeholder-gray-500 focus:outline-none"
           />
-          <button
-            type="submit"
-            className="rounded-lg bg-blue-600 px-4 py-3 text-white hover:bg-blue-500"
-          >
+          <button type="submit" className="core-button-primary px-4 py-3">
             Search
           </button>
           <button
             type="button"
             onClick={onClear}
-            className="rounded-lg bg-gray-700 px-4 py-3 text-white hover:bg-gray-600"
+            className="core-button-secondary px-4 py-3"
           >
             Clear
           </button>
@@ -83,7 +80,7 @@ export default function Page() {
             onClick={() => {
               refresh();
             }}
-            className="rounded-lg bg-gray-700 px-4 py-3 text-white hover:bg-gray-600"
+            className="core-button-secondary px-4 py-3"
           >
             Refresh
           </button>
@@ -92,7 +89,7 @@ export default function Page() {
 
       <div className="mx-auto mt-6 w-full max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl">
         {isLoading && (
-          <div className="rounded border border-gray-700 bg-gray-900 p-4 text-sm text-gray-200">
+          <div className="core-surface rounded-2xl p-4 text-sm text-gray-200">
             Fetching mempool...
           </div>
         )}
@@ -103,7 +100,7 @@ export default function Page() {
         )}
 
         {mempool && mempool.result && (
-          <div className="space-y-4 rounded-lg border border-gray-700 bg-gray-900 p-5 text-white">
+          <div className="core-surface rounded-3xl p-5 text-white">
             <div className="text-base font-medium">
               Unconfirmed Transactions ({filtered.length})
             </div>
@@ -124,7 +121,7 @@ function MempoolTxCard({ txid, info }: { txid: string; info: RawMempoolTx }) {
   const when = new Date((info.time || 0) * 1000);
 
   return (
-    <div className="rounded border border-gray-700 bg-gray-800 p-3">
+    <div className="core-panel-muted rounded-xl p-3">
       <div className="text-xs text-gray-400">TxID</div>
       <div className="font-mono text-xs break-all">{txid}</div>
       <div className="mt-2 grid grid-cols-2 gap-2 text-xs">

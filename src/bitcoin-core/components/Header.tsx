@@ -18,13 +18,15 @@ export function Header() {
 
   function navLinkClass(active: boolean) {
     const base =
-      'text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-colors rounded px-2 py-1 flex items-center gap-2';
-    return active ? `${base} text-white bg-white/10` : base;
+      'flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium transition-colors border-transparent text-gray-300 hover:border-white/8 hover:bg-white/8 hover:text-white';
+    return active
+      ? `${base} border-cyan-300/15 bg-cyan-400/12 text-white`
+      : base;
   }
   return (
     <>
       <div className="fixed inset-x-0 top-0 z-10 border-b border-black/5 dark:border-white/10">
-        <div className="bg-white/10 backdrop-blur-xl">
+        <div className="bg-[linear-gradient(180deg,rgba(7,17,27,0.78),rgba(7,17,27,0.55))] backdrop-blur-xl">
           <div className="flex h-14 items-center justify-between gap-8 px-4 sm:px-6">
             <div className="flex items-center gap-4">
               <Link
@@ -93,14 +95,14 @@ export function Header() {
                   <>
                     <Link
                       href="/profile"
-                      className="rounded px-2 py-1 text-sm text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
+                      className="core-button-secondary px-3 py-1.5 text-sm text-gray-200"
                     >
                       {user.email ?? 'Signed in'}
                     </Link>
                     <button
                       type="button"
                       onClick={() => void logout()}
-                      className="rounded border border-white/10 px-2 py-1 text-xs text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
+                      className="core-button-muted px-3 py-1.5 text-xs text-gray-200"
                     >
                       Log out
                     </button>
@@ -108,7 +110,7 @@ export function Header() {
                 ) : (
                   <Link
                     href="/auth/signin"
-                    className="rounded border border-white/10 px-2 py-1 text-xs text-gray-200 transition-colors hover:bg-white/10 hover:text-white"
+                    className="core-button-secondary px-3 py-1.5 text-xs text-gray-200"
                   >
                     Login / Register
                   </Link>

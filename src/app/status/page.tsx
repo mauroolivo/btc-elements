@@ -42,7 +42,7 @@ export default async function Page() {
   } catch (e) {
     return (
       <div className="mx-auto max-w-2xl px-6 pt-24 pb-8">
-        <div className="rounded border border-red-700 bg-red-900/30 p-4 text-sm text-red-200">
+        <div className="core-surface rounded-2xl p-4 text-sm text-red-200">
           Unable to connect to the Bitcoin node. Please ensure that your node is
           running and that the application is properly configured to connect to
           it ({e instanceof Error ? e.message : String(e)}).
@@ -73,12 +73,12 @@ export default async function Page() {
       </div>
 
       {!r ? (
-        <div className="rounded border border-red-700 bg-red-900/30 p-4 text-sm text-red-200">
+        <div className="core-surface rounded-2xl p-4 text-sm text-red-200">
           Unable to fetch node status.
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="rounded-lg border border-gray-700 bg-gray-900 p-5">
+          <div className="core-surface rounded-3xl p-5">
             <div className="mb-2 flex items-center justify-between">
               <div className="text-base font-medium text-white">
                 Synchronization Progress
@@ -87,9 +87,9 @@ export default async function Page() {
                 {formatPercent(progress)}
               </div>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded bg-gray-800">
+            <div className="core-progress-track h-2 w-full overflow-hidden rounded-full">
               <div
-                className="h-full bg-green-600"
+                className="core-progress-fill h-full"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
@@ -101,35 +101,35 @@ export default async function Page() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+            <div className="core-panel rounded-2xl p-4">
               <div className="text-xs text-gray-400">Network</div>
               <div className="mt-1 text-lg text-white">{r.chain}</div>
             </div>
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+            <div className="core-panel rounded-2xl p-4">
               <div className="text-xs text-gray-400">Blocks</div>
               <div className="mt-1 font-mono text-lg text-white">
                 {r.blocks}
               </div>
             </div>
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+            <div className="core-panel rounded-2xl p-4">
               <div className="text-xs text-gray-400">Headers</div>
               <div className="mt-1 font-mono text-lg text-white">
                 {r.headers}
               </div>
             </div>
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+            <div className="core-panel rounded-2xl p-4">
               <div className="text-xs text-gray-400">Difficulty</div>
               <div className="mt-1 font-mono text-lg text-white">
                 {r.difficulty}
               </div>
             </div>
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+            <div className="core-panel rounded-2xl p-4">
               <div className="text-xs text-gray-400">Size on Disk</div>
               <div className="mt-1 font-mono text-lg text-white">
                 {formatBytes(r.size_on_disk)}
               </div>
             </div>
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+            <div className="core-panel rounded-2xl p-4">
               <div className="text-xs text-gray-400">Pruned</div>
               <div className="mt-1 text-lg text-white">
                 {r.pruned ? 'Yes' : 'No'}
@@ -138,25 +138,25 @@ export default async function Page() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+            <div className="core-panel rounded-2xl p-4">
               <div className="text-xs text-gray-400">Best Block Hash</div>
               <div className="mt-1 font-mono text-sm break-all text-white">
                 {r.bestblockhash}
               </div>
             </div>
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+            <div className="core-panel rounded-2xl p-4">
               <div className="text-xs text-gray-400">Chain Work</div>
               <div className="mt-1 font-mono text-sm break-all text-white">
                 {r.chainwork}
               </div>
             </div>
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+            <div className="core-panel rounded-2xl p-4">
               <div className="text-xs text-gray-400">Node Time</div>
               <div className="mt-1 font-mono text-sm text-white">
                 {formatTime(r.time)}
               </div>
             </div>
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+            <div className="core-panel rounded-2xl p-4">
               <div className="text-xs text-gray-400">Median Block Time</div>
               <div className="mt-1 font-mono text-sm text-white">
                 {formatTime(r.mediantime)}
@@ -164,7 +164,7 @@ export default async function Page() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
+          <div className="core-surface rounded-2xl p-4">
             <div className="text-base font-medium text-white">Warnings</div>
             {r.warnings && r.warnings.length > 0 ? (
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-yellow-300">
@@ -181,7 +181,7 @@ export default async function Page() {
 
       {m && (
         <div className="mt-8 space-y-6">
-          <div className="rounded-lg border border-gray-700 bg-gray-900 p-5">
+          <div className="core-surface rounded-3xl p-5">
             <div className="mb-2 flex items-center justify-between">
               <div className="text-base font-medium text-white">Mempool</div>
               <div className="text-xs text-gray-300">
@@ -249,7 +249,7 @@ export default async function Page() {
           </div>
 
           {mi && (
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-5">
+            <div className="core-surface rounded-3xl p-5">
               <div className="mb-3 text-base font-medium text-white">
                 Mining
               </div>
@@ -283,7 +283,7 @@ export default async function Page() {
           )}
 
           {ni && (
-            <div className="rounded-lg border border-gray-700 bg-gray-900 p-5">
+            <div className="core-surface rounded-3xl p-5">
               <div className="mb-3 text-base font-medium text-white">
                 Network Peers
               </div>

@@ -11,7 +11,7 @@ export function AuthSessionPanel() {
   }
 
   return (
-    <div className="max-w-2xl rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-6 text-white">
+    <div className="core-surface-hero max-w-2xl rounded-2xl p-6 text-white">
       <div className="text-sm tracking-[0.2em] text-emerald-200/80 uppercase">
         Signed In
       </div>
@@ -26,14 +26,11 @@ export function AuthSessionPanel() {
         <button
           type="button"
           onClick={() => void logout()}
-          className="inline-flex rounded-md border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/15"
+          className="core-button-secondary"
         >
           Log out
         </button>
-        <Link
-          href="/status"
-          className="inline-flex rounded-md border border-white/10 bg-black/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black/30"
-        >
+        <Link href="/status" className="core-button-primary">
           Go to status
         </Link>
       </div>
