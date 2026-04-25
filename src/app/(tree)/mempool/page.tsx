@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRawmempool } from '@/bitcoin-core/components/Mempool/hooks';
 import { RawMempoolTx } from '@/bitcoin-core/model/transaction';
@@ -9,6 +9,7 @@ type Entry = [string, RawMempoolTx];
 
 export default function Page() {
   const [filter, setFilter] = useState<string>('');
+  const [lastRefreshAt, setLastRefreshAt] = useState<number | null>(null);
   const { register, handleSubmit, setValue } = useForm<FormFields>({
     defaultValues: { ref: '' },
   });
@@ -17,6 +18,31 @@ export default function Page() {
     verbose: true,
     revalidateOnFocus: false,
   });
+
+  async function triggerRefresh() {
+    await refresh();
+    setLastRefreshAt(Date.now());
+  }
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      void refresh().then(() => {
+        setLastRefreshAt(Date.now());
+      });
+    }, 10000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [refresh]);
+
+  const lastRefreshLabel = useMemo(() => {
+    if (!lastRefreshAt) {
+      return null;
+    }
+
+    return new Date(lastRefreshAt).toLocaleTimeString();
+  }, [lastRefreshAt]);
 
   const entries: Entry[] = useMemo(() => {
     const e = mempool?.result
@@ -78,7 +104,7 @@ export default function Page() {
           <button
             type="button"
             onClick={() => {
-              refresh();
+              void triggerRefresh();
             }}
             className="core-button-secondary px-4 py-3"
           >
@@ -100,11 +126,20 @@ export default function Page() {
         )}
 
         {mempool && mempool.result && (
-          <div className="core-surface rounded-3xl p-5 text-white">
-            <div className="text-base font-medium">
-              Unconfirmed Transactions ({filtered.length})
+          <div className="core-surface mempool-surface rounded-3xl p-5 text-white">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-base font-medium">
+                Unconfirmed Transactions ({filtered.length})
+              </div>
+              <div className="flex items-center gap-2 text-xs text-cyan-100/70">
+                <span className="mempool-live-dot" aria-hidden="true" />
+                <span>
+                  Auto-refreshing every 10s
+                  {lastRefreshLabel ? ` · Updated ${lastRefreshLabel}` : ''}
+                </span>
+              </div>
             </div>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
               {filtered.map(([txid, info]) => (
                 <MempoolTxCard key={txid} txid={txid} info={info} />
               ))}
@@ -121,7 +156,7 @@ function MempoolTxCard({ txid, info }: { txid: string; info: RawMempoolTx }) {
   const when = new Date((info.time || 0) * 1000);
 
   return (
-    <div className="core-panel-muted rounded-xl p-3">
+    <div className="core-panel-muted mempool-card rounded-xl p-3">
       <div className="text-xs text-gray-400">TxID</div>
       <div className="font-mono text-xs break-all">{txid}</div>
       <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
