@@ -8,7 +8,10 @@ import {
   type ReactNode,
 } from 'react';
 import {
+  type AuthProvider as FirebaseAuthProvider,
   createUserWithEmailAndPassword,
+  fetchSignInMethodsForEmail,
+  GithubAuthProvider,
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithPopup,
@@ -23,6 +26,7 @@ type AuthContextValue = {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<UserCredential>;
+  loginWithGithub: () => Promise<UserCredential>;
   loginWithGoogle: () => Promise<UserCredential>;
   register: (email: string, password: string) => Promise<UserCredential>;
   logout: () => Promise<void>;
@@ -30,9 +34,26 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function getProviderLabel(method: string) {
+  if (method === GoogleAuthProvider.PROVIDER_ID) {
+    return 'Google';
+  }
+
+  if (method === GithubAuthProvider.PROVIDER_ID) {
+    return 'GitHub';
+  }
+
+  if (method === 'password') {
+    return 'email and password';
+  }
+
+  return method;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const githubProvider = new GithubAuthProvider();
   const googleProvider = new GoogleAuthProvider();
 
   useEffect(() => {
@@ -48,8 +69,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return signInWithEmailAndPassword(firebaseAuth, email, password);
   }
 
+  async function signInWithSocialProvider(provider: FirebaseAuthProvider) {
+    try {
+      return await signInWithPopup(firebaseAuth, provider);
+    } catch (error) {
+      const authError = error as Error & {
+        code?: string;
+        customData?: { email?: string };
+      };
+
+      if (
+        authError.code === 'auth/account-exists-with-different-credential' &&
+        authError.customData?.email
+      ) {
+        const methods = await fetchSignInMethodsForEmail(
+          firebaseAuth,
+          authError.customData.email
+        );
+
+        if (methods.length > 0) {
+          const providerList = methods.map(getProviderLabel).join(' or ');
+
+          throw new Error(
+            `An account already exists for ${authError.customData.email}. Sign in with ${providerList} instead, then link this provider later if needed.`
+          );
+        }
+      }
+
+      throw error;
+    }
+  }
+
   async function loginWithGoogle() {
-    return signInWithPopup(firebaseAuth, googleProvider);
+    return signInWithSocialProvider(googleProvider);
+  }
+
+  async function loginWithGithub() {
+    return signInWithSocialProvider(githubProvider);
   }
 
   async function register(email: string, password: string) {
@@ -62,7 +118,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, loginWithGoogle, register, logout }}
+      value={{
+        user,
+        loading,
+        login,
+        loginWithGithub,
+        loginWithGoogle,
+        register,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -10,6 +10,7 @@ import {
   type FormAuthRegisterType,
 } from '@/bitcoin-core/model/forms';
 import { AuthButtonSpinner } from '../_components/AuthButtonSpinner';
+import { AuthGithubButton } from '../_components/AuthGithubButton';
 import { AuthGoogleButton } from '../_components/AuthGoogleButton';
 import { AuthSessionPanel } from '../_components/AuthSessionPanel';
 import { PasswordField } from '../_components/PasswordField';
@@ -39,7 +40,8 @@ function mapFirebaseError(message: string) {
 }
 
 export default function SignUpPage() {
-  const { user, loading, loginWithGoogle, register } = useAuth();
+  const { user, loading, loginWithGithub, loginWithGoogle, register } =
+    useAuth();
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authAction, setAuthAction] = useState('Creating your account...');
@@ -84,6 +86,27 @@ export default function SignUpPage() {
 
     try {
       await loginWithGoogle();
+    } catch (error) {
+      setRegisterError(mapFirebaseError((error as Error).message));
+    } finally {
+      const elapsed = Date.now() - startedAt;
+
+      if (elapsed < 400) {
+        await new Promise((resolve) => setTimeout(resolve, 400 - elapsed));
+      }
+
+      setIsAuthenticating(false);
+    }
+  }
+
+  async function onGithubLogin() {
+    setRegisterError(null);
+    setAuthAction('Connecting to GitHub...');
+    setIsAuthenticating(true);
+    const startedAt = Date.now();
+
+    try {
+      await loginWithGithub();
     } catch (error) {
       setRegisterError(mapFirebaseError((error as Error).message));
     } finally {
@@ -164,11 +187,22 @@ export default function SignUpPage() {
               </div>
             )}
 
-            <AuthGoogleButton
-              onClick={() => void onGoogleLogin()}
-              disabled={isAuthenticating || registerForm.formState.isSubmitting}
-              label="Continue with Google"
-            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <AuthGoogleButton
+                onClick={() => void onGoogleLogin()}
+                disabled={
+                  isAuthenticating || registerForm.formState.isSubmitting
+                }
+                label="Continue with Google"
+              />
+              <AuthGithubButton
+                onClick={() => void onGithubLogin()}
+                disabled={
+                  isAuthenticating || registerForm.formState.isSubmitting
+                }
+                label="Continue with GitHub"
+              />
+            </div>
 
             <div className="flex items-center gap-3 text-xs text-gray-500">
               <div className="h-px flex-1 bg-white/10" />
