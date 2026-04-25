@@ -66,9 +66,7 @@ export default async function Page() {
   return (
     <div className="mx-auto max-w-5xl px-6 pt-24 pb-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-white">
-          Bitcoin Node Status
-        </h1>
+        <h1 className="text-2xl font-semibold text-white">Node Status</h1>
         <p className="mt-1 text-sm text-gray-400">
           Overview of the connected node and sync state.
         </p>

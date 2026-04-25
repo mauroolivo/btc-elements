@@ -39,7 +39,7 @@ export function Header() {
                 className={navLinkClass(!!isStatus)}
                 aria-current={isStatus ? 'page' : undefined}
               >
-                Status
+                Node Status
               </Link>
               <Link
                 href="/wallet"

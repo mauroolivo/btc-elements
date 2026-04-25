@@ -1,15 +1,46 @@
 # BTC Elements
 
-A Modern Web Interface for Bitcoin Core - Visual Companion to Learning Bitcoin from the Command Line
+BTC Elements is a Next.js interface for operating and inspecting a Bitcoin Core
+node through a modern web UI. The application is centered on the same ideas
+promoted by Bitcoin Core itself: full validation, privacy-aware operation,
+network participation, and direct access to node functionality through Bitcoin
+Core RPC concepts.
 
-## Features
+The home page introduces the product as a Bitcoin Core UI rather than a generic
+dashboard. From there, users can move into wallet operations, node status,
+exploration tools, mempool visibility, charts, and authenticated profile flows.
 
-- **Wallet Management**: View balances, transaction history, receive and send Bitcoin, and manage addresses.
-- **Transaction Details**: Inspect transaction details, including BIP125 Replace-by-Fee (RBF) support.
-- **Replace-by-Fee (RBF)**: Easily bump transaction fees for replaceable transactions.
-- **Blockchain Explorer**: Explore blocks, transactions, and mempool data.
-- **Mempool Visualization**: View unconfirmed transactions and mempool statistics.
-- **Help & Documentation**: Integrated help section for Bitcoin Core concepts.
+## What The App Covers
+
+- **Home**: A landing page for the Bitcoin Core UI with direct entry points to wallet and node workflows.
+- **Node Status**: Sync progress, chain state, mempool information, mining data, and network-level diagnostics.
+- **Wallet**: Address management, send and receive flows, wallet connection state, transaction history, RBF, and CPFP-related actions.
+- **Explorer**: Block and transaction inspection from the connected node.
+- **Mempool**: Visibility into current mempool conditions and fee-related signals.
+- **Chart**: BTC market charting through the CoinGecko route.
+- **Profile**: Firebase-backed session and profile information for authenticated users.
+
+## Design Direction
+
+The UI is intentionally close to the underlying Bitcoin Core model instead of
+hiding it behind generic abstractions. The product copy and route design are
+inspired by:
+
+- Bitcoin Core features such as full validation, better privacy, and network support.
+- The Bitcoin Core RPC reference categories such as blockchain, wallet, network, raw transaction, control, and mining RPCs.
+
+## Authentication
+
+Firebase Authentication is integrated for user identity and profile access.
+The app supports:
+
+- Email and password sign in
+- Email and password sign up
+- Google sign in
+- GitHub sign in
+
+Successful authentication redirects the user to the home page. Profile details
+are available under `/profile`.
 
 ## Tech Stack
 
@@ -17,102 +48,113 @@ A Modern Web Interface for Bitcoin Core - Visual Companion to Learning Bitcoin f
 - [React 19](https://react.dev/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
-- [Zustand](https://zustand-demo.pmnd.rs/) (state management)
-- [SWR](https://swr.vercel.app/) (data fetching)
-- [Zod](https://zod.dev/) (schema validation)
+- [Firebase Authentication](https://firebase.google.com/docs/auth)
+- [Zustand](https://zustand-demo.pmnd.rs/)
+- [SWR](https://swr.vercel.app/)
+- [React Hook Form](https://react-hook-form.com/)
+- [Zod](https://zod.dev/)
 
-## Getting Started
-
-### Prerequisites
+## Prerequisites
 
 - Node.js 18+
-- Bitcoin Core node (with RPC enabled)
+- A reachable Bitcoin Core node with RPC enabled
+- A Firebase project configured for the authentication providers you want to use
 
-### Installation
+## Installation
 
 ```bash
-# Clone the repository
-$ git clone https://github.com/yourusername/btc-elements.git
-$ cd btc-elements
-
-# Install dependencies
-$ npm install
+npm install
 ```
 
-### Configuration
+## Configuration
 
-1. Copy your Bitcoin Core RPC credentials to an `.env` file:
+Create a `.env` file in the project root and provide both Bitcoin Core RPC and
+Firebase client configuration.
 
-```
-PUBLIC_NODE_URL=http://192.168.1.XX:3000/bitcoin-proxy
+```dotenv
+PUBLIC_NODE_URL=http://127.0.0.1:8332
 PUBLIC_RPC_USER=your_rpc_user
 PUBLIC_RPC_PASS=your_rpc_password
+
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 ```
 
-### Running the App
+Notes:
+
+- The Firebase values are client-side configuration and must use `NEXT_PUBLIC_` prefixes.
+- If you use Google or GitHub authentication, those providers must also be enabled in the Firebase console.
+- GitHub authentication also requires the correct OAuth callback URL in the Firebase provider setup.
+
+## Running The App
 
 ```bash
-# Start the development server
-$ npm run dev
-
-# Open http://localhost:3000 in your browser
+npm run dev
 ```
+
+Open `http://localhost:3000` in your browser.
+
+## Main Routes
+
+- `/` Home landing page
+- `/status` Node Status
+- `/wallet` Wallet tools
+- `/explorer` Explorer
+- `/mempool` Mempool view
+- `/chart` BTC chart
+- `/help` Help content
+- `/profile` Firebase profile page
+- `/auth/signin` Sign in
+- `/auth/signup` Sign up
 
 ## Project Structure
 
-This project uses the Next.js app router and keeps Bitcoin-related logic inside `src/bitcoin-core`.
-
-```
-/(root)
-├── src/
-│   ├── app/                        # Next.js app directory (routes & UI pages)
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   └── (tree)/                  # Feature routes
-│   │       ├── chart/page.tsx       # BTC price chart page (ChartCoinGecko)
-│   │       ├── explorer/page.tsx
-│   │       ├── help/page.tsx
-│   │       ├── mempool/page.tsx
-│   │       └── wallet/page.tsx
-│   ├── app/api/                     # Server (Edge / Route) API endpoints
-│   │   └── coin-gecko/route.ts      # Proxy to CoinGecko for price history
-│   └── bitcoin-core/                # Bitcoin Core domain code and UI primitives
-│       ├── constants.ts
-│       ├── params.ts
-│       ├── useWalletStore.ts
-│       ├── api/
-│       │   └── api.ts               # RPC helpers and client wrappers
-│       ├── components/              # React components (Header, Wallet, Chart, etc.)
-│       │   ├── Header.tsx
-│       │   ├── ThemeSelector.tsx
-│       │   ├── ChartCoinGecko.tsx   # Chart component used by /chart
-│       │   └── Wallet/              # Wallet-related components and subfolders
-│       └── model/                   # TypeScript models & domain types
-│           ├── block.ts
-│           ├── blockchain.ts
-│           ├── forms.ts
-│           ├── help.ts
-│           ├── transaction.ts
-│           └── wallet.ts
-├── public/                          # Static assets
-├── package.json                     # Project metadata & scripts
-├── next.config.ts                   # Next.js configuration
-├── tsconfig.json                    # TypeScript configuration
-└── README.md                        # This file
+```text
+src/
+	app/
+		globals.css
+		layout.tsx
+		page.tsx
+		status/page.tsx
+		profile/page.tsx
+		auth/
+			page.tsx
+			signin/page.tsx
+			signup/page.tsx
+			_components/
+		api/
+			coin-gecko/route.ts
+		(tree)/
+			chart/page.tsx
+			explorer/page.tsx
+			help/page.tsx
+			mempool/page.tsx
+			wallet/page.tsx
+	bitcoin-core/
+		api/
+		components/
+		model/
+		constants.ts
+		params.ts
+		useWalletStore.ts
+	components/
+		auth/
+	lib/
+		firebase/
 ```
 
-## Contributing
+## Development Notes
 
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+- The app router handles page routing and shared layout composition.
+- Firebase auth state is provided globally through an auth provider mounted in the root layout.
+- Forms follow the `react-hook-form` plus `zod` validation pattern used across the codebase.
+- The UI is designed to stay close to Bitcoin Core data rather than presenting a generic crypto wallet abstraction.
 
 ## License
 
 MIT
-
-## Acknowledgments
-
-- [Bitcoin Core](https://bitcoincore.org/)
-- [Next.js](https://nextjs.org/)
-- [React](https://react.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
