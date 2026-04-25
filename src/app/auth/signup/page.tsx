@@ -126,8 +126,8 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-6 pt-24 pb-8">
-      <div className="mb-8 max-w-2xl">
+    <div className="mx-auto flex min-h-[calc(100vh-6rem)] max-w-4xl flex-col items-center justify-center px-6 pt-24 pb-8">
+      <div className="mb-8 max-w-2xl text-center">
         <h1 className="text-3xl font-semibold text-white">Sign Up</h1>
         <p className="mt-3 text-sm leading-6 text-gray-300">
           Create an account for future user-specific features, then sign in
@@ -136,13 +136,13 @@ export default function SignUpPage() {
       </div>
 
       {loading ? (
-        <div className="core-surface rounded-2xl p-6 text-sm text-gray-300">
+        <div className="core-surface w-full max-w-xl rounded-2xl p-6 text-sm text-gray-300">
           Checking your current session...
         </div>
       ) : user ? (
         <AuthSessionPanel />
       ) : (
-        <section className="core-surface relative max-w-xl rounded-2xl p-6">
+        <section className="core-surface relative w-full max-w-xl rounded-2xl p-6">
           {isAuthenticating && (
             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-[2px]">
               <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-white">

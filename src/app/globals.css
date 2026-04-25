@@ -41,7 +41,58 @@ body {
     ),
     linear-gradient(180deg, #07111b 0%, #0a1220 52%, #070d16 100%);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+.marketing-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.marketing-hero-title {
+  font-size: clamp(3rem, 6vw, 4.75rem);
+  line-height: 0.94;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+.marketing-section-title {
+  font-size: clamp(1.65rem, 2.2vw, 2.4rem);
+  line-height: 1.02;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.marketing-lead {
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  line-height: 1.75;
+  letter-spacing: -0.012em;
+}
+
+.marketing-copy {
+  line-height: 1.8;
+  letter-spacing: -0.01em;
+}
+
+code,
+pre,
+kbd,
+samp,
+.font-mono {
+  font-family: var(--font-plex-mono), monospace;
 }
 
 body::before {

@@ -60,14 +60,16 @@ export default function WalletReceive() {
   });
 
   return (
-    <div className="min-h-screen w-full bg-gray-950/30">
+    <div className="min-h-screen w-full">
       <div className="mx-auto flex max-w-md items-center justify-center px-4 py-10">
-        <div className="w-full rounded-lg border border-gray-700 bg-gray-900 p-6 text-white shadow-lg">
+        <div className="core-surface w-full rounded-3xl p-6 text-white shadow-lg">
           <div className={'pb-3 text-base font-semibold'}>
             Generate a new receiving address
           </div>
           <form noValidate onSubmit={onSubmit}>
-            <div className={'mt-2 mb-2'}>{select()}</div>
+            <div className={'core-input mt-2 mb-2 rounded-xl p-2'}>
+              {select()}
+            </div>
             {errors.addressType && (
               <div className="mb-2 text-xs text-red-300">
                 {errors.addressType.message?.toString()}
@@ -85,7 +87,7 @@ export default function WalletReceive() {
                 isLoading ||
                 currentWallet === null
               }
-              className="inline-flex items-center rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700 disabled:opacity-50"
+              className="core-button-primary"
             >
               {isLoading ? 'Generating…' : 'Generate'}
             </button>
@@ -110,7 +112,7 @@ export default function WalletReceive() {
           )}
           {response !== null && response.result && (
             <div className="mt-5">
-              <div className="mb-3 w-full rounded bg-gray-800 px-3 py-2 font-mono text-sm break-all text-gray-100">
+              <div className="core-panel-muted mb-3 w-full rounded-xl px-3 py-2 font-mono text-sm break-all text-gray-100">
                 {response.result}
               </div>
               <div className="inline-block rounded bg-white p-3">
@@ -128,7 +130,7 @@ export default function WalletReceive() {
                     setCopied(true);
                     setTimeout(() => setCopied(false), 1500);
                   }}
-                  className="rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700"
+                  className="core-button-secondary"
                 >
                   Copy
                 </button>

@@ -17,13 +17,13 @@ export default function WalletAddressDetail({
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="relative z-10 w-full max-w-2xl rounded-lg border border-gray-700 bg-gray-900 p-4 shadow-lg">
+      <div className="core-surface relative z-10 w-full max-w-2xl rounded-3xl p-4 shadow-lg">
         <div className="mb-3 flex items-center justify-between">
           <div className="text-sm font-semibold text-white">Address Detail</div>
           <button
             type="button"
             aria-label="Close"
-            className="rounded p-2 text-gray-300 hover:bg-gray-700 hover:text-white"
+            className="rounded p-2 text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
             onClick={onClose}
           >
             <svg
@@ -39,12 +39,12 @@ export default function WalletAddressDetail({
         <div className="space-y-3">
           <div>
             <div className="text-xs text-gray-400">Address</div>
-            <div className="font-mono text-xs break-all text-white">
+            <div className="core-panel-muted rounded-xl px-3 py-2 font-mono text-xs break-all text-white">
               {address}
             </div>
           </div>
           {isLoading ? (
-            <div className="rounded border border-gray-700 bg-gray-800 p-3 text-center text-xs text-gray-300">
+            <div className="core-panel-muted rounded-xl p-3 text-center text-xs text-gray-300">
               Loading detail…
             </div>
           ) : error ? (
@@ -115,7 +115,7 @@ export default function WalletAddressDetail({
               </div>
             </div>
           ) : (
-            <div className="rounded border border-gray-700 bg-gray-800 p-3 text-center text-xs text-gray-300">
+            <div className="core-panel-muted rounded-xl p-3 text-center text-xs text-gray-300">
               No detail available.
             </div>
           )}

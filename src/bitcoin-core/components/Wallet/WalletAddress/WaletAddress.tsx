@@ -11,7 +11,7 @@ export default function WalletAddress() {
   if (isLoading) {
     return (
       <div className="flex w-full items-center justify-center py-6">
-        <div className="w-full max-w-md rounded-lg border border-gray-700 bg-gray-900 p-6 text-center">
+        <div className="core-surface w-full max-w-md rounded-3xl p-6 text-center">
           <div className="text-sm text-gray-300">Loading addresses…</div>
         </div>
       </div>
@@ -43,13 +43,13 @@ export default function WalletAddress() {
         <button
           type="button"
           onClick={refresh}
-          className="rounded bg-gray-700 px-3 py-1.5 text-sm text-white hover:bg-gray-600"
+          className="core-button-secondary px-3 py-1.5"
         >
           Refresh
         </button>
       </div>
       {groups.length === 0 ? (
-        <div className="rounded-lg border border-gray-700 bg-gray-900 p-4 text-sm text-gray-300">
+        <div className="core-surface rounded-2xl p-4 text-sm text-gray-300">
           No addresses found.
         </div>
       ) : (
@@ -58,10 +58,7 @@ export default function WalletAddress() {
             Groups: {groups.length} · Addresses: {totalAddresses}
           </div>
           {groups.map((group, gi) => (
-            <div
-              key={gi}
-              className="rounded-lg border border-gray-700 bg-gray-900 p-4"
-            >
+            <div key={gi} className="core-surface rounded-2xl p-4">
               <div className="mb-2 text-sm font-medium text-white">
                 Group #{gi + 1}
               </div>
@@ -78,10 +75,7 @@ export default function WalletAddress() {
                       : 0;
                     // label removed from list UI; shown in detail only
                     return (
-                      <div
-                        key={ei}
-                        className="rounded border border-gray-700 bg-gray-800 p-3"
-                      >
+                      <div key={ei} className="core-panel-muted rounded-xl p-3">
                         <div className="flex items-start justify-between">
                           <div>
                             <div className="text-xs text-gray-400">Address</div>
@@ -92,7 +86,7 @@ export default function WalletAddress() {
                           <button
                             type="button"
                             aria-label="Disclose detail"
-                            className="ml-2 rounded p-1 text-gray-300 hover:bg-gray-700 hover:text-white"
+                            className="ml-2 rounded p-1 text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
                             onClick={() => setSelectedAddress(addr)}
                           >
                             <svg

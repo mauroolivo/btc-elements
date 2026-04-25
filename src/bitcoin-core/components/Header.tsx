@@ -9,6 +9,7 @@ export function Header() {
   const { user, loading, logout } = useAuth();
   const isHome = pathname === '/' || pathname === undefined;
   const isProfile = pathname?.startsWith('/profile');
+  const isMyWallets = pathname?.startsWith('/my-wallets');
   const isWallet = pathname?.startsWith('/wallet');
   const isStatus = pathname?.startsWith('/status');
   const isExplorer = pathname?.startsWith('/explorer');
@@ -85,6 +86,15 @@ export function Header() {
               >
                 Profile
               </Link>
+              {user ? (
+                <Link
+                  href="/my-wallets"
+                  className={navLinkClass(!!isMyWallets)}
+                  aria-current={isMyWallets ? 'page' : undefined}
+                >
+                  My Wallets
+                </Link>
+              ) : null}
             </div>
 
             <div className="flex items-center gap-4 max-md:hidden">

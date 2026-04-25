@@ -135,7 +135,7 @@ export default function WalletSendAdvanced({
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl rounded-lg border border-gray-700 bg-gray-900 p-6 text-white shadow-lg">
+    <div className="core-surface mx-auto w-full max-w-2xl rounded-3xl p-6 text-white shadow-lg">
       <div className="mb-4 flex items-center justify-between">
         <div className="text-base font-semibold">Build Transaction</div>
         <div className="text-xs text-gray-400">Step {step} of 2</div>
@@ -159,7 +159,7 @@ export default function WalletSendAdvanced({
                   type="button"
                   onClick={() => setStep(2)}
                   disabled={selectedUtxos.length === 0}
-                  className="inline-flex items-center rounded bg-orange-600 px-4 py-2 text-sm text-white hover:bg-orange-500 disabled:opacity-50"
+                  className="core-button-primary disabled:opacity-50"
                 >
                   Next
                 </button>
@@ -170,7 +170,7 @@ export default function WalletSendAdvanced({
           {step === 2 && (
             <div className="text-sm text-gray-300">
               {selectedUtxos.length > 0 && (
-                <div className="mt-3 rounded border border-gray-700 bg-gray-900 p-3 text-xs text-gray-300">
+                <div className="core-panel-muted mt-3 rounded-xl p-3 text-xs text-gray-300">
                   <div className="flex items-center justify-between">
                     <span>Selected: {selectedUtxos.length} UTXO(s)</span>
                     <span className="font-mono text-white">
@@ -190,7 +190,7 @@ export default function WalletSendAdvanced({
                   type="text"
                   id="address"
                   {...register('address')}
-                  className="w-full rounded border border-gray-600 bg-gray-800 p-2 text-white focus:border-blue-500 focus:outline-none"
+                  className="core-input w-full rounded-xl p-2 text-white focus:outline-none"
                 />
                 {errors.address && (
                   <p className="mt-1 text-xs text-red-400">
@@ -209,7 +209,7 @@ export default function WalletSendAdvanced({
                   id="amount"
                   step="any"
                   {...register('amount', { valueAsNumber: true })}
-                  className="w-full rounded border border-gray-600 bg-gray-800 p-2 text-white focus:border-blue-500 focus:outline-none"
+                  className="core-input w-full rounded-xl p-2 text-white focus:outline-none"
                 />
                 {errors.amount && (
                   <p className="mt-1 text-xs text-red-400">
@@ -231,7 +231,7 @@ export default function WalletSendAdvanced({
                   readOnly
                   disabled
                   placeholder={changeLoading ? 'Loading change address…' : ''}
-                  className="w-full rounded border border-gray-600 bg-gray-800 p-2 text-white focus:border-blue-500 focus:outline-none disabled:opacity-60"
+                  className="core-input w-full rounded-xl p-2 text-white focus:outline-none disabled:opacity-60"
                 />
                 {errors.addressChange && (
                   <p className="mt-1 text-xs text-red-400">
@@ -250,7 +250,7 @@ export default function WalletSendAdvanced({
                   id="amountChange"
                   step="any"
                   {...register('amountChange', { valueAsNumber: true })}
-                  className="w-full rounded border border-gray-600 bg-gray-800 p-2 text-white focus:border-blue-500 focus:outline-none"
+                  className="core-input w-full rounded-xl p-2 text-white focus:outline-none"
                 />
                 {errors.amountChange && (
                   <p className="mt-1 text-xs text-red-400">
@@ -258,7 +258,7 @@ export default function WalletSendAdvanced({
                   </p>
                 )}
               </div>
-              <div className="mt-3 rounded border border-gray-700 bg-gray-900 p-3 text-xs text-gray-300">
+              <div className="core-panel-muted mt-3 rounded-xl p-3 text-xs text-gray-300">
                 <div className="flex items-center justify-between">
                   <span>Calculated Fee</span>
                   <span
@@ -272,14 +272,14 @@ export default function WalletSendAdvanced({
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="inline-flex items-center rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700"
+                  className="core-button-secondary"
                 >
                   Back
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || currentWallet === null}
-                  className="inline-flex items-center rounded bg-orange-600 px-4 py-2 text-sm text-white hover:bg-orange-500"
+                  className="core-button-primary"
                 >
                   {isSubmitting ? 'Reviewing…' : 'Review'}
                 </button>
@@ -291,7 +291,7 @@ export default function WalletSendAdvanced({
 
       {open && pending && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="w-full max-w-md rounded-lg border border-gray-700 bg-gray-900 p-6 text-white shadow-xl">
+          <div className="core-surface w-full max-w-md rounded-3xl p-6 text-white shadow-xl">
             <div className="mb-3 text-base font-semibold">
               Confirm Transaction
             </div>
@@ -339,7 +339,7 @@ export default function WalletSendAdvanced({
                   setOpen(false);
                   setPending(null);
                 }}
-                className="inline-flex items-center rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700"
+                className="core-button-secondary"
               >
                 Cancel
               </button>
@@ -348,7 +348,7 @@ export default function WalletSendAdvanced({
                   confirmSend();
                 }}
                 disabled={sendLoading}
-                className="inline-flex items-center rounded bg-orange-600 px-4 py-2 text-sm text-white hover:bg-orange-500 disabled:opacity-50"
+                className="core-button-primary disabled:opacity-50"
               >
                 {sendLoading ? 'Confirming…' : 'Confirm'}
               </button>

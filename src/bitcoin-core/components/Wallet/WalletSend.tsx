@@ -72,9 +72,9 @@ export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-950/30">
+    <div className="min-h-screen w-full">
       <div className="mx-auto flex max-w-md items-center justify-center px-4 py-10">
-        <div className="w-full rounded-lg border border-gray-700 bg-gray-900 p-6 text-white shadow-lg">
+        <div className="core-surface w-full rounded-3xl p-6 text-white shadow-lg">
           <div className={'pb-3 text-base font-semibold'}>Send Bitcoin</div>
           {!successTxid && (
             <form noValidate onSubmit={onSubmit} onChange={() => clear()}>
@@ -89,7 +89,7 @@ export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
                   type="text"
                   id="address"
                   {...register('address')}
-                  className="w-full rounded border border-gray-600 bg-gray-800 p-2 text-white focus:border-blue-500 focus:outline-none"
+                  className="core-input w-full rounded-xl p-2 text-white focus:outline-none"
                 />
                 {errors.address && (
                   <p className="mt-1 text-xs text-red-400">
@@ -108,7 +108,7 @@ export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
                   id="amount"
                   step="any"
                   {...register('amount', { valueAsNumber: true })}
-                  className="w-full rounded border border-gray-600 bg-gray-800 p-2 text-white focus:border-blue-500 focus:outline-none"
+                  className="core-input w-full rounded-xl p-2 text-white focus:outline-none"
                 />
                 {errors.amount && (
                   <p className="mt-1 text-xs text-red-400">
@@ -127,7 +127,7 @@ export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
                   id="fee_rate"
                   step="any"
                   {...register('fee_rate', { valueAsNumber: true })}
-                  className="w-full rounded border border-gray-600 bg-gray-800 p-2 text-white focus:border-blue-500 focus:outline-none"
+                  className="core-input w-full rounded-xl p-2 text-white focus:outline-none"
                 />
                 {errors.fee_rate && (
                   <p className="mt-1 text-xs text-red-400">
@@ -166,7 +166,7 @@ export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
               <button
                 type="submit"
                 disabled={isSubmitting || isLoading || currentWallet === null}
-                className="inline-flex items-center rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700 disabled:opacity-50"
+                className="core-button-primary"
               >
                 {isSubmitting ? 'Sending…' : 'Send'}
               </button>
@@ -196,7 +196,7 @@ export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
 
           {open && pending && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-              <div className="w-full max-w-md rounded-lg border border-gray-700 bg-gray-900 p-6 text-white shadow-xl">
+              <div className="core-surface w-full max-w-md rounded-3xl p-6 text-white shadow-xl">
                 <div className="mb-3 text-base font-semibold">
                   Confirm Transaction
                 </div>
@@ -232,14 +232,14 @@ export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
                       setOpen(false);
                       setPending(null);
                     }}
-                    className="inline-flex items-center rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700"
+                    className="core-button-secondary"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={confirmSend}
                     disabled={isLoading || currentWallet === null}
-                    className="inline-flex items-center rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-500 disabled:opacity-50"
+                    className="core-button-primary disabled:opacity-50"
                   >
                     {isLoading ? 'Sending…' : 'Confirm & Send'}
                   </button>
