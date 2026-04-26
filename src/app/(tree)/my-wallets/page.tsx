@@ -10,6 +10,45 @@ import {
   type FirestoreWallet,
 } from '@/lib/firebase/wallets';
 
+function WalletsLoadingView({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="core-surface rounded-3xl p-8">
+      <div className="flex flex-col items-center justify-center gap-4 text-center">
+        <div className="relative h-12 w-12">
+          <div className="absolute inset-0 rounded-full border-2 border-cyan-400/20" />
+          <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-cyan-300 border-r-cyan-500" />
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-white">{title}</h2>
+          <p className="mt-2 text-sm text-gray-400">{description}</p>
+        </div>
+
+        <div className="grid w-full max-w-3xl grid-cols-1 gap-4 pt-4 md:grid-cols-3">
+          <div className="core-panel rounded-2xl p-4">
+            <div className="h-3 w-24 animate-pulse rounded bg-white/10" />
+            <div className="mt-3 h-7 w-28 animate-pulse rounded bg-white/8" />
+          </div>
+          <div className="core-panel rounded-2xl p-4">
+            <div className="h-3 w-20 animate-pulse rounded bg-white/10" />
+            <div className="mt-3 h-7 w-20 animate-pulse rounded bg-white/8" />
+          </div>
+          <div className="core-panel rounded-2xl p-4">
+            <div className="h-3 w-28 animate-pulse rounded bg-white/10" />
+            <div className="mt-3 h-7 w-24 animate-pulse rounded bg-white/8" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MyWalletsPage() {
   const { user, loading } = useAuth();
   const [wallets, setWallets] = useState<FirestoreWallet[]>([]);
@@ -89,21 +128,28 @@ export default function MyWalletsPage() {
       </div>
 
       {loading ? (
-        <div className="core-surface rounded-2xl p-6 text-sm text-gray-300">
-          Checking your current session...
-        </div>
+        <WalletsLoadingView
+          title="Loading my wallets"
+          description="Checking your session and preparing wallet access..."
+        />
       ) : !user ? (
-        <div className="core-surface max-w-2xl rounded-2xl p-6 text-white">
-          <h2 className="text-xl font-semibold">No active session</h2>
-          <p className="mt-3 text-sm leading-6 text-gray-300">
-            Sign in to access your saved wallets.
+        <div className="core-surface-hero max-w-3xl rounded-3xl p-8 text-white sm:p-10">
+          <div className="text-sm tracking-[0.24em] text-cyan-100/70 uppercase">
+            Authentication required
+          </div>
+          <h2 className="mt-4 text-3xl font-semibold text-white sm:text-4xl">
+            Please authenticate to access your wallets
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-cyan-50/80 sm:text-base">
+            Your saved wallets are tied to your account. Sign in or create one
+            to view, create, and manage your wallet list in this workspace.
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/auth/signin" className="core-button-primary">
-              Sign in
-            </Link>
-            <Link href="/auth/signup" className="core-button-secondary">
-              Sign up
+          <div className="mt-8">
+            <Link
+              href="/auth/signin"
+              className="core-button-primary px-6 py-3 text-sm font-semibold"
+            >
+              Authenticate
             </Link>
           </div>
         </div>
@@ -111,9 +157,10 @@ export default function MyWalletsPage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,0.9fr)]">
           <section className="core-surface rounded-2xl p-6">
             {walletsLoading ? (
-              <div className="core-panel-muted rounded-2xl p-4 text-sm text-gray-300">
-                Loading your wallets...
-              </div>
+              <WalletsLoadingView
+                title="Loading my wallets"
+                description="Syncing your saved wallets and preparing the dashboard..."
+              />
             ) : (
               <>
                 <div className="mb-6 flex items-start justify-between gap-4">
