@@ -35,7 +35,7 @@ export default function Page() {
       </section>
 
       <section className="mt-8 grid gap-4 lg:grid-cols-3">
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <article className="core-surface rounded-2xl p-6">
           <h2 className="text-xl font-semibold tracking-[-0.03em] text-white">
             Full validation
           </h2>
@@ -46,7 +46,7 @@ export default function Page() {
           </p>
         </article>
 
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <article className="core-surface rounded-2xl p-6">
           <h2 className="text-xl font-semibold tracking-[-0.03em] text-white">
             Privacy-aware operations
           </h2>
@@ -57,7 +57,7 @@ export default function Page() {
           </p>
         </article>
 
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        <article className="core-surface rounded-2xl p-6">
           <h2 className="text-xl font-semibold tracking-[-0.03em] text-white">
             Network support
           </h2>
@@ -69,7 +69,7 @@ export default function Page() {
         </article>
       </section>
 
-      <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm">
+      <section className="core-surface mt-8 rounded-3xl p-8">
         <div className="max-w-3xl">
           <div className="marketing-eyebrow text-gray-400">RPC Surface</div>
           <h2 className="marketing-section-title mt-3 text-white">
@@ -83,7 +83,7 @@ export default function Page() {
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+          <div className="core-panel-muted rounded-2xl p-5">
             <div className="text-base font-semibold tracking-[-0.025em] text-white">
               Blockchain
             </div>
@@ -93,7 +93,7 @@ export default function Page() {
               `getblockchaininfo` and related RPCs.
             </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+          <div className="core-panel-muted rounded-2xl p-5">
             <div className="text-base font-semibold tracking-[-0.025em] text-white">
               Wallet
             </div>
@@ -102,7 +102,7 @@ export default function Page() {
               flows, fee bumping, and wallet lifecycle actions from one place.
             </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+          <div className="core-panel-muted rounded-2xl p-5">
             <div className="text-base font-semibold tracking-[-0.025em] text-white">
               Network & mempool
             </div>
@@ -112,7 +112,7 @@ export default function Page() {
               reference.
             </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+          <div className="core-panel-muted rounded-2xl p-5">
             <div className="text-base font-semibold tracking-[-0.025em] text-white">
               Raw transaction tooling
             </div>
@@ -127,7 +127,7 @@ export default function Page() {
       <section className="mt-8 grid gap-4 md:grid-cols-3">
         <Link
           href="/wallet"
-          className="rounded-2xl border border-white/10 bg-white/5 p-6 transition-colors hover:bg-white/10"
+          className="core-surface rounded-2xl p-6 transition-colors hover:bg-white/8"
         >
           <div className="text-base font-semibold tracking-[-0.025em] text-white">
             Wallet
@@ -139,7 +139,7 @@ export default function Page() {
         </Link>
         <Link
           href="/explorer"
-          className="rounded-2xl border border-white/10 bg-white/5 p-6 transition-colors hover:bg-white/10"
+          className="core-surface rounded-2xl p-6 transition-colors hover:bg-white/8"
         >
           <div className="text-base font-semibold tracking-[-0.025em] text-white">
             Explorer
@@ -151,7 +151,7 @@ export default function Page() {
         </Link>
         <Link
           href="/mempool"
-          className="rounded-2xl border border-white/10 bg-white/5 p-6 transition-colors hover:bg-white/10"
+          className="core-surface rounded-2xl p-6 transition-colors hover:bg-white/8"
         >
           <div className="text-base font-semibold tracking-[-0.025em] text-white">
             Mempool

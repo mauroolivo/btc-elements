@@ -79,13 +79,15 @@ export function Header() {
               >
                 Chart
               </Link>
-              <Link
-                href="/profile"
-                className={navLinkClass(!!isProfile)}
-                aria-current={isProfile ? 'page' : undefined}
-              >
-                Profile
-              </Link>
+              {user ? (
+                <Link
+                  href="/profile"
+                  className={navLinkClass(!!isProfile)}
+                  aria-current={isProfile ? 'page' : undefined}
+                >
+                  Profile
+                </Link>
+              ) : null}
               <Link
                 href="/my-wallets"
                 className={navLinkClass(!!isMyWallets)}
