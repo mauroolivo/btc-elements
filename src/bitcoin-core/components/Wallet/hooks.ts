@@ -4,6 +4,7 @@ import useSWRMutation from 'swr/mutation';
 import useSWRInfinite from 'swr/infinite';
 
 import {
+  Createwallet,
   Getwalletinfo,
   Listtransactions,
   Listwalletdir,
@@ -21,6 +22,7 @@ import {
   Bumpfee,
 } from '@/bitcoin-core/model/wallet';
 import {
+  createwallet,
   listwalletdir,
   listwallets,
   loadwallet,
@@ -117,6 +119,25 @@ export function useUnloadWallet() {
   );
   return {
     unload: (wallet: string) => trigger(wallet),
+    isLoading: isMutating,
+    error,
+  };
+}
+
+export function useCreateWallet() {
+  const { trigger, data, isMutating, error } = useSWRMutation(
+    'createwallet',
+    async (_key, { arg }: { arg: string }) => {
+      const response = await createwallet(arg);
+      await swrMutate('listwalletdir');
+      await swrMutate('listwallets');
+      return response;
+    }
+  );
+
+  return {
+    response: (data as Createwallet) ?? null,
+    create: (wallet: string) => trigger(wallet),
     isLoading: isMutating,
     error,
   };

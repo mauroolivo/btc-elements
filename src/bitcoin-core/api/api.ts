@@ -11,6 +11,7 @@ import {
   Rawmempool,
 } from '@/bitcoin-core/model/transaction';
 import {
+  Createwallet,
   Getbalance,
   Getwalletinfo,
   Listtransactions,
@@ -116,6 +117,12 @@ export async function loadwallet(name: string): Promise<Loadwallet> {
   return (await fetcher('loadwallet', {
     filename: name,
   })) as Promise<Loadwallet>;
+}
+
+export async function createwallet(name: string): Promise<Createwallet> {
+  return (await fetcher('createwallet', {
+    wallet_name: name,
+  })) as Promise<Createwallet>;
 }
 
 export async function getbalance(wallet: string): Promise<Getbalance> {

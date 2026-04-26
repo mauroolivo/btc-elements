@@ -41,6 +41,16 @@ export const UnloadwalletSchema = z.object({
 });
 export type Unloadwallet = z.infer<typeof UnloadwalletSchema>;
 
+export const CreatewalletSchema = z.object({
+  result: z.object({
+    name: z.string(),
+    warnings: z.array(z.string()),
+  }),
+  error: z.object(RpcErrorSchema).optional(),
+  id: z.string(),
+});
+export type Createwallet = z.infer<typeof CreatewalletSchema>;
+
 export const GetbalanceSchema = z.object({
   result: z.number(),
   error: z.object(RpcErrorSchema).optional(),

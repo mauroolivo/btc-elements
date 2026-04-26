@@ -3,6 +3,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   getDocs,
   limit,
   orderBy,
@@ -85,6 +86,18 @@ export async function addUserWallet(userId: string, name: string) {
   });
 
   return walletId;
+}
+
+export async function deleteUserWalletById(userId: string, walletId: string) {
+  const walletSnapshot = await getDocs(
+    query(getWalletsCollection(userId), where('id', '==', walletId), limit(1))
+  );
+
+  if (walletSnapshot.empty) {
+    return;
+  }
+
+  await deleteDoc(walletSnapshot.docs[0].ref);
 }
 
 export { MAX_WALLETS_PER_USER };

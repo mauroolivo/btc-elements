@@ -5,10 +5,12 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth/useAuth';
 import {
   addUserWallet,
+  deleteUserWalletById,
   getUserWallets,
   MAX_WALLETS_PER_USER,
   type FirestoreWallet,
 } from '@/lib/firebase/wallets';
+import { useCreateWallet } from '@/bitcoin-core/components/Wallet/hooks';
 
 function WalletsLoadingView({
   title,
@@ -51,6 +53,7 @@ function WalletsLoadingView({
 
 export default function MyWalletsPage() {
   const { user, loading } = useAuth();
+  const { create: createRpcWallet } = useCreateWallet();
   const [wallets, setWallets] = useState<FirestoreWallet[]>([]);
   const [walletsLoading, setWalletsLoading] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -91,23 +94,30 @@ export default function MyWalletsPage() {
     void loadWallets(user.uid);
   }, [user]);
 
-  async function handleSaveWallet() {
+  async function handleCreateWallet() {
     if (!user) {
       setError('Sign in to save wallets.');
       return;
     }
+
+    let createdWalletId: string | null = null;
 
     setIsSaving(true);
     setError(null);
     setSuccess(null);
 
     try {
-      await addUserWallet(user.uid, walletName);
+      createdWalletId = await addUserWallet(user.uid, walletName);
+      await createRpcWallet(createdWalletId);
       setWalletName('');
       setIsFormOpen(false);
       setSuccess('Wallet saved.');
       await loadWallets(user.uid);
     } catch (nextError) {
+      if (createdWalletId) {
+        await deleteUserWalletById(user.uid, createdWalletId);
+      }
+
       setError(
         nextError instanceof Error
           ? nextError.message
@@ -243,7 +253,7 @@ export default function MyWalletsPage() {
                         className="mt-8 max-w-xl space-y-4"
                         onSubmit={(event) => {
                           event.preventDefault();
-                          void handleSaveWallet();
+                          void handleCreateWallet();
                         }}
                       >
                         <div>
@@ -268,7 +278,7 @@ export default function MyWalletsPage() {
                             disabled={isSaving || !walletName.trim()}
                             className="core-button-primary disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            Start setup
+                            Create
                           </button>
                           <span className="text-xs tracking-[0.12em] text-cyan-50/65 uppercase">
                             1 of {MAX_WALLETS_PER_USER} wallet slots
@@ -297,7 +307,7 @@ export default function MyWalletsPage() {
                         <div className="mt-4 flex flex-wrap gap-3">
                           <button
                             type="button"
-                            onClick={() => void handleSaveWallet()}
+                            onClick={() => void handleCreateWallet()}
                             disabled={isSaving}
                             className="core-button-primary disabled:cursor-not-allowed disabled:opacity-50"
                           >
