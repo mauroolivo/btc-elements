@@ -9,7 +9,9 @@ export default function Loading() {
           </div>
 
           <div>
-            <h1 className="text-xl font-semibold text-white">Loading node status</h1>
+            <h1 className="text-xl font-semibold text-white">
+              Loading node status
+            </h1>
             <p className="mt-2 text-sm text-gray-400">
               Querying blockchain, mempool, mining, and network data...
             </p>
