@@ -67,7 +67,7 @@ export default function SignUpPage() {
     try {
       await register(values.email, values.password);
       registerForm.reset();
-      router.replace('/');
+      router.replace('/my-wallets');
     } catch (error) {
       setRegisterError(mapFirebaseError((error as Error).message));
     } finally {
@@ -89,7 +89,7 @@ export default function SignUpPage() {
 
     try {
       await loginWithGoogle();
-      router.replace('/');
+      router.replace('/my-wallets');
     } catch (error) {
       setRegisterError(mapFirebaseError((error as Error).message));
     } finally {
@@ -111,7 +111,7 @@ export default function SignUpPage() {
 
     try {
       await loginWithGithub();
-      router.replace('/');
+      router.replace('/my-wallets');
     } catch (error) {
       setRegisterError(mapFirebaseError((error as Error).message));
     } finally {

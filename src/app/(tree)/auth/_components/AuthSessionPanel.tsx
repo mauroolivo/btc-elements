@@ -30,8 +30,8 @@ export function AuthSessionPanel() {
         >
           Log out
         </button>
-        <Link href="/status" className="core-button-primary">
-          Go to status
+        <Link href="/my-wallets" className="core-button-primary">
+          Go to my wallets
         </Link>
       </div>
     </div>

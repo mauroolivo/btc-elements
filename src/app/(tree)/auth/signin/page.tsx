@@ -61,7 +61,7 @@ export default function SignInPage() {
     try {
       await login(values.email, values.password);
       loginForm.reset();
-      router.replace('/');
+      router.replace('/my-wallets');
     } catch (error) {
       setLoginError(mapFirebaseError((error as Error).message));
     } finally {
@@ -83,7 +83,7 @@ export default function SignInPage() {
 
     try {
       await loginWithGoogle();
-      router.replace('/');
+      router.replace('/my-wallets');
     } catch (error) {
       setLoginError(mapFirebaseError((error as Error).message));
     } finally {
@@ -105,7 +105,7 @@ export default function SignInPage() {
 
     try {
       await loginWithGithub();
-      router.replace('/');
+      router.replace('/my-wallets');
     } catch (error) {
       setLoginError(mapFirebaseError((error as Error).message));
     } finally {

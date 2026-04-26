@@ -86,15 +86,13 @@ export function Header() {
               >
                 Profile
               </Link>
-              {user ? (
-                <Link
-                  href="/my-wallets"
-                  className={navLinkClass(!!isMyWallets)}
-                  aria-current={isMyWallets ? 'page' : undefined}
-                >
-                  My Wallets
-                </Link>
-              ) : null}
+              <Link
+                href="/my-wallets"
+                className={navLinkClass(!!isMyWallets)}
+                aria-current={isMyWallets ? 'page' : undefined}
+              >
+                My Wallets
+              </Link>
             </div>
 
             <div className="flex items-center gap-4 max-md:hidden">
@@ -120,9 +118,9 @@ export function Header() {
                 ) : (
                   <Link
                     href="/auth/signin"
-                    className="core-button-secondary px-3 py-1.5 text-xs text-gray-200"
+                    className="core-button-primary px-3 py-1.5 text-xs"
                   >
-                    Login / Register
+                    Authenticate
                   </Link>
                 )}
               </div>

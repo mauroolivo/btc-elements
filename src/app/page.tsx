@@ -25,16 +25,10 @@ export default function Page() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/wallet"
-              className="inline-flex rounded-md border border-cyan-300/20 bg-cyan-400/15 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-400/20"
+              href="/my-wallets"
+              className="inline-flex items-center rounded-2xl border border-cyan-200/25 bg-[linear-gradient(180deg,rgba(56,189,248,0.42),rgba(14,165,233,0.22))] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_34px_rgba(14,165,233,0.22),inset_0_1px_0_rgba(255,255,255,0.16)] transition-all hover:bg-[linear-gradient(180deg,rgba(56,189,248,0.5),rgba(14,165,233,0.28))]"
             >
-              Open wallet
-            </Link>
-            <Link
-              href="/status"
-              className="inline-flex rounded-md border border-white/10 bg-white/10 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/15"
-            >
-              View node status
+              My Wallets
             </Link>
           </div>
         </div>

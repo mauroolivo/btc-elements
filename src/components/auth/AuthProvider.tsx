@@ -114,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function logout() {
     await signOut(firebaseAuth);
+    window.location.assign('/');
   }
 
   return (
