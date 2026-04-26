@@ -37,8 +37,10 @@ function formatHashrate(hs?: number) {
 }
 
 export default async function Page() {
+  let blockchainInfo;
+
   try {
-    await getblockchaininfo();
+    blockchainInfo = await getblockchaininfo();
   } catch (e) {
     return (
       <div className="mx-auto max-w-2xl px-6 pt-24 pb-8">
@@ -51,10 +53,11 @@ export default async function Page() {
     );
   }
 
-  const blockchainInfo = await getblockchaininfo();
-  const mempoolInfo = await getmempoolinfo();
-  const miningInfo = await getmininginfo();
-  const networkInfo = await getnetworkinfo();
+  const [mempoolInfo, miningInfo, networkInfo] = await Promise.all([
+    getmempoolinfo(),
+    getmininginfo(),
+    getnetworkinfo(),
+  ]);
   const r = blockchainInfo?.result;
   const m = mempoolInfo?.result;
   const mi = miningInfo?.result;
