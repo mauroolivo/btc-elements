@@ -39,7 +39,11 @@ export default function WalletHomeTxList({
     return <div>Loading transactions...</div>;
   }
   if (transactions.length === 0) {
-    return <div>No transactions available</div>;
+    return (
+      <div className="flex justify-center py-8 text-center text-sm text-gray-400">
+        No transactions available
+      </div>
+    );
   }
 
   function handleCPFP(tx: ListTransaction) {
@@ -60,13 +64,12 @@ export default function WalletHomeTxList({
           typeof tx.amount === 'number' ? tx.amount : Number(tx.amount ?? 0);
         const isPositive = amountValue > 0;
         const amountColor = isPositive ? 'text-green-400' : 'text-red-400';
-        const amountBg = 'bg-gray-800';
         const amountSign = isPositive ? '+' : '';
         const isExpanded = selectedTx && selectedTx.txid === tx.txid;
         return (
           <div key={`${tx.txid}-${idx}`} className="mx-auto max-w-3xl border-b">
             <div className="flex items-center justify-between gap-4 py-3">
-              <div className={`flex-1 ${amountBg} rounded px-3 py-2`}>
+              <div className="core-panel-muted flex-1 rounded-xl px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_16px_32px_rgba(15,23,42,0.18)]">
                 <div className={`text-2xl font-bold text-white`}>
                   <span className={amountColor}>
                     {amountSign}

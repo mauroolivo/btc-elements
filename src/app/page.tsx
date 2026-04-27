@@ -3,8 +3,8 @@ import Link from 'next/link';
 export default function Page() {
   return (
     <div className="mx-auto max-w-6xl px-6 pt-24 pb-10">
-      <section className="overflow-hidden rounded-3xl border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(34,197,94,0.14),transparent_35%),rgba(255,255,255,0.04)] p-8 backdrop-blur-sm sm:p-10">
-        <div className="max-w-3xl">
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(34,197,94,0.14),transparent_35%),rgba(255,255,255,0.04)] p-8 backdrop-blur-sm sm:p-10 lg:min-h-108">
+        <div className="max-w-3xl lg:max-w-[calc(100%-25rem)] lg:pr-8">
           <div className="marketing-eyebrow text-cyan-200/80">
             Bitcoin Core UI
           </div>
@@ -22,6 +22,30 @@ export default function Page() {
             stay close to the underlying node primitives instead of abstracting
             them away.
           </p>
+
+          <div className="relative mt-8 max-w-2xl overflow-hidden rounded-[28px] border border-amber-300/18 bg-[linear-gradient(135deg,rgba(250,204,21,0.14),rgba(56,189,248,0.08)_52%,rgba(255,255,255,0.04))] p-5 shadow-[0_20px_50px_rgba(15,23,42,0.22),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm lg:absolute lg:top-10 lg:right-10 lg:mt-0 lg:max-w-sm">
+            <div className="pointer-events-none absolute top-6 right-[-2.1rem] w-44 rotate-45 border-y border-cyan-50/30 bg-[linear-gradient(180deg,rgba(34,211,238,0.96),rgba(8,145,178,0.84))] py-2 text-center text-xs font-bold tracking-[0.18em] text-slate-950 uppercase shadow-[0_14px_32px_rgba(8,145,178,0.28)]">
+              testnet4
+            </div>
+            <div>
+              <div className="text-[11px] font-semibold tracking-[0.24em] text-amber-100/75 uppercase">
+                Network disclaimer
+              </div>
+              <h2 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-white">
+                This UI works on{' '}
+                <span className="font-semibold tracking-[-0.02em] text-cyan-100">
+                  testnet4
+                </span>{' '}
+                coins.
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-cyan-50/80">
+                Funds and addresses shown here are for Bitcoin{' '}
+                <span className="font-semibold text-cyan-100">testnet4</span>,
+                not mainnet. Testnet3 is being deprecated, so this workspace is
+                already moving with the next wave of public testing.
+              </p>
+            </div>
+          </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -126,15 +150,15 @@ export default function Page() {
 
       <section className="mt-8 grid gap-4 md:grid-cols-3">
         <Link
-          href="/wallet"
+          href="/my-wallets"
           className="core-surface rounded-2xl p-6 transition-colors hover:bg-white/8"
         >
           <div className="text-base font-semibold tracking-[-0.025em] text-white">
-            Wallet
+            My Wallets
           </div>
           <p className="marketing-copy mt-2 text-sm text-gray-300">
-            Move into address management, balances, receive requests, send
-            flows, and transaction controls.
+            Open your wallet list, create new wallets, and jump directly into a
+            connected wallet view.
           </p>
         </Link>
         <Link

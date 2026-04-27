@@ -1,6 +1,5 @@
 'use client';
 import Link from 'next/link';
-import { WalletConnect } from './Wallet/WalletConnect';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/components/auth/useAuth';
 
@@ -10,12 +9,10 @@ export function Header() {
   const isHome = pathname === '/' || pathname === undefined;
   const isProfile = pathname?.startsWith('/profile');
   const isMyWallets = pathname?.startsWith('/my-wallets');
-  const isWallet = pathname?.startsWith('/wallet');
   const isStatus = pathname?.startsWith('/status');
   const isExplorer = pathname?.startsWith('/explorer');
   const isChart = pathname?.startsWith('/chart');
   const isMempool = pathname?.startsWith('/mempool');
-  const isHelp = pathname?.startsWith('/help');
 
   function navLinkClass(active: boolean) {
     const base =
@@ -45,13 +42,6 @@ export function Header() {
                 Node Status
               </Link>
               <Link
-                href="/wallet"
-                className={navLinkClass(isWallet)}
-                aria-current={isWallet ? 'page' : undefined}
-              >
-                Wallet
-              </Link>
-              <Link
                 href="/explorer"
                 className={navLinkClass(!!isExplorer)}
                 aria-current={isExplorer ? 'page' : undefined}
@@ -64,13 +54,6 @@ export function Header() {
                 aria-current={isMempool ? 'page' : undefined}
               >
                 Mempool
-              </Link>
-              <Link
-                href="/help"
-                className={navLinkClass(!!isHelp)}
-                aria-current={isHelp ? 'page' : undefined}
-              >
-                Help
               </Link>
               <Link
                 href="/chart"
@@ -126,7 +109,6 @@ export function Header() {
                   </Link>
                 )}
               </div>
-              {isWallet && <WalletConnect />}
               {/* <ThemeSelector /> */}
             </div>
           </div>

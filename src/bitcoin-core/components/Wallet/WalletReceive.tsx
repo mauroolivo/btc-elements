@@ -30,7 +30,9 @@ export default function WalletReceive() {
   });
 
   function select(): React.JSX.Element {
-    const list_items = ADDRESS_TYPES.map(({ value, label }) => (
+    const listItems = ADDRESS_TYPES.filter(
+      ({ value }) => value !== 'invalid-vector'
+    ).map(({ value, label }) => (
       <option key={value} value={value}>
         {label}
       </option>
@@ -39,8 +41,33 @@ export default function WalletReceive() {
       <option key={0} value="no-value">
         -- select address type --
       </option>,
-    ].concat(list_items);
-    return <select {...register('addressType')}>{list}</select>;
+    ].concat(listItems);
+
+    return (
+      <div className="relative">
+        <select
+          {...register('addressType')}
+          className="core-input w-full appearance-none rounded-2xl px-4 py-3 pr-12 text-sm font-medium text-white focus:outline-none"
+        >
+          {list}
+        </select>
+        <span className="pointer-events-none absolute inset-y-0 right-0 flex w-12 items-center justify-center text-cyan-100/75">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-4 w-4"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.512a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </span>
+      </div>
+    );
   }
 
   const onSubmit = handleSubmit(async ({ addressType }) => {
@@ -67,9 +94,7 @@ export default function WalletReceive() {
             Generate a new receiving address
           </div>
           <form noValidate onSubmit={onSubmit}>
-            <div className={'core-input mt-2 mb-2 rounded-xl p-2'}>
-              {select()}
-            </div>
+            <div className="mt-2 mb-2">{select()}</div>
             {errors.addressType && (
               <div className="mb-2 text-xs text-red-300">
                 {errors.addressType.message?.toString()}

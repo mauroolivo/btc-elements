@@ -50,6 +50,33 @@ export async function getUserWallets(
   });
 }
 
+export async function getUserWalletById(
+  userId: string,
+  walletId: string
+): Promise<FirestoreWallet | null> {
+  const snapshot = await getDocs(
+    query(getWalletsCollection(userId), where('id', '==', walletId), limit(1))
+  );
+
+  if (snapshot.empty) {
+    return null;
+  }
+
+  const doc = snapshot.docs[0];
+  const data = doc.data() as {
+    id?: string;
+    name?: string;
+    createdAt?: Timestamp;
+  };
+
+  return {
+    docId: doc.id,
+    id: data.id ?? '',
+    name: data.name ?? '',
+    createdAt: data.createdAt ?? null,
+  };
+}
+
 export async function addUserWallet(userId: string, name: string) {
   const trimmedName = name.trim();
 
@@ -62,7 +89,7 @@ export async function addUserWallet(userId: string, name: string) {
   );
 
   if (existingWallets.size >= MAX_WALLETS_PER_USER) {
-    throw new Error('You can save up to 10 wallets.');
+    throw new Error('Unable to save wallet.');
   }
 
   const duplicateSnapshot = await getDocs(

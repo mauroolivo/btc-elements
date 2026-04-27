@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth/useAuth';
+import { useWalletStore } from '@/bitcoin-core/useWalletStore';
 import {
   addUserWallet,
   deleteUserWalletById,
@@ -51,9 +53,22 @@ function WalletsLoadingView({
   );
 }
 
+function formatWalletCreatedAt(createdAt: FirestoreWallet['createdAt']) {
+  if (!createdAt) {
+    return 'Creation date pending';
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(createdAt.toDate());
+}
+
 export default function MyWalletsPage() {
+  const router = useRouter();
   const { user, loading } = useAuth();
   const { create: createRpcWallet } = useCreateWallet();
+  const { setTargetWallet } = useWalletStore();
   const [wallets, setWallets] = useState<FirestoreWallet[]>([]);
   const [walletsLoading, setWalletsLoading] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -128,12 +143,17 @@ export default function MyWalletsPage() {
     }
   }
 
+  function handleOpenWallet(walletId: string) {
+    setTargetWallet(walletId);
+    router.push('/wallet');
+  }
+
   return (
     <div className="mx-auto max-w-5xl px-6 pt-24 pb-8">
       <div className="mb-8 max-w-2xl">
         <h1 className="text-3xl font-semibold text-white">My Wallets</h1>
         <p className="mt-3 text-sm leading-6 text-gray-300">
-          Manage the wallet names stored in Firestore for your account.
+          Manage the wallet names saved for your account.
         </p>
       </div>
 
@@ -176,18 +196,17 @@ export default function MyWalletsPage() {
                 <div className="mb-6 flex items-start justify-between gap-4">
                   <div>
                     <div className="text-sm tracking-[0.2em] text-emerald-200/80 uppercase">
-                      Firestore wallets
+                      Wallets
                     </div>
                     <h2 className="mt-3 text-2xl font-semibold text-white">
-                      {hasWallets
-                        ? 'Saved wallet list'
-                        : 'Create your first wallet'}
+                      {hasWallets ? 'Wallet list' : 'Create your first wallet'}
                     </h2>
-                    <p className="mt-2 text-sm leading-6 text-gray-300">
-                      {hasWallets
-                        ? `${wallets.length} of ${MAX_WALLETS_PER_USER} wallet slots used.`
-                        : 'Set up your first saved wallet to unlock the full My Wallets view.'}
-                    </p>
+                    {!hasWallets ? (
+                      <p className="mt-2 text-sm leading-6 text-gray-300">
+                        Set up your first wallet to unlock the full My Wallets
+                        view.
+                      </p>
+                    ) : null}
                   </div>
 
                   {hasWallets ? (
@@ -280,9 +299,6 @@ export default function MyWalletsPage() {
                           >
                             Create
                           </button>
-                          <span className="text-xs tracking-[0.12em] text-cyan-50/65 uppercase">
-                            1 of {MAX_WALLETS_PER_USER} wallet slots
-                          </span>
                         </div>
                       </form>
                     </div>
@@ -338,10 +354,17 @@ export default function MyWalletsPage() {
                             <div className="text-sm font-semibold text-white">
                               {wallet.name}
                             </div>
-                            <div className="mt-1 font-mono text-xs text-gray-400">
-                              {wallet.id}
+                            <div className="mt-1 text-xs text-gray-400">
+                              Created {formatWalletCreatedAt(wallet.createdAt)}
                             </div>
                           </div>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenWallet(wallet.id)}
+                            className="core-button-primary px-4 py-2 text-xs font-semibold"
+                          >
+                            Open wallet
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -352,13 +375,21 @@ export default function MyWalletsPage() {
           </section>
 
           <aside className="core-surface rounded-2xl p-6">
-            <h2 className="text-xl font-semibold text-white">Rules</h2>
+            <h2 className="text-xl font-semibold text-white">About wallets</h2>
             <div className="mt-4 space-y-3 text-sm leading-6 text-gray-300">
-              <p>Wallets are loaded from Firestore when this page opens.</p>
               <p>
-                Adding a wallet creates a new document under your user path.
+                A wallet is the part of Bitcoin Core that tracks your addresses,
+                balances, transaction history, and spendable coins.
               </p>
-              <p>You can store up to {MAX_WALLETS_PER_USER} wallets.</p>
+              <p>
+                In this workspace, each saved wallet gives you a named entry you
+                can reopen later, then inspect through receive, send, address,
+                descriptor, and transaction flows.
+              </p>
+              <p>
+                Each wallet can carry its own label so different operational
+                contexts remain easy to recognize and reopen later.
+              </p>
             </div>
           </aside>
         </div>

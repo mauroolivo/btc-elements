@@ -9,6 +9,45 @@ import {
 
 type FormFields = { ref: string };
 
+function ExplorerLoadingView({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="core-surface rounded-3xl p-8">
+      <div className="flex flex-col items-center justify-center gap-4 text-center">
+        <div className="relative h-12 w-12">
+          <div className="absolute inset-0 rounded-full border-2 border-cyan-400/20" />
+          <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-cyan-300 border-r-cyan-500" />
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-white">{title}</h2>
+          <p className="mt-2 text-sm text-gray-400">{description}</p>
+        </div>
+
+        <div className="grid w-full max-w-3xl grid-cols-1 gap-4 pt-4 md:grid-cols-3">
+          <div className="core-panel rounded-2xl p-4">
+            <div className="h-3 w-24 animate-pulse rounded bg-white/10" />
+            <div className="mt-3 h-7 w-28 animate-pulse rounded bg-white/8" />
+          </div>
+          <div className="core-panel rounded-2xl p-4">
+            <div className="h-3 w-20 animate-pulse rounded bg-white/10" />
+            <div className="mt-3 h-7 w-20 animate-pulse rounded bg-white/8" />
+          </div>
+          <div className="core-panel rounded-2xl p-4">
+            <div className="h-3 w-28 animate-pulse rounded bg-white/10" />
+            <div className="mt-3 h-7 w-24 animate-pulse rounded bg-white/8" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Page() {
   const [ref, setRef] = useState<string>('');
   const [page, setPage] = useState<number>(0);
@@ -43,6 +82,10 @@ export default function Page() {
     revalidateOnFocus: false,
   });
   const blockData = blockByHeight || blockByHash;
+  const hasQuery = ref !== '';
+  const isLoadingAny =
+    isLoadingTx || isLoadingBlockHash || isLoadingBlockHeight;
+  const hasFetchError = txError || blockHashError || blockHeightError;
 
   // Pagination resets handled on submit/clear
 
@@ -93,19 +136,18 @@ export default function Page() {
       </form>
 
       <div className="mx-auto mt-6 w-full max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl">
-        {(isLoadingTx || isLoadingBlockHash || isLoadingBlockHeight) && (
-          <div className="core-surface rounded-2xl p-4 text-sm text-gray-200">
-            Fetching data...
+        {isLoadingAny && (
+          <ExplorerLoadingView
+            title="Fetching explorer data"
+            description="Checking the transaction and block references against your node..."
+          />
+        )}
+        {hasQuery && !isLoadingAny && hasFetchError && !raw && !blockData && (
+          <div className="rounded border border-red-700 bg-red-900/30 p-4 text-sm text-red-200">
+            Failed to fetch data. Please ensure the TxID, block hash, or block
+            height is correct.
           </div>
         )}
-        {(txError || blockHashError || blockHeightError) &&
-          !raw &&
-          !blockData && (
-            <div className="rounded border border-red-700 bg-red-900/30 p-4 text-sm text-red-200">
-              Failed to fetch data. Please ensure the TxID, block hash, or block
-              height is correct.
-            </div>
-          )}
         {blockData &&
           blockData.result &&
           !(isLoadingBlockHash || isLoadingBlockHeight) && (

@@ -1,14 +1,62 @@
 'use client';
 import { WalletHome } from './WalletHome/WalletHome';
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/auth/useAuth';
 import WalletReceive from './WalletReceive';
-import { useWalletInfo } from '@/bitcoin-core/components/Wallet/hooks';
+import {
+  useLoadWallet,
+  useWalletInfo,
+  useWalletsList,
+} from '@/bitcoin-core/components/Wallet/hooks';
 import WalletDescriptor from './WalletDescriptor';
 import { useWalletStore } from '@/bitcoin-core/useWalletStore';
 import WalletSend from './WalletSend';
 import WaletAddress from './WalletAddress/WaletAddress';
 import { Getwalletinfo } from '@/bitcoin-core/model/wallet';
 import WalletSendAdvanced from './WalletSendAdvanced/WalletSendAdvanced';
+import { getUserWalletById } from '@/lib/firebase/wallets';
+
+function WalletRouteLoader({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="core-surface mx-4 w-full max-w-2xl rounded-3xl p-8 text-center">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="relative h-12 w-12">
+            <div className="absolute inset-0 rounded-full border-2 border-cyan-400/20" />
+            <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-cyan-300 border-r-cyan-500" />
+          </div>
+
+          <div>
+            <h2 className="text-xl font-semibold text-white">{title}</h2>
+            <p className="mt-2 text-sm text-gray-400">{description}</p>
+          </div>
+
+          <div className="grid w-full max-w-xl grid-cols-1 gap-4 pt-4 md:grid-cols-3">
+            <div className="core-panel rounded-2xl p-4">
+              <div className="h-3 w-20 animate-pulse rounded bg-white/10" />
+              <div className="mt-3 h-7 w-24 animate-pulse rounded bg-white/8" />
+            </div>
+            <div className="core-panel rounded-2xl p-4">
+              <div className="h-3 w-24 animate-pulse rounded bg-white/10" />
+              <div className="mt-3 h-7 w-20 animate-pulse rounded bg-white/8" />
+            </div>
+            <div className="core-panel rounded-2xl p-4">
+              <div className="h-3 w-18 animate-pulse rounded bg-white/10" />
+              <div className="mt-3 h-7 w-28 animate-pulse rounded bg-white/8" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Wallet() {
   enum Tab {
@@ -21,9 +69,83 @@ export default function Wallet() {
   }
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.TRANSACTIONS);
   const [isMoreOpen, setIsMoreOpen] = useState<boolean>(false);
+  const [autoConnectError, setAutoConnectError] = useState<string | null>(null);
+  const [walletLabel, setWalletLabel] = useState<string | null>(null);
   const moreRef = useRef<HTMLDivElement | null>(null);
-  const { currentWallet } = useWalletStore();
+  const autoLoadAttemptRef = useRef<string | null>(null);
+  const router = useRouter();
+  const { user } = useAuth();
+  const { currentWallet, targetWallet, setCurrentWallet, setTargetWallet } =
+    useWalletStore();
+  const {
+    listwallets,
+    isLoading: walletsLoading,
+    refresh: refreshWallets,
+  } = useWalletsList();
+  const { load: loadWallet, isLoading: loadLoading } = useLoadWallet();
   const { walletInfo, isLoading: infoLoading } = useWalletInfo();
+
+  useEffect(() => {
+    if (targetWallet === null) {
+      router.replace('/my-wallets');
+    }
+  }, [router, targetWallet]);
+
+  useEffect(() => {
+    if (!targetWallet) {
+      setAutoConnectError(null);
+      autoLoadAttemptRef.current = null;
+      return;
+    }
+
+    if (walletsLoading) {
+      return;
+    }
+
+    if (listwallets.result.includes(targetWallet)) {
+      if (currentWallet !== targetWallet) {
+        setCurrentWallet(targetWallet);
+      }
+      setAutoConnectError(null);
+      autoLoadAttemptRef.current = null;
+      return;
+    }
+
+    if (loadLoading || autoLoadAttemptRef.current === targetWallet) {
+      return;
+    }
+
+    autoLoadAttemptRef.current = targetWallet;
+    setAutoConnectError(null);
+
+    void (async () => {
+      try {
+        await loadWallet(targetWallet);
+        await refreshWallets();
+        setCurrentWallet(targetWallet);
+        setTargetWallet(targetWallet);
+      } catch (error) {
+        setAutoConnectError(
+          error instanceof Error
+            ? error.message
+            : 'Failed to load the requested wallet.'
+        );
+      } finally {
+        autoLoadAttemptRef.current = null;
+      }
+    })();
+  }, [
+    currentWallet,
+    listwallets.result,
+    loadLoading,
+    loadWallet,
+    refreshWallets,
+    setCurrentWallet,
+    setTargetWallet,
+    targetWallet,
+    walletsLoading,
+  ]);
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (!isMoreOpen) return;
@@ -37,6 +159,74 @@ export default function Wallet() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMoreOpen]);
+
+  useEffect(() => {
+    if (!user || !currentWallet) {
+      setWalletLabel(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const savedWallet = await getUserWalletById(user.uid, currentWallet);
+
+        if (!cancelled) {
+          setWalletLabel(savedWallet?.name?.trim() || null);
+        }
+      } catch {
+        if (!cancelled) {
+          setWalletLabel(null);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentWallet, user]);
+
+  const isTargetWalletReady =
+    !targetWallet ||
+    (currentWallet === targetWallet &&
+      listwallets.result.includes(targetWallet));
+  const walletDisplayName = currentWallet === '' ? 'default' : currentWallet;
+  const walletTitle = walletLabel || walletDisplayName;
+
+  if (targetWallet && autoConnectError) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="core-surface mx-4 w-full max-w-xl rounded-3xl p-6 text-center">
+          <h2 className="text-lg font-semibold text-white">
+            Could not open wallet
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-gray-400">
+            {autoConnectError}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (targetWallet && (!isTargetWalletReady || infoLoading)) {
+    return (
+      <WalletRouteLoader
+        title="Opening wallet"
+        description="Loading and connecting the selected wallet before querying its data..."
+      />
+    );
+  }
+
+  if (targetWallet === null) {
+    return (
+      <WalletRouteLoader
+        title="Redirecting to My Wallets"
+        description="A wallet target is required before opening the wallet screen..."
+      />
+    );
+  }
+
   if (currentWallet === null) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -201,7 +391,14 @@ export default function Wallet() {
             <div className="my-3 flex w-full items-center justify-center">
               <div className="core-surface w-full max-w-md rounded-3xl p-6 shadow-lg">
                 <div className="flex flex-col items-center">
+                  <div className="text-[11px] font-semibold tracking-[0.24em] text-cyan-200/75 uppercase">
+                    Wallet
+                  </div>
+                  <div className="mt-2 text-center text-lg font-semibold tracking-[-0.03em] text-white">
+                    {walletTitle}
+                  </div>
                   <div className="text-[11px] font-semibold tracking-widest text-gray-300">
+                    <span className="sr-only">Wallet balance</span>
                     BALANCE
                   </div>
                   <div className="mt-2 flex items-baseline justify-center gap-2">

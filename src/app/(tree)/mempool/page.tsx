@@ -7,6 +7,45 @@ import { RawMempoolTx } from '@/bitcoin-core/model/transaction';
 type FormFields = { ref: string };
 type Entry = [string, RawMempoolTx];
 
+function MempoolLoadingView({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="core-surface rounded-3xl p-8">
+      <div className="flex flex-col items-center justify-center gap-4 text-center">
+        <div className="relative h-12 w-12">
+          <div className="absolute inset-0 rounded-full border-2 border-cyan-400/20" />
+          <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-cyan-300 border-r-cyan-500" />
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-white">{title}</h2>
+          <p className="mt-2 text-sm text-gray-400">{description}</p>
+        </div>
+
+        <div className="grid w-full max-w-3xl grid-cols-1 gap-4 pt-4 md:grid-cols-3">
+          <div className="core-panel rounded-2xl p-4">
+            <div className="h-3 w-24 animate-pulse rounded bg-white/10" />
+            <div className="mt-3 h-7 w-28 animate-pulse rounded bg-white/8" />
+          </div>
+          <div className="core-panel rounded-2xl p-4">
+            <div className="h-3 w-20 animate-pulse rounded bg-white/10" />
+            <div className="mt-3 h-7 w-20 animate-pulse rounded bg-white/8" />
+          </div>
+          <div className="core-panel rounded-2xl p-4">
+            <div className="h-3 w-28 animate-pulse rounded bg-white/10" />
+            <div className="mt-3 h-7 w-24 animate-pulse rounded bg-white/8" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Page() {
   const [filter, setFilter] = useState<string>('');
   const [lastRefreshAt, setLastRefreshAt] = useState<number | null>(null);
@@ -115,9 +154,10 @@ export default function Page() {
 
       <div className="mx-auto mt-6 w-full max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl">
         {isLoading && (
-          <div className="core-surface rounded-2xl p-4 text-sm text-gray-200">
-            Fetching mempool...
-          </div>
+          <MempoolLoadingView
+            title="Fetching mempool data"
+            description="Syncing unconfirmed transactions and fee activity from your node..."
+          />
         )}
         {error && !mempool && (
           <div className="rounded border border-red-700 bg-red-900/30 p-4 text-sm text-red-200">
@@ -129,7 +169,9 @@ export default function Page() {
           <div className="core-surface mempool-surface rounded-3xl p-5 text-white">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="text-base font-medium">
-                Unconfirmed Transactions ({filtered.length})
+                {filtered.length > 0
+                  ? `Unconfirmed Transactions (${filtered.length})`
+                  : 'No transactions in the mempool'}
               </div>
               <div className="flex items-center gap-2 text-xs text-cyan-100/70">
                 <span className="mempool-live-dot" aria-hidden="true" />
@@ -139,11 +181,17 @@ export default function Page() {
                 </span>
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-              {filtered.map(([txid, info]) => (
-                <MempoolTxCard key={txid} txid={txid} info={info} />
-              ))}
-            </div>
+            {filtered.length > 0 ? (
+              <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                {filtered.map(([txid, info]) => (
+                  <MempoolTxCard key={txid} txid={txid} info={info} />
+                ))}
+              </div>
+            ) : (
+              <div className="core-panel-muted mt-4 rounded-2xl p-6 text-sm text-gray-300">
+                Your node is reporting an empty mempool right now.
+              </div>
+            )}
           </div>
         )}
       </div>
