@@ -403,7 +403,7 @@ export default function Wallet() {
                   </div>
                   <div className="mt-2 flex items-baseline justify-center gap-2">
                     <span className="text-4xl font-extrabold text-white tabular-nums">
-                      {walletInfo.result.balance.toFixed(8)}
+                      {(walletInfo.result.balance ?? 0).toFixed(8)}
                     </span>
                     <span className="text-sm font-semibold text-gray-300">
                       BTC
@@ -415,7 +415,7 @@ export default function Wallet() {
                         UNCONF
                       </div>
                       <div className="text-sm font-medium text-gray-200 tabular-nums">
-                        {walletInfo.result.unconfirmed_balance.toFixed(8)}
+                        {(walletInfo.result.unconfirmed_balance ?? 0).toFixed(8)}
                       </div>
                     </div>
                     <div className="rounded-lg bg-gray-800/40 px-3 py-2">
@@ -423,7 +423,7 @@ export default function Wallet() {
                         IMMATURE
                       </div>
                       <div className="text-sm font-medium text-gray-200 tabular-nums">
-                        {walletInfo.result.immature_balance.toFixed(8)}
+                        {(walletInfo.result.immature_balance ?? 0).toFixed(8)}
                       </div>
                     </div>
                     <div className="rounded-lg bg-gray-800/40 px-3 py-2">
