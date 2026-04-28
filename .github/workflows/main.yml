@@ -1,14 +1,51 @@
 name: Deploy application
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   workflow_dispatch:
+  workflow_call:
+    secrets:
+      DEPLOY_HOST:
+        required: true
+      DEPLOY_USER:
+        required: true
+      DEPLOY_SSH_KEY:
+        required: true
+      DEPLOY_PORT:
+        required: true
+      DEPLOY_PATH:
+        required: true
+      NEXT_PUBLIC_SITE_URL:
+        required: true
+      PUBLIC_NODE_URL:
+        required: true
+      PUBLIC_RPC_USER:
+        required: true
+      PUBLIC_RPC_PASS:
+        required: true
+      NEXT_PUBLIC_FIREBASE_API_KEY:
+        required: true
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:
+        required: true
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID:
+        required: true
+      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET:
+        required: true
+      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:
+        required: true
+      NEXT_PUBLIC_FIREBASE_APP_ID:
+        required: true
+      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID:
+        required: true
+
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build:
+  security:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,5 +54,69 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Say Hello
-        run: echo "Hello, GitHub Actions!"
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Security scan with Trivy
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          vuln-type: os,library
+          scanners: vuln,secret,misconfig
+          exit-code: '1'
+
+      - name: Secret scan with Gitleaks
+        uses: gitleaks/gitleaks-action@v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: 'false'
+
+  build:
+    needs:
+      - security
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Create deployment bundle
+        run: |
+          mkdir -p public
+
+          tar -czf deploy-package.tar.gz \
+            .next \
+            public \
+            package.json \
+            package-lock.json \
+            next.config.ts \
+            ecosystem.config.js
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-package
+          path: deploy-package.tar.gz
+          retention-days: 1
