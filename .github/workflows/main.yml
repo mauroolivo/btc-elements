@@ -5,40 +5,6 @@ env:
 
 on:
   workflow_dispatch:
-  workflow_call:
-    secrets:
-      DEPLOY_HOST:
-        required: true
-      DEPLOY_USER:
-        required: true
-      DEPLOY_SSH_KEY:
-        required: true
-      DEPLOY_PORT:
-        required: true
-      DEPLOY_PATH:
-        required: true
-      NEXT_PUBLIC_SITE_URL:
-        required: true
-      PUBLIC_NODE_URL:
-        required: true
-      PUBLIC_RPC_USER:
-        required: true
-      PUBLIC_RPC_PASS:
-        required: true
-      NEXT_PUBLIC_FIREBASE_API_KEY:
-        required: true
-      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:
-        required: true
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID:
-        required: true
-      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET:
-        required: true
-      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:
-        required: true
-      NEXT_PUBLIC_FIREBASE_APP_ID:
-        required: true
-      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID:
-        required: true
 
   push:
     branches:
@@ -132,3 +98,91 @@ jobs:
           name: deploy-package
           path: deploy-package.tar.gz
           retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-package
+          path: .
+
+      - name: Prepare deployment directory
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          script: |
+            set -euo pipefail
+
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+
+            mkdir -p "$(dirname "$DEPLOY_PATH")"
+            rm -rf "$DEPLOY_PATH"
+            mkdir -p "$DEPLOY_PATH"
+
+      - name: Copy deployment bundle to Debian server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          source: 'deploy-package.tar.gz'
+          target: /tmp/btc-elements-deploy
+
+      - name: Deploy on Debian server with PM2
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          PUBLIC_NODE_URL: ${{ secrets.PUBLIC_NODE_URL }}
+          PUBLIC_RPC_USER: ${{ secrets.PUBLIC_RPC_USER }}
+          PUBLIC_RPC_PASS: ${{ secrets.PUBLIC_RPC_PASS }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          envs: DEPLOY_PATH,NEXT_PUBLIC_SITE_URL,PUBLIC_NODE_URL,PUBLIC_RPC_USER,PUBLIC_RPC_PASS,NEXT_PUBLIC_FIREBASE_API_KEY,NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,NEXT_PUBLIC_FIREBASE_PROJECT_ID,NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,NEXT_PUBLIC_FIREBASE_APP_ID,NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+          script: |
+            set -euo pipefail
+
+            DEPLOY_PATH="${DEPLOY_PATH:-/var/www/btc-elements}"
+            ARCHIVE_PATH="/tmp/btc-elements-deploy/deploy-package.tar.gz"
+
+            cd "$DEPLOY_PATH"
+
+            tar -xzf "$ARCHIVE_PATH" -C "$DEPLOY_PATH"
+
+            HUSKY=0 npm ci --omit=dev
+
+            export NODE_ENV=production
+            export NEXT_PUBLIC_SITE_URL
+            export PUBLIC_NODE_URL
+            export PUBLIC_RPC_USER
+            export PUBLIC_RPC_PASS
+            export NEXT_PUBLIC_FIREBASE_API_KEY
+            export NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+            export NEXT_PUBLIC_FIREBASE_PROJECT_ID
+            export NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+            export NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+            export NEXT_PUBLIC_FIREBASE_APP_ID
+            export NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+            export NODE_BINARY="$(command -v node)"
+
+            pm2 startOrRestart ecosystem.config.js --only btc-elements --env production --update-env
+
+            pm2 save
