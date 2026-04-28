@@ -7,6 +7,9 @@ import {
   getnetworkinfo,
 } from '@/bitcoin-core/api/api';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 function formatBytes(bytes?: number) {
   if (!bytes || bytes <= 0) return '0 B';
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
