@@ -1,6 +1,94 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useAuth } from '@/components/auth/useAuth';
+import { useWalletStore } from '@/bitcoin-core/useWalletStore';
+import {
+  useCreateWallet,
+  useWalletsDir,
+} from '@/bitcoin-core/components/Wallet/hooks';
+import { getUserWallets } from '@/lib/firebase/wallets';
 
 export default function Page() {
+  const router = useRouter();
+  const { user, loading, login } = useAuth();
+  const { setTargetWallet } = useWalletStore();
+  const { create: createRpcWallet } = useCreateWallet();
+  const { listwalletdir } = useWalletsDir();
+  const [isDemoOpening, setIsDemoOpening] = useState(false);
+  const [demoError, setDemoError] = useState<string | null>(null);
+
+  async function handleOpenDemoWallet() {
+    setIsDemoOpening(true);
+    setDemoError(null);
+
+    try {
+      const authenticatedUser = user;
+      let userId = authenticatedUser?.uid;
+
+      if (!userId) {
+        const credentialsResponse = await fetch('/api/demo-credentials', {
+          cache: 'no-store',
+        });
+
+        if (!credentialsResponse.ok) {
+          return;
+        }
+
+        const credentials = (await credentialsResponse.json()) as {
+          email?: string;
+          password?: string;
+        };
+
+        if (!credentials.email || !credentials.password) {
+          return;
+        }
+
+        const signInResult = await login(
+          credentials.email,
+          credentials.password
+        );
+        userId = signInResult.user.uid;
+      }
+
+      const wallets = await getUserWallets(userId);
+
+      if (wallets.length === 0 || !wallets[0].id) {
+        return;
+      }
+
+      const walletId = wallets[0].id;
+      const walletExistsInCore = listwalletdir.result.wallets.some(
+        (wallet) => wallet.name === walletId
+      );
+
+      if (!walletExistsInCore) {
+        const created = await createRpcWallet(walletId);
+
+        if (created?.error) {
+          const rpcErrorText = JSON.stringify(created.error).toLowerCase();
+
+          if (!rpcErrorText.includes('already exists')) {
+            return;
+          }
+        }
+      }
+
+      if (!walletId) {
+        return;
+      }
+
+      setTargetWallet(walletId);
+      router.push('/wallet');
+    } catch {
+      // Silent fail by request.
+    } finally {
+      setIsDemoOpening(false);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-6xl px-6 pt-24 pb-10">
       <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(34,197,94,0.14),transparent_35%),rgba(255,255,255,0.04)] p-8 backdrop-blur-sm sm:p-10 lg:min-h-108">
@@ -54,7 +142,26 @@ export default function Page() {
             >
               My Wallets
             </Link>
+
+            {!loading && !user ? (
+              <button
+                type="button"
+                onClick={() => void handleOpenDemoWallet()}
+                disabled={isDemoOpening}
+                className="inline-flex items-center rounded-2xl border border-amber-300/40 bg-[linear-gradient(180deg,rgba(245,158,11,0.92),rgba(251,146,60,0.82))] px-7 py-3 text-base font-extrabold text-slate-950 shadow-[0_16px_40px_rgba(245,158,11,0.35),inset_0_1px_0_rgba(255,255,255,0.34)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isDemoOpening
+                  ? 'Opening demo wallet...'
+                  : '👉 One Click Demo Wallet'}
+              </button>
+            ) : null}
           </div>
+
+          {demoError ? (
+            <p className="mt-4 text-sm font-semibold text-red-300">
+              {demoError}
+            </p>
+          ) : null}
         </div>
       </section>
 
