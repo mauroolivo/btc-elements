@@ -12,7 +12,10 @@ import {
   MAX_WALLETS_PER_USER,
   type FirestoreWallet,
 } from '@/lib/firebase/wallets';
-import { useCreateWallet } from '@/bitcoin-core/components/Wallet/hooks';
+import {
+  useCreateWallet,
+  useWalletsDir,
+} from '@/bitcoin-core/components/Wallet/hooks';
 
 function WalletsLoadingView({
   title,
@@ -68,6 +71,7 @@ export default function MyWalletsPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const { create: createRpcWallet } = useCreateWallet();
+  const { listwalletdir, refresh: refreshWalletDir } = useWalletsDir();
   const { setTargetWallet } = useWalletStore();
   const [wallets, setWallets] = useState<FirestoreWallet[]>([]);
   const [walletsLoading, setWalletsLoading] = useState(false);
@@ -76,6 +80,11 @@ export default function MyWalletsPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isOpeningWallet, setIsOpeningWallet] = useState(false);
+  const [openingWalletName, setOpeningWalletName] = useState<string | null>(
+    null
+  );
+  const [openWalletError, setOpenWalletError] = useState<string | null>(null);
   const hasWallets = wallets.length > 0;
 
   async function loadWallets(userId: string) {
@@ -143,7 +152,36 @@ export default function MyWalletsPage() {
     }
   }
 
-  function handleOpenWallet(walletId: string) {
+  async function handleOpenWallet(walletId: string, walletLabel: string) {
+    setOpenWalletError(null);
+
+    const walletExistsInCore = listwalletdir.result.wallets.some(
+      (wallet) => wallet.name === walletId
+    );
+
+    if (!walletExistsInCore) {
+      setIsOpeningWallet(true);
+      setOpeningWalletName(walletLabel);
+
+      try {
+        const created = await createRpcWallet(walletId);
+
+        if (created?.error) {
+          const rpcErrorText = JSON.stringify(created.error).toLowerCase();
+          if (!rpcErrorText.includes('already exists')) {
+            throw new Error('Failed to create wallet in Bitcoin Core.');
+          }
+        }
+
+        await refreshWalletDir();
+      } catch {
+        setOpenWalletError('Cannnot open your wallet at this time, try later.');
+        setIsOpeningWallet(false);
+        setOpeningWalletName(null);
+        return;
+      }
+    }
+
     setTargetWallet(walletId);
     router.push('/wallet');
   }
@@ -228,6 +266,9 @@ export default function MyWalletsPage() {
                 {error ? (
                   <p className="mb-4 text-sm text-red-400">{error}</p>
                 ) : null}
+                {openWalletError ? (
+                  <p className="mb-4 text-sm text-red-400">{openWalletError}</p>
+                ) : null}
                 {success && hasWallets ? (
                   <p className="mb-4 text-sm text-green-400">{success}</p>
                 ) : null}
@@ -305,6 +346,29 @@ export default function MyWalletsPage() {
                   </div>
                 ) : (
                   <>
+                    {isOpeningWallet ? (
+                      <div className="core-panel-muted relative mb-6 overflow-hidden rounded-2xl p-6 text-white">
+                        <div className="absolute -top-16 right-2 h-40 w-40 rounded-full bg-cyan-300/10 blur-3xl" />
+                        <div className="absolute -bottom-16 left-0 h-36 w-36 rounded-full bg-emerald-300/10 blur-3xl" />
+                        <div className="relative z-10 flex flex-col items-center justify-center text-center">
+                          <div className="relative h-20 w-20">
+                            <div className="absolute inset-0 rounded-full border border-cyan-200/20" />
+                            <div className="absolute inset-2 animate-ping rounded-full border border-emerald-300/30" />
+                            <div className="absolute inset-4 animate-spin rounded-full border-2 border-transparent border-t-cyan-300 border-r-emerald-300" />
+                            <div className="absolute inset-[1.35rem] rounded-full bg-white/10 shadow-[0_0_40px_rgba(34,211,238,0.18)]" />
+                          </div>
+                          <p className="mt-5 text-lg font-semibold text-white">
+                            Preparing wallet in Bitcoin Core
+                          </p>
+                          <p className="mt-2 max-w-md text-sm leading-6 text-cyan-50/80">
+                            {openingWalletName
+                              ? `Creating ${openingWalletName} and connecting it to your workspace...`
+                              : 'Creating the selected wallet and connecting it to your workspace...'}
+                          </p>
+                        </div>
+                      </div>
+                    ) : null}
+
                     {isFormOpen ? (
                       <div className="core-panel-muted mb-6 rounded-2xl p-4">
                         <label className="mb-2 block text-xs tracking-[0.16em] text-gray-400 uppercase">
@@ -360,7 +424,10 @@ export default function MyWalletsPage() {
                           </div>
                           <button
                             type="button"
-                            onClick={() => handleOpenWallet(wallet.id)}
+                            onClick={() =>
+                              void handleOpenWallet(wallet.id, wallet.name)
+                            }
+                            disabled={isOpeningWallet}
                             className="core-button-primary px-4 py-2 text-xs font-semibold"
                           >
                             Open wallet

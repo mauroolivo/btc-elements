@@ -415,7 +415,9 @@ export default function Wallet() {
                         UNCONF
                       </div>
                       <div className="text-sm font-medium text-gray-200 tabular-nums">
-                        {(walletInfo.result.unconfirmed_balance ?? 0).toFixed(8)}
+                        {(walletInfo.result.unconfirmed_balance ?? 0).toFixed(
+                          8
+                        )}
                       </div>
                     </div>
                     <div className="rounded-lg bg-gray-800/40 px-3 py-2">
