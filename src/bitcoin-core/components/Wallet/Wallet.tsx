@@ -192,7 +192,7 @@ export default function Wallet() {
     (currentWallet === targetWallet &&
       listwallets.result.includes(targetWallet));
   const walletDisplayName = currentWallet === '' ? 'default' : currentWallet;
-  const walletTitle = walletLabel || walletDisplayName;
+  const walletTitle = walletLabel || (user ? walletDisplayName : null);
 
   if (targetWallet && autoConnectError) {
     return (
