@@ -11,7 +11,7 @@ import {
 } from '@/bitcoin-core/components/Wallet/hooks';
 import { getUserWallets } from '@/lib/firebase/wallets';
 
-const DEMO_ACCOUNT_EMAIL = 'demo@btccore.io';
+const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
 
 export default function Page() {
   const router = useRouter();

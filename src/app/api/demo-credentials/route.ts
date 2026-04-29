@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const email = process.env.DEMO_EMAIL;
+  const email = process.env.NEXT_PUBLIC_DEMO_EMAIL;
   const password = process.env.DEMO_PASSWORD;
 
   if (!email || !password) {
     return NextResponse.json(
-      { error: 'Missing DEMO_EMAIL or DEMO_PASSWORD.' },
+      { error: 'Missing NEXT_PUBLIC_DEMO_EMAIL or DEMO_PASSWORD.' },
       { status: 500 }
     );
   }

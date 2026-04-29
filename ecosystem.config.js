@@ -25,7 +25,7 @@ module.exports = {
         NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
         NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID:
           process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-        DEMO_EMAIL: process.env.DEMO_EMAIL,
+        NEXT_PUBLIC_DEMO_EMAIL: process.env.NEXT_PUBLIC_DEMO_EMAIL,
         DEMO_PASSWORD: process.env.DEMO_PASSWORD,
       },
     },
