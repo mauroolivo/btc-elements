@@ -86,7 +86,7 @@ export default function Wallet() {
   } = useWalletsList();
   const { load: loadWallet, isLoading: loadLoading } = useLoadWallet();
   const { walletInfo, isLoading: infoLoading } = useWalletInfo();
-  const { balanceInfo } = useBalance();
+  const { balanceInfo, isLoading: balanceLoading } = useBalance();
 
   useEffect(() => {
     if (targetWallet === null) {
@@ -198,10 +198,21 @@ export default function Wallet() {
     (currentWallet === targetWallet &&
       listwallets.result.includes(targetWallet));
   const walletTitle = isWalletLabelLoading ? null : walletLabel;
+  const hasWalletInfoBalance =
+    typeof walletInfo?.result?.balance === 'number' &&
+    !Number.isNaN(walletInfo.result.balance);
   const displayedBalance =
     typeof balanceInfo?.result === 'number'
       ? balanceInfo.result
-      : (walletInfo?.result?.balance ?? 0);
+      : hasWalletInfoBalance
+        ? walletInfo.result.balance
+        : null;
+  const isWalletCardReady =
+    !infoLoading &&
+    walletInfo !== null &&
+    !isWalletLabelLoading &&
+    !balanceLoading &&
+    displayedBalance !== null;
 
   if (targetWallet && autoConnectError) {
     return (
@@ -390,68 +401,77 @@ export default function Wallet() {
           </div>
         </div>
       </div>
-      {(walletInfo as Getwalletinfo) && (
-        <>
-          {infoLoading || walletInfo === null ? (
-            <div className="flex w-full items-center justify-center py-3 text-sm text-gray-300">
-              Loading wallet info...
-            </div>
-          ) : (
-            <div className="my-3 flex w-full items-center justify-center">
-              <div className="core-surface w-full max-w-md rounded-3xl p-6 shadow-lg">
-                <div className="flex flex-col items-center">
-                  <div className="text-[11px] font-semibold tracking-[0.24em] text-cyan-200/75 uppercase">
-                    Wallet
+      <div className="my-3 flex w-full items-center justify-center">
+        <div className="core-surface w-full max-w-md rounded-3xl p-6 shadow-lg">
+          {isWalletCardReady && (walletInfo as Getwalletinfo) ? (
+            <div className="flex flex-col items-center">
+              <div className="text-[11px] font-semibold tracking-[0.24em] text-cyan-200/75 uppercase">
+                Wallet
+              </div>
+              <div className="mt-2 text-center text-lg font-semibold tracking-[-0.03em] text-white">
+                {walletTitle}
+              </div>
+              <div className="text-[11px] font-semibold tracking-widest text-gray-300">
+                <span className="sr-only">Wallet balance</span>
+                BALANCE
+              </div>
+              <div className="mt-2 flex items-baseline justify-center gap-2">
+                <span className="text-4xl font-extrabold text-white tabular-nums">
+                  {displayedBalance.toFixed(8)}
+                </span>
+                <span className="text-sm font-semibold text-gray-300">BTC</span>
+              </div>
+              <div className="mt-3 grid w-full grid-cols-3 gap-2 text-center">
+                <div className="core-panel-muted rounded-lg px-3 py-2">
+                  <div className="text-[10px] tracking-wider text-gray-400">
+                    UNCONF
                   </div>
-                  <div className="mt-2 text-center text-lg font-semibold tracking-[-0.03em] text-white">
-                    {walletTitle}
+                  <div className="text-sm font-medium text-gray-200 tabular-nums">
+                    {(walletInfo.result.unconfirmed_balance ?? 0).toFixed(8)}
                   </div>
-                  <div className="text-[11px] font-semibold tracking-widest text-gray-300">
-                    <span className="sr-only">Wallet balance</span>
-                    BALANCE
+                </div>
+                <div className="rounded-lg bg-gray-800/40 px-3 py-2">
+                  <div className="text-[10px] tracking-wider text-gray-400">
+                    IMMATURE
                   </div>
-                  <div className="mt-2 flex items-baseline justify-center gap-2">
-                    <span className="text-4xl font-extrabold text-white tabular-nums">
-                      {displayedBalance.toFixed(8)}
-                    </span>
-                    <span className="text-sm font-semibold text-gray-300">
-                      BTC
-                    </span>
+                  <div className="text-sm font-medium text-gray-200 tabular-nums">
+                    {(walletInfo.result.immature_balance ?? 0).toFixed(8)}
                   </div>
-                  <div className="mt-3 grid w-full grid-cols-3 gap-2 text-center">
-                    <div className="core-panel-muted rounded-lg px-3 py-2">
-                      <div className="text-[10px] tracking-wider text-gray-400">
-                        UNCONF
-                      </div>
-                      <div className="text-sm font-medium text-gray-200 tabular-nums">
-                        {(walletInfo.result.unconfirmed_balance ?? 0).toFixed(
-                          8
-                        )}
-                      </div>
-                    </div>
-                    <div className="rounded-lg bg-gray-800/40 px-3 py-2">
-                      <div className="text-[10px] tracking-wider text-gray-400">
-                        IMMATURE
-                      </div>
-                      <div className="text-sm font-medium text-gray-200 tabular-nums">
-                        {(walletInfo.result.immature_balance ?? 0).toFixed(8)}
-                      </div>
-                    </div>
-                    <div className="rounded-lg bg-gray-800/40 px-3 py-2">
-                      <div className="text-[10px] tracking-wider text-gray-400">
-                        TX COUNT
-                      </div>
-                      <div className="text-sm font-medium text-gray-200 tabular-nums">
-                        {walletInfo.result.txcount}
-                      </div>
-                    </div>
+                </div>
+                <div className="rounded-lg bg-gray-800/40 px-3 py-2">
+                  <div className="text-[10px] tracking-wider text-gray-400">
+                    TX COUNT
+                  </div>
+                  <div className="text-sm font-medium text-gray-200 tabular-nums">
+                    {walletInfo.result.txcount}
                   </div>
                 </div>
               </div>
             </div>
+          ) : (
+            <div className="flex flex-col items-center">
+              <div className="h-3 w-16 animate-pulse rounded bg-cyan-300/25" />
+              <div className="mt-3 h-7 w-44 animate-pulse rounded bg-white/10" />
+              <div className="mt-3 h-3 w-20 animate-pulse rounded bg-white/10" />
+              <div className="mt-3 h-12 w-56 animate-pulse rounded bg-white/10" />
+              <div className="mt-4 grid w-full grid-cols-3 gap-2">
+                <div className="rounded-lg bg-gray-800/40 px-3 py-3">
+                  <div className="h-3 w-14 animate-pulse rounded bg-white/10" />
+                  <div className="mt-2 h-5 w-20 animate-pulse rounded bg-white/10" />
+                </div>
+                <div className="rounded-lg bg-gray-800/40 px-3 py-3">
+                  <div className="h-3 w-16 animate-pulse rounded bg-white/10" />
+                  <div className="mt-2 h-5 w-20 animate-pulse rounded bg-white/10" />
+                </div>
+                <div className="rounded-lg bg-gray-800/40 px-3 py-3">
+                  <div className="h-3 w-14 animate-pulse rounded bg-white/10" />
+                  <div className="mt-2 h-5 w-12 animate-pulse rounded bg-white/10" />
+                </div>
+              </div>
+            </div>
           )}
-        </>
-      )}
+        </div>
+      </div>
       {currentTab === Tab.TRANSACTIONS ? (
         <WalletHome />
       ) : currentTab === Tab.RECEIVE ? (
