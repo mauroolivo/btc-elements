@@ -71,6 +71,7 @@ export default function Wallet() {
   const [isMoreOpen, setIsMoreOpen] = useState<boolean>(false);
   const [autoConnectError, setAutoConnectError] = useState<string | null>(null);
   const [walletLabel, setWalletLabel] = useState<string | null>(null);
+  const [isWalletLabelLoading, setIsWalletLabelLoading] = useState(false);
   const moreRef = useRef<HTMLDivElement | null>(null);
   const autoLoadAttemptRef = useRef<string | null>(null);
   const router = useRouter();
@@ -121,9 +122,7 @@ export default function Wallet() {
     void (async () => {
       try {
         await loadWallet(targetWallet);
-        await refreshWallets();
         setCurrentWallet(targetWallet);
-        setTargetWallet(targetWallet);
       } catch (error) {
         setAutoConnectError(
           error instanceof Error
@@ -163,21 +162,26 @@ export default function Wallet() {
   useEffect(() => {
     if (!user || !currentWallet) {
       setWalletLabel(null);
+      setIsWalletLabelLoading(false);
       return;
     }
 
     let cancelled = false;
+    setWalletLabel(null);
+    setIsWalletLabelLoading(true);
 
     void (async () => {
       try {
         const savedWallet = await getUserWalletById(user.uid, currentWallet);
 
         if (!cancelled) {
-          setWalletLabel(savedWallet?.name?.trim() || null);
+          setWalletLabel(savedWallet?.name?.trim() || 'Wallet');
+          setIsWalletLabelLoading(false);
         }
       } catch {
         if (!cancelled) {
-          setWalletLabel(null);
+          setWalletLabel('Wallet');
+          setIsWalletLabelLoading(false);
         }
       }
     })();
@@ -191,8 +195,7 @@ export default function Wallet() {
     !targetWallet ||
     (currentWallet === targetWallet &&
       listwallets.result.includes(targetWallet));
-  const walletDisplayName = currentWallet === '' ? 'default' : currentWallet;
-  const walletTitle = walletLabel || (user ? walletDisplayName : null);
+  const walletTitle = isWalletLabelLoading ? null : walletLabel;
 
   if (targetWallet && autoConnectError) {
     return (

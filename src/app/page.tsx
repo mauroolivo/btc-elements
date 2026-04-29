@@ -143,18 +143,21 @@ export default function Page() {
               My Wallets
             </Link>
 
-            {!loading && !user ? (
-              <button
-                type="button"
-                onClick={() => void handleOpenDemoWallet()}
-                disabled={isDemoOpening}
-                className="inline-flex items-center rounded-2xl border border-amber-300/40 bg-[linear-gradient(180deg,rgba(245,158,11,0.92),rgba(251,146,60,0.82))] px-7 py-3 text-base font-extrabold text-slate-950 shadow-[0_16px_40px_rgba(245,158,11,0.35),inset_0_1px_0_rgba(255,255,255,0.34)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {isDemoOpening
-                  ? 'Opening demo wallet...'
-                  : '👉 One Click Demo Wallet'}
-              </button>
-            ) : null}
+            <button
+              type="button"
+              onClick={() => void handleOpenDemoWallet()}
+              disabled={isDemoOpening || loading || !!user}
+              className="inline-flex items-center gap-2 rounded-2xl border border-amber-300/40 bg-[linear-gradient(180deg,rgba(245,158,11,0.92),rgba(251,146,60,0.82))] px-7 py-3 text-base font-extrabold text-slate-950 shadow-[0_16px_40px_rgba(245,158,11,0.35),inset_0_1px_0_rgba(255,255,255,0.34)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isDemoOpening ? (
+                <>
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-slate-950/30 border-t-slate-950" />
+                  Connecting...
+                </>
+              ) : (
+                '👉 One Click Demo Wallet'
+              )}
+            </button>
           </div>
 
           {demoError ? (
