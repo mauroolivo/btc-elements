@@ -1,116 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useAuth } from '@/components/auth/useAuth';
-import { useWalletStore } from '@/bitcoin-core/useWalletStore';
-import {
-  useCreateWallet,
-  useWalletsDir,
-} from '@/bitcoin-core/components/Wallet/hooks';
-import { getUserWallets } from '@/lib/firebase/wallets';
-
-const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
+import { useDemoWalletAccess } from '@/components/auth/useDemoWalletAccess';
 
 export default function Page() {
-  const router = useRouter();
-  const { user, login } = useAuth();
-  const { setTargetWallet } = useWalletStore();
-  const { create: createRpcWallet } = useCreateWallet();
-  const { listwalletdir, refresh: refreshWalletDir } = useWalletsDir();
-  const [isDemoOpening, setIsDemoOpening] = useState(false);
-  const [demoError, setDemoError] = useState<string | null>(null);
   const [blockedDemoAccount, setBlockedDemoAccount] = useState<string | null>(
     null
   );
-
-  async function openDemoWalletForUser(userId: string) {
-    const wallets = await getUserWallets(userId);
-
-    if (wallets.length === 0 || !wallets[0].id) {
-      setDemoError('Demo wallet is not available right now.');
-      return;
-    }
-
-    const walletId = wallets[0].id;
-    const walletExistsInCore = listwalletdir.result.wallets.some(
-      (wallet) => wallet.name === walletId
-    );
-
-    if (!walletExistsInCore) {
-      const created = await createRpcWallet(walletId);
-
-      if (created?.error) {
-        const rpcErrorText = JSON.stringify(created.error).toLowerCase();
-
-        if (!rpcErrorText.includes('already exists')) {
-          setDemoError('Demo wallet is not available right now.');
-          return;
-        }
-      }
-
-      await refreshWalletDir();
-    }
-
-    setTargetWallet(walletId);
-    router.push('/wallet');
-  }
-
-  async function handleOpenDemoWallet() {
-    if (user) {
-      const authenticatedEmail = user.email?.toLowerCase();
-
-      if (authenticatedEmail === DEMO_ACCOUNT_EMAIL) {
-        setIsDemoOpening(true);
-        setDemoError(null);
-
-        try {
-          await openDemoWalletForUser(user.uid);
-        } finally {
-          setIsDemoOpening(false);
-        }
-
-        return;
-      }
-
-      if (authenticatedEmail !== DEMO_ACCOUNT_EMAIL) {
-        const accountLabel = user.email ?? 'an unknown account';
-
-        setBlockedDemoAccount(accountLabel);
-        return;
-      }
-    }
-
-    setIsDemoOpening(true);
-    setDemoError(null);
-
-    try {
-      const credentialsResponse = await fetch('/api/demo-credentials', {
-        cache: 'no-store',
-      });
-
-      if (!credentialsResponse.ok) {
-        return;
-      }
-
-      const credentials = (await credentialsResponse.json()) as {
-        email?: string;
-        password?: string;
-      };
-
-      if (!credentials.email || !credentials.password) {
-        return;
-      }
-
-      const signInResult = await login(credentials.email, credentials.password);
-      await openDemoWalletForUser(signInResult.user.uid);
-    } catch {
-      // Silent fail by request.
-    } finally {
-      setIsDemoOpening(false);
-    }
-  }
+  const { demoError, isDemoOpening, openDemoWallet } = useDemoWalletAccess({
+    onBlockedAccount: (accountLabel) => setBlockedDemoAccount(accountLabel),
+  });
 
   return (
     <>
@@ -204,7 +104,7 @@ export default function Page() {
 
               <button
                 type="button"
-                onClick={() => void handleOpenDemoWallet()}
+                onClick={() => void openDemoWallet()}
                 disabled={isDemoOpening}
                 className="inline-flex items-center gap-2 rounded-2xl border border-amber-300/40 bg-[linear-gradient(180deg,rgba(245,158,11,0.92),rgba(251,146,60,0.82))] px-7 py-3 text-base font-extrabold whitespace-nowrap text-slate-950 shadow-[0_16px_40px_rgba(245,158,11,0.35),inset_0_1px_0_rgba(255,255,255,0.34)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
               >

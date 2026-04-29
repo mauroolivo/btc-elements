@@ -15,6 +15,7 @@ import { AuthGithubButton } from '../_components/AuthGithubButton';
 import { AuthGoogleButton } from '../_components/AuthGoogleButton';
 import { AuthSessionPanel } from '../_components/AuthSessionPanel';
 import { PasswordField } from '../_components/PasswordField';
+import { useDemoWalletAccess } from '@/components/auth/useDemoWalletAccess';
 
 function mapFirebaseError(message: string) {
   if (message.includes('auth/invalid-credential')) {
@@ -42,6 +43,7 @@ export default function SignInPage() {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authAction, setAuthAction] = useState('Signing you in...');
+  const { demoError, isDemoOpening, openDemoWallet } = useDemoWalletAccess();
   const loginForm = useForm<FormAuthLoginType>({
     mode: 'onChange',
     reValidateMode: 'onChange',
@@ -179,6 +181,12 @@ export default function SignInPage() {
               </div>
             )}
 
+            {demoError && (
+              <div className="core-surface rounded-2xl p-3 text-sm text-red-200">
+                {demoError}
+              </div>
+            )}
+
             <div className="grid gap-3 sm:grid-cols-2">
               <AuthGoogleButton
                 onClick={() => void onGoogleLogin()}
@@ -196,6 +204,32 @@ export default function SignInPage() {
               <div className="h-px flex-1 bg-white/10" />
               <span>or</span>
               <div className="h-px flex-1 bg-white/10" />
+            </div>
+
+            <div className="rounded-2xl border border-amber-300/18 bg-[linear-gradient(135deg,rgba(245,158,11,0.12),rgba(56,189,248,0.08),rgba(255,255,255,0.03))] p-4">
+              <div className="text-sm font-semibold text-white">Not ready?</div>
+              <p className="mt-1 text-sm leading-6 text-gray-300">
+                Try the demo wallet and land directly in the wallet experience.
+              </p>
+              <button
+                type="button"
+                onClick={() => void openDemoWallet()}
+                disabled={
+                  isAuthenticating ||
+                  loginForm.formState.isSubmitting ||
+                  isDemoOpening
+                }
+                className="mt-3 inline-flex items-center gap-2 rounded-2xl border border-amber-300/40 bg-[linear-gradient(180deg,rgba(245,158,11,0.92),rgba(251,146,60,0.82))] px-6 py-3 text-sm font-extrabold whitespace-nowrap text-slate-950 shadow-[0_16px_40px_rgba(245,158,11,0.28),inset_0_1px_0_rgba(255,255,255,0.34)] transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isDemoOpening ? (
+                  <>
+                    <AuthButtonSpinner />
+                    <span>Connecting...</span>
+                  </>
+                ) : (
+                  '👉 One Click Demo Wallet'
+                )}
+              </button>
             </div>
 
             <div className="flex items-center gap-3">
