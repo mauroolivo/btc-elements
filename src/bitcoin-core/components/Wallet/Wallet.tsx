@@ -18,6 +18,8 @@ import { Getwalletinfo } from '@/bitcoin-core/model/wallet';
 import WalletSendAdvanced from './WalletSendAdvanced/WalletSendAdvanced';
 import { getUserWalletById } from '@/lib/firebase/wallets';
 
+const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
+
 function WalletRouteLoader({
   title,
   description,
@@ -70,6 +72,7 @@ export default function Wallet() {
   }
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.TRANSACTIONS);
   const [isMoreOpen, setIsMoreOpen] = useState<boolean>(false);
+  const [isGuideCollapsed, setIsGuideCollapsed] = useState(false);
   const [autoConnectError, setAutoConnectError] = useState<string | null>(null);
   const [walletLabel, setWalletLabel] = useState<string | null>(null);
   const [isWalletLabelLoading, setIsWalletLabelLoading] = useState(false);
@@ -213,6 +216,7 @@ export default function Wallet() {
     !isWalletLabelLoading &&
     !balanceLoading &&
     displayedBalance !== null;
+  const isDemoAccount = user?.email?.toLowerCase() === DEMO_ACCOUNT_EMAIL;
 
   if (targetWallet && autoConnectError) {
     return (
@@ -285,7 +289,7 @@ export default function Wallet() {
     );
   }
   return (
-    <div className="">
+    <div className="relative">
       <div className="mb-6 flex w-full items-center justify-center">
         <div
           className="core-tab-strip inline-flex rounded-xl p-1 shadow-sm"
@@ -487,6 +491,110 @@ export default function Wallet() {
       ) : (
         <div>ERROR</div>
       )}
+
+      {isDemoAccount ? (
+        <div className="fixed right-4 bottom-4 z-30 w-[calc(100vw-2rem)] max-w-sm sm:right-6 sm:bottom-6">
+          <div className="overflow-hidden rounded-3xl border border-amber-300/18 bg-[linear-gradient(180deg,rgba(15,23,42,0.96),rgba(15,23,42,0.92))] shadow-[0_24px_70px_rgba(2,8,23,0.5)] backdrop-blur-xl">
+            <div className="flex items-center justify-between gap-3 border-b border-white/8 px-4 py-3">
+              <div>
+                <div className="text-[11px] font-semibold tracking-[0.24em] text-amber-100/75 uppercase">
+                  Guided next step
+                </div>
+                <div className="mt-1 text-sm font-semibold text-white">
+                  Fund this demo wallet with testnet4 coins
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsGuideCollapsed((value) => !value)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10"
+                aria-expanded={!isGuideCollapsed}
+                aria-label={
+                  isGuideCollapsed ? 'Expand demo guide' : 'Collapse demo guide'
+                }
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className={`h-5 w-5 transition-transform ${isGuideCollapsed ? '' : 'rotate-180'}`}
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.51a.75.75 0 01-1.08 0l-4.25-4.51a.75.75 0 01.02-1.06z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {!isGuideCollapsed ? (
+              <div className="space-y-4 px-4 py-4 text-sm text-gray-200">
+                <ol className="space-y-3">
+                  <li className="flex gap-3">
+                    <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/14 text-xs font-bold text-cyan-100">
+                      1
+                    </span>
+                    <div>
+                      <div>Click on Receive.</div>
+                      <button
+                        type="button"
+                        onClick={() => setCurrentTab(Tab.RECEIVE)}
+                        className="mt-2 inline-flex items-center rounded-2xl border border-cyan-200/18 bg-cyan-400/10 px-3 py-2 text-xs font-semibold tracking-wide text-cyan-100 transition-colors hover:bg-cyan-400/16"
+                      >
+                        Open Receive
+                      </button>
+                    </div>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/14 text-xs font-bold text-cyan-100">
+                      2
+                    </span>
+                    <span>Generate a new address and copy it.</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/14 text-xs font-bold text-cyan-100">
+                      3
+                    </span>
+                    <div>
+                      <div>
+                        Open a testnet4 faucet such as mempool.space, paste the
+                        copied address, choose an amount, and send the coins.
+                      </div>
+                      <a
+                        href="https://mempool.space/it/testnet4/faucet"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-flex items-center rounded-2xl border border-amber-300/18 bg-amber-400/10 px-3 py-2 text-xs font-semibold tracking-wide text-amber-100 transition-colors hover:bg-amber-400/16"
+                      >
+                        Open Faucet
+                      </a>
+                    </div>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/14 text-xs font-bold text-cyan-100">
+                      4
+                    </span>
+                    <div>
+                      <div>
+                        Come back here, open Transactions, and you should soon
+                        see the incoming payment as pending.
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setCurrentTab(Tab.TRANSACTIONS)}
+                        className="mt-2 inline-flex items-center rounded-2xl border border-white/10 bg-white/6 px-3 py-2 text-xs font-semibold tracking-wide text-white transition-colors hover:bg-white/10"
+                      >
+                        Open Transactions
+                      </button>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
