@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth/useAuth';
 import WalletReceive from './WalletReceive';
 import {
+  useBalance,
   useLoadWallet,
   useWalletInfo,
   useWalletsList,
@@ -85,6 +86,7 @@ export default function Wallet() {
   } = useWalletsList();
   const { load: loadWallet, isLoading: loadLoading } = useLoadWallet();
   const { walletInfo, isLoading: infoLoading } = useWalletInfo();
+  const { balanceInfo } = useBalance();
 
   useEffect(() => {
     if (targetWallet === null) {
@@ -196,6 +198,10 @@ export default function Wallet() {
     (currentWallet === targetWallet &&
       listwallets.result.includes(targetWallet));
   const walletTitle = isWalletLabelLoading ? null : walletLabel;
+  const displayedBalance =
+    typeof balanceInfo?.result === 'number'
+      ? balanceInfo.result
+      : (walletInfo?.result?.balance ?? 0);
 
   if (targetWallet && autoConnectError) {
     return (
@@ -406,7 +412,7 @@ export default function Wallet() {
                   </div>
                   <div className="mt-2 flex items-baseline justify-center gap-2">
                     <span className="text-4xl font-extrabold text-white tabular-nums">
-                      {(walletInfo.result.balance ?? 0).toFixed(8)}
+                      {displayedBalance.toFixed(8)}
                     </span>
                     <span className="text-sm font-semibold text-gray-300">
                       BTC

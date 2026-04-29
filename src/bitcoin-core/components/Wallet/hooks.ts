@@ -5,6 +5,7 @@ import useSWRInfinite from 'swr/infinite';
 
 import {
   Createwallet,
+  Getbalance,
   Getwalletinfo,
   Listtransactions,
   Listwalletdir,
@@ -27,6 +28,7 @@ import {
   listwallets,
   loadwallet,
   unloadwallet,
+  getbalance as rpcGetBalance,
   getwalletinfo,
   listtransactions,
   getnewaddress,
@@ -87,6 +89,22 @@ export function useWalletInfo() {
   );
   return {
     walletInfo: (data as Getwalletinfo) ?? null,
+    error,
+    isLoading,
+    refresh: () => mutate(),
+  };
+}
+
+export function useBalance() {
+  const currentWallet = useWalletStore((s) => s.currentWallet);
+  const shouldFetch = currentWallet !== null;
+  const { data, error, isLoading, mutate } = useSWR(
+    shouldFetch ? ['getbalance', currentWallet] : null,
+    () => rpcGetBalance(currentWallet as string),
+    { revalidateOnFocus: false }
+  );
+  return {
+    balanceInfo: (data as Getbalance) ?? null,
     error,
     isLoading,
     refresh: () => mutate(),
