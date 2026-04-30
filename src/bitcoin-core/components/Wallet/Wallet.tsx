@@ -550,7 +550,7 @@ export default function Wallet() {
                     <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/14 text-xs font-bold text-cyan-100">
                       2
                     </span>
-                    <span>Generate a new address and copy it.</span>
+                    <span>Copy the auto generated address (or create a new one).</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/14 text-xs font-bold text-cyan-100">
