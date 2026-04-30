@@ -107,7 +107,8 @@ export default function WalletReceive() {
               </div>
               <div className="mt-2">{select()}</div>
               <div className="mt-2 text-xs text-gray-400">
-                Changing the format regenerates the address and QR code automatically.
+                Changing the format regenerates the address and QR code
+                automatically.
               </div>
             </div>
             {errors.addressType && (
@@ -170,7 +171,10 @@ export default function WalletReceive() {
                   Copy
                 </button>
                 {copied && (
-                  <span className="ml-2 text-xs text-green-400" aria-live="polite">
+                  <span
+                    className="ml-2 text-xs text-green-400"
+                    aria-live="polite"
+                  >
                     Address copied
                   </span>
                 )}
