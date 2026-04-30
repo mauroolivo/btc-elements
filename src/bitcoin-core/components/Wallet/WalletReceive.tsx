@@ -15,7 +15,6 @@ export default function WalletReceive() {
   type FormFields = z.infer<typeof FormNewAddressSchema>;
 
   const [copied, setCopied] = useState(false);
-  const [isTypeSelectorOpen, setIsTypeSelectorOpen] = useState(false);
   const { response, isLoading, error: mutError, generate } = useNewAddress();
 
   const {
@@ -103,27 +102,13 @@ export default function WalletReceive() {
           </p>
           <div>
             <div className="mt-4 rounded-2xl border border-white/8 bg-white/4 p-3">
-              <button
-                type="button"
-                onClick={() => setIsTypeSelectorOpen((value) => !value)}
-                className="flex w-full items-center justify-between gap-3 text-left text-sm font-medium text-gray-200"
-                aria-expanded={isTypeSelectorOpen}
-              >
-                <span>Need a different address format?</span>
-                <span className="text-cyan-100/80">
-                  {isTypeSelectorOpen ? 'Hide' : 'Change'}
-                </span>
-              </button>
-
-              {isTypeSelectorOpen ? (
-                <div className="mt-3 border-t border-white/8 pt-3">
-                  <div className="mb-2">{select()}</div>
-                  <div className="text-xs text-gray-400">
-                    Changing the format regenerates the address and QR code
-                    automatically.
-                  </div>
-                </div>
-              ) : null}
+              <div className="text-xs font-medium tracking-wide text-gray-400 uppercase">
+                Different format
+              </div>
+              <div className="mt-2">{select()}</div>
+              <div className="mt-2 text-xs text-gray-400">
+                Changing the format regenerates the address and QR code automatically.
+              </div>
             </div>
             {errors.addressType && (
               <div className="mt-2 text-xs text-red-300">
@@ -174,6 +159,7 @@ export default function WalletReceive() {
               </div>
               <div className="mt-3">
                 <button
+                  type="button"
                   onClick={() => {
                     navigator.clipboard.writeText(response.result);
                     setCopied(true);
@@ -184,10 +170,7 @@ export default function WalletReceive() {
                   Copy
                 </button>
                 {copied && (
-                  <span
-                    className="ml-2 text-xs text-green-400"
-                    aria-live="polite"
-                  >
+                  <span className="ml-2 text-xs text-green-400" aria-live="polite">
                     Address copied
                   </span>
                 )}
