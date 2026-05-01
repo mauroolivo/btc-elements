@@ -6,6 +6,9 @@ import { Sendtoaddress } from '@/bitcoin-core/model/wallet';
 import { useSendtoaddress } from '@/bitcoin-core/components/Wallet/hooks';
 import { useWalletStore } from '@/bitcoin-core/useWalletStore';
 import { FormSendSchema } from '@/bitcoin-core/model/forms';
+import { useAuth } from '@/components/auth/useAuth';
+
+const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
 
 type WalletSendProps = {
   showTxs?: () => void;
@@ -13,6 +16,7 @@ type WalletSendProps = {
 
 export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
   const currentWallet = useWalletStore((s) => s.currentWallet);
+  const { user } = useAuth();
   type FormFields = z.infer<typeof FormSendSchema>;
   const {
     response,
@@ -51,6 +55,17 @@ export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
 
   async function confirmSend() {
     if (!pending) return;
+
+    if (user?.email?.toLowerCase() === DEMO_ACCOUNT_EMAIL) {
+      setOpen(false);
+      setPending(null);
+      setError('root', {
+        message:
+          'You cannot send funds from the demo account. Please register a new account.',
+      });
+      return;
+    }
+
     try {
       const sendResult: Sendtoaddress = await send({
         address: pending.address,
@@ -171,6 +186,12 @@ export default function WalletSend({ showTxs: showTxs }: WalletSendProps) {
                 {isSubmitting ? 'Sending…' : 'Send'}
               </button>
             </form>
+          )}
+
+          {errors.root && (
+            <div className="mt-4 rounded border border-red-700 bg-red-900/30 p-3 text-sm text-red-200">
+              {errors.root.message}
+            </div>
           )}
 
           {successTxid && (

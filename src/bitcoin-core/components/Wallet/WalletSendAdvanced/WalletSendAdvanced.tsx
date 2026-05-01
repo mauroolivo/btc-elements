@@ -12,6 +12,9 @@ import {
 } from '@/bitcoin-core/components/Wallet/hooks';
 import { useWalletStore } from '@/bitcoin-core/useWalletStore';
 import { ParamsDictionary } from '@/bitcoin-core/params';
+import { useAuth } from '@/components/auth/useAuth';
+
+const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
 
 export default function WalletSendAdvanced({
   showTxs,
@@ -29,6 +32,7 @@ export default function WalletSendAdvanced({
     [selectedUtxos]
   );
   const currentWallet = useWalletStore((s) => s.currentWallet);
+  const { user } = useAuth();
   type FormFields = z.infer<typeof FormSendAdvancedSchema>;
 
   const {
@@ -110,6 +114,17 @@ export default function WalletSendAdvanced({
 
   async function confirmSend() {
     if (!pending) return;
+
+    if (user?.email?.toLowerCase() === DEMO_ACCOUNT_EMAIL) {
+      setOpen(false);
+      setPending(null);
+      setError('root', {
+        message:
+          'You cannot send funds from the demo account. Please register a new account.',
+      });
+      return;
+    }
+
     try {
       console.log('Preparing to send transaction...');
       const data = payload();
@@ -287,6 +302,12 @@ export default function WalletSendAdvanced({
             </div>
           )}
         </form>
+      )}
+
+      {errors.root && (
+        <div className="mt-4 rounded border border-red-700 bg-red-900/30 p-3 text-sm text-red-200">
+          {errors.root.message}
+        </div>
       )}
 
       {open && pending && (
