@@ -9,6 +9,9 @@ import {
 } from '@/bitcoin-core/model/forms';
 import { useSendAdvanced } from '@/bitcoin-core/components/Wallet/hooks';
 import { ParamsDictionary } from '@/bitcoin-core/params';
+import { useAuth } from '@/components/auth/useAuth';
+
+const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
 
 type Props = {
   tx?: ListTransaction;
@@ -17,6 +20,7 @@ type Props = {
 };
 
 export default function WalletHomeCPFP({ tx, onBack, onSuccess }: Props) {
+  const { user } = useAuth();
   const {
     register,
     handleSubmit,
@@ -56,6 +60,17 @@ export default function WalletHomeCPFP({ tx, onBack, onSuccess }: Props) {
 
   async function confirmSend() {
     if (!pending || !tx) return;
+
+    if (user?.email?.toLowerCase() === DEMO_ACCOUNT_EMAIL) {
+      setOpen(false);
+      setPending(null);
+      setError('root', {
+        message:
+          'You cannot send funds from the demo account. Please register a new account.',
+      });
+      return;
+    }
+
     try {
       const inputs: ParamsDictionary[] = [{ txid: tx.txid, vout: tx.vout }];
       const outputs: ParamsDictionary = {
@@ -192,6 +207,7 @@ export default function WalletHomeCPFP({ tx, onBack, onSuccess }: Props) {
           </div>
           <div className="flex gap-3">
             <button
+              type="button"
               onClick={() => {
                 setOpen(false);
                 setPending(null);
@@ -201,6 +217,7 @@ export default function WalletHomeCPFP({ tx, onBack, onSuccess }: Props) {
               Cancel
             </button>
             <button
+              type="button"
               onClick={() => {
                 confirmSend();
               }}
@@ -210,6 +227,12 @@ export default function WalletHomeCPFP({ tx, onBack, onSuccess }: Props) {
               {sendLoading ? 'Confirming…' : 'Confirm'}
             </button>
           </div>
+        </div>
+      )}
+
+      {errors.root && (
+        <div className="mt-4 rounded border border-red-700 bg-red-900/30 p-3 text-sm text-red-200">
+          {errors.root.message}
         </div>
       )}
 

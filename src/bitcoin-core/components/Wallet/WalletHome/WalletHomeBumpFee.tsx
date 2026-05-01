@@ -6,8 +6,11 @@ import { ListTransaction, BumpfeeSchema } from '@/bitcoin-core/model/wallet';
 import { FormBumpFeeSchema } from '@/bitcoin-core/model/forms';
 import { useBumpfee } from '@/bitcoin-core/components/Wallet/hooks';
 import { ParamsDictionary } from '@/bitcoin-core/params';
+import { useAuth } from '@/components/auth/useAuth';
 
 import { Bumpfee } from '@/bitcoin-core/model/wallet';
+
+const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
 
 type Props = {
   tx?: ListTransaction | null;
@@ -24,6 +27,7 @@ export default function WalletHomeBumpFee({
   onBack,
   onSuccess,
 }: PropsWithSuccess) {
+  const { user } = useAuth();
   const { response, error: mutError, isLoading, bump, clear } = useBumpfee();
   const [successResponse, setSuccessResponse] = useState<Bumpfee | null>(null);
 
@@ -40,6 +44,14 @@ export default function WalletHomeBumpFee({
   });
 
   const onSubmit = handleSubmit(async (data) => {
+    if (user?.email?.toLowerCase() === DEMO_ACCOUNT_EMAIL) {
+      setError('root', {
+        message:
+          'You cannot send funds from the demo account. Please register a new account.',
+      });
+      return;
+    }
+
     try {
       clear();
       const payload: ParamsDictionary = {
