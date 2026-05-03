@@ -550,7 +550,9 @@ export default function Wallet() {
                     <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/14 text-xs font-bold text-cyan-100">
                       2
                     </span>
-                    <span>Copy the auto generated address (or create a new one).</span>
+                    <span>
+                      Copy the auto generated address (or create a new one).
+                    </span>
                   </li>
                   <li className="flex gap-3">
                     <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/14 text-xs font-bold text-cyan-100">
@@ -558,11 +560,11 @@ export default function Wallet() {
                     </span>
                     <div>
                       <div>
-                        Open a testnet4 faucet such as mempool.space, paste the
-                        copied address, choose an amount, and send the coins.
+                        Open a testnet4 faucet such as <span className="underline">coinfaucet.eu</span>, paste the copied address,
+                        choose an amount, and send the coins.
                       </div>
                       <a
-                        href="https://mempool.space/it/testnet4/faucet"
+                        href="https://coinfaucet.eu/en/btc-testnet4/"
                         target="_blank"
                         rel="noreferrer"
                         className="mt-2 inline-flex items-center rounded-2xl border border-amber-300/18 bg-amber-400/10 px-3 py-2 text-xs font-semibold tracking-wide text-amber-100 transition-colors hover:bg-amber-400/16"
