@@ -114,12 +114,6 @@ export default function ChartCoinGecko() {
   }, [labels, prices]);
 
   const options = useMemo(() => {
-    const labelMap: Record<string, string> = {
-      '1': '24 hours',
-      '7': '7 days',
-      '30': '30 days',
-      '365': '1 year',
-    };
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -139,7 +133,7 @@ export default function ChartCoinGecko() {
         },
       },
     };
-  }, [range]);
+  }, []);
 
   return (
     <section style={{ maxWidth: 720, margin: '16px auto', padding: 8 }}>
