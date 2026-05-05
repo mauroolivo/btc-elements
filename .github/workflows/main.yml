@@ -27,10 +27,11 @@ jobs:
         run: npm ci
 
       - name: Security scan with Trivy
-        uses: aquasecurity/trivy-action@v0.35.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: .
+          cache: 'false'
           format: table
           severity: HIGH,CRITICAL
           ignore-unfixed: true
@@ -95,7 +96,7 @@ jobs:
             ecosystem.config.js
 
       - name: Upload deployment artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: deploy-package
           path: deploy-package.tar.gz
@@ -107,7 +108,7 @@ jobs:
 
     steps:
       - name: Download deployment artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: deploy-package
           path: .
