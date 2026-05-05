@@ -1,0 +1,19 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "useGitignore": true,
+  "words": [
+    "btc",
+    "coingecko",
+    "commitlint",
+    "cspell",
+    "eslint",
+    "firebase",
+    "husky",
+    "mempool",
+    "pm2",
+    "swr",
+    "zustand"
+  ],
+  "ignorePaths": [".next/**", "node_modules/**"]
+}

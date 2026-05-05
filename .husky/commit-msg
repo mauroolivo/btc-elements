@@ -1,3 +1,7 @@
 #!/usr/bin/env sh
 
+set -e
+
 npx --no -- commitlint --edit "$1"
+cat "$1" | npx --no -- cspell lint --no-config-search --config ./cspell.config.json --no-summary --language-id plaintext stdin://COMMIT_EDITMSG
+
