@@ -11,7 +11,7 @@ export function Header() {
   const isMyWallets = pathname?.startsWith('/my-wallets');
   const isStatus = pathname?.startsWith('/status');
   const isExplorer = pathname?.startsWith('/explorer');
-  const isChart = pathname?.startsWith('/chart');
+  // const isChart = pathname?.startsWith('/chart');
   const isMempool = pathname?.startsWith('/mempool');
 
   function navLinkClass(active: boolean) {
@@ -55,13 +55,13 @@ export function Header() {
               >
                 Mempool
               </Link>
-              <Link
+              {/* <Link
                 href="/chart"
                 className={navLinkClass(!!isChart)}
                 aria-current={isChart ? 'page' : undefined}
               >
                 Chart
-              </Link>
+              </Link> */}
               {user ? (
                 <Link
                   href="/profile"
