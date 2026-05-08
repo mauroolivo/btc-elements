@@ -70,9 +70,11 @@ export default function HomePage() {
               abstracting them away.
             </p>
 
-            <div className="relative mt-8 max-w-2xl overflow-hidden rounded-[28px] border border-amber-300/18 bg-[linear-gradient(135deg,rgba(250,204,21,0.14),rgba(56,189,248,0.08)_52%,rgba(255,255,255,0.04))] p-5 shadow-[0_20px_50px_rgba(15,23,42,0.22),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm lg:absolute lg:top-10 lg:right-10 lg:mt-0 lg:max-w-sm">
-              <div className="pointer-events-none absolute top-6 right-[-2.1rem] w-44 rotate-45 border-y border-cyan-50/30 bg-[linear-gradient(180deg,rgba(34,211,238,0.96),rgba(8,145,178,0.84))] py-2 text-center text-xs font-bold tracking-[0.18em] text-slate-950 uppercase shadow-[0_14px_32px_rgba(8,145,178,0.28)]">
-                testnet4
+            <div className="relative mt-8 max-w-2xl overflow-hidden rounded-[28px] border border-amber-300/18 bg-[linear-gradient(135deg,rgba(250,204,21,0.14),rgba(56,189,248,0.08)_52%,rgba(255,255,255,0.04))] p-5 pr-24 shadow-[0_20px_50px_rgba(15,23,42,0.22),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm sm:pr-24 lg:absolute lg:top-10 lg:right-10 lg:mt-0 lg:max-w-sm lg:p-5 lg:pr-5">
+              <div className="pointer-events-none absolute top-8 -right-24 flex h-10 w-80 rotate-45 items-center justify-center overflow-hidden border-y border-cyan-50/30 bg-[linear-gradient(180deg,rgba(34,211,238,0.96),rgba(8,145,178,0.84))] shadow-[0_14px_32px_rgba(8,145,178,0.28)] sm:top-8 sm:-right-20 sm:h-10 sm:w-72 lg:top-8 lg:-right-16 lg:h-9 lg:w-60">
+                <span className="absolute inset-0 flex items-center justify-center text-center text-[11px] leading-none font-bold tracking-[0.16em] text-slate-950 uppercase sm:text-xs sm:tracking-[0.18em] lg:tracking-[0.16em]">
+                  TESTNET4
+                </span>
               </div>
               <div>
                 <div className="text-[11px] font-semibold tracking-[0.24em] text-amber-100/75 uppercase">

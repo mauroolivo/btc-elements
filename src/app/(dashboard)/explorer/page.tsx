@@ -80,22 +80,27 @@ export default function ExplorerPage() {
         onSubmit={onSubmit}
         className="mx-auto w-full max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <input
             {...register('ref')}
             placeholder="Enter TxID, Blockhash, or Block Height"
             className="core-input w-full rounded-2xl p-4 font-mono text-lg text-white placeholder-gray-500 focus:outline-none"
           />
-          <button type="submit" className="core-button-primary px-4 py-3">
-            Search
-          </button>
-          <button
-            type="button"
-            onClick={onClear}
-            className="core-button-secondary px-4 py-3"
-          >
-            Clear
-          </button>
+          <div className="grid w-full grid-cols-2 gap-3 sm:flex sm:w-auto sm:flex-none">
+            <button
+              type="submit"
+              className="core-button-primary w-full px-4 py-3"
+            >
+              Search
+            </button>
+            <button
+              type="button"
+              onClick={onClear}
+              className="core-button-secondary w-full px-4 py-3"
+            >
+              Clear
+            </button>
+          </div>
         </div>
       </form>
 

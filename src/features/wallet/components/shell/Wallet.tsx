@@ -72,7 +72,7 @@ export default function Wallet() {
   }
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.TRANSACTIONS);
   const [isMoreOpen, setIsMoreOpen] = useState<boolean>(false);
-  const [isGuideCollapsed, setIsGuideCollapsed] = useState(false);
+  const [isGuideCollapsed, setIsGuideCollapsed] = useState(true);
   const [autoConnectError, setAutoConnectError] = useState<string | null>(null);
   const [walletLabel, setWalletLabel] = useState<string | null>(null);
   const [isWalletLabelLoading, setIsWalletLabelLoading] = useState(false);
