@@ -1,0 +1,41 @@
+'use client';
+import { useState } from 'react';
+import { useWalletInfo, useTransactions } from '@features/wallet/hooks/hooks';
+import { Getwalletinfo, ListTransaction } from '@features/wallet/types/wallet';
+import WalletHomeTxList from './WalletHomeTxList';
+
+export function WalletHome() {
+  const [selectedTx, setSelectedTx] = useState<ListTransaction | null>(null);
+  const {
+    transactions,
+    isLoading: txLoading,
+    isValidating: txValidating,
+    hasMore,
+    loadMore,
+    refresh,
+  } = useTransactions({ pageSize: 5 });
+  const { walletInfo, isLoading: infoLoading } = useWalletInfo();
+
+  return (
+    <div className="mx-auto max-w-3xl px-4 pt-8 pb-8">
+      {(walletInfo as Getwalletinfo) && (
+        <>
+          {infoLoading || walletInfo === null ? (
+            <div>Loading wallet info...</div>
+          ) : (
+            <WalletHomeTxList
+              transactions={transactions}
+              txLoading={txLoading}
+              txValidating={txValidating}
+              hasMore={hasMore}
+              loadMore={loadMore}
+              txRefresh={refresh}
+              selectedTx={selectedTx}
+              setSelectedTx={setSelectedTx}
+            />
+          )}
+        </>
+      )}
+    </div>
+  );
+}

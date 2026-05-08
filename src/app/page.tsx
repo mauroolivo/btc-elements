@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useDemoWalletAccess } from '@/components/auth/useDemoWalletAccess';
+import { useDemoWalletAccess } from '@features/auth/useDemoWalletAccess';
 
 export default function Page() {
   const [blockedDemoAccount, setBlockedDemoAccount] = useState<string | null>(

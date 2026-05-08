@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { IBM_Plex_Mono, Inter } from 'next/font/google';
 import './globals.css';
-import { AuthProvider } from '@/components/auth/AuthProvider';
-import { Header } from '@/bitcoin-core/components/Header';
+import { AuthProvider } from '@features/auth/AuthProvider';
+import { Header } from '@shared/ui/header/Header';
 
 const inter = Inter({
   variable: '--font-inter',
