@@ -7,46 +7,10 @@ import {
   useRawTransaction,
 } from '@features/explorer';
 
+import { BlockTransactions } from './_components/BlockTransactions';
+import { ExplorerLoadingView } from './_components/ExplorerLoadingView';
+
 type FormFields = { ref: string };
-
-function ExplorerLoadingView({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="core-surface rounded-3xl p-8">
-      <div className="flex flex-col items-center justify-center gap-4 text-center">
-        <div className="relative h-12 w-12">
-          <div className="absolute inset-0 rounded-full border-2 border-cyan-400/20" />
-          <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-cyan-300 border-r-cyan-500" />
-        </div>
-
-        <div>
-          <h2 className="text-xl font-semibold text-white">{title}</h2>
-          <p className="mt-2 text-sm text-gray-400">{description}</p>
-        </div>
-
-        <div className="grid w-full max-w-3xl grid-cols-1 gap-4 pt-4 md:grid-cols-3">
-          <div className="core-panel rounded-2xl p-4">
-            <div className="h-3 w-24 animate-pulse rounded bg-white/10" />
-            <div className="mt-3 h-7 w-28 animate-pulse rounded bg-white/8" />
-          </div>
-          <div className="core-panel rounded-2xl p-4">
-            <div className="h-3 w-20 animate-pulse rounded bg-white/10" />
-            <div className="mt-3 h-7 w-20 animate-pulse rounded bg-white/8" />
-          </div>
-          <div className="core-panel rounded-2xl p-4">
-            <div className="h-3 w-28 animate-pulse rounded bg-white/10" />
-            <div className="mt-3 h-7 w-24 animate-pulse rounded bg-white/8" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function ExplorerPage() {
   const [ref, setRef] = useState<string>('');
@@ -351,117 +315,6 @@ export default function ExplorerPage() {
             </div>
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-type BlockTransactionsProps = {
-  txids: string[];
-  page: number;
-  pageSize: number;
-  onPageChange: (p: number) => void;
-};
-
-function BlockTransactions({
-  txids,
-  page,
-  pageSize,
-  onPageChange,
-}: BlockTransactionsProps) {
-  const total = txids.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const current = Math.min(page, totalPages - 1);
-  const start = current * pageSize;
-  const end = Math.min(start + pageSize, total);
-  const pageTxids = txids.slice(start, end);
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-semibold">Transactions ({total})</div>
-        <div className="flex items-center gap-2 text-xs text-gray-300">
-          <button
-            type="button"
-            className="core-button-secondary px-2 py-1"
-            onClick={() => onPageChange(Math.max(0, current - 1))}
-            disabled={current === 0}
-          >
-            Prev
-          </button>
-          <div>
-            Page {current + 1} of {totalPages}
-          </div>
-          <button
-            type="button"
-            className="core-button-secondary px-2 py-1"
-            onClick={() => onPageChange(Math.min(totalPages - 1, current + 1))}
-            disabled={current >= totalPages - 1}
-          >
-            Next
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        {pageTxids.map((txid) => (
-          <TxSummary key={txid} txid={txid} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TxSummary({ txid }: { txid: string }) {
-  const { raw, isLoading, error } = useRawTransaction(txid, {
-    verbose: true,
-    revalidateOnFocus: false,
-  });
-
-  if (isLoading) {
-    return (
-      <div className="core-panel-muted rounded-xl p-3">
-        <div className="h-4 w-1/2 animate-pulse rounded bg-gray-700" />
-        <div className="mt-2 h-3 w-1/3 animate-pulse rounded bg-gray-700" />
-      </div>
-    );
-  }
-  if (error || !raw || !raw.result) {
-    return (
-      <div className="core-panel-muted rounded-xl p-3 text-xs text-red-300">
-        Failed to load transaction
-      </div>
-    );
-  }
-
-  const r = raw.result;
-  const totalOut = Array.isArray(r.vout)
-    ? r.vout.reduce((sum, v) => sum + (v.value || 0), 0)
-    : 0;
-
-  return (
-    <div className="core-panel-muted rounded-xl p-3">
-      <div className="text-xs text-gray-400">TxID</div>
-      <div className="font-mono text-xs break-all">{r.txid}</div>
-      <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-        <div>
-          <div className="text-gray-400">Confirmations</div>
-          <div className="font-mono">{r.confirmations ?? 0}</div>
-        </div>
-        <div>
-          <div className="text-gray-400">Size / vSize</div>
-          <div className="font-mono">
-            {r.size} / {r.vsize}
-          </div>
-        </div>
-        <div>
-          <div className="text-gray-400">Outputs</div>
-          <div className="font-mono">{r.vout?.length ?? 0}</div>
-        </div>
-        <div>
-          <div className="text-gray-400">Total Out</div>
-          <div className="font-mono">{totalOut} BTC</div>
-        </div>
       </div>
     </div>
   );

@@ -1,1 +1,1 @@
-export { default as WalletDescriptor } from './WalletDescriptor';
+export { default as WalletDescriptor } from './Descriptor';

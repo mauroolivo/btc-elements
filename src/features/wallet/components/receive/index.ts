@@ -1,1 +1,1 @@
-export { default as WalletReceive } from './WalletReceive';
+export { default as WalletReceive } from './Receive';

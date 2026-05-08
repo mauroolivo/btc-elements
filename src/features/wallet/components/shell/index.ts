@@ -1,2 +1,2 @@
 export { default as Wallet } from './Wallet';
-export { WalletConnect } from './WalletConnect';
+export { WalletConnect } from './Connect';

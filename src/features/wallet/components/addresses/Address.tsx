@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useAddressGroupings } from '@features/wallet/hooks';
-import WalletAddressDetail from './WalletAddressDetail';
+import WalletAddressDetail from './AddressDetail';
 
 export default function WalletAddress() {
   const { groupings, isLoading, error, refresh } = useAddressGroupings();
@@ -126,4 +126,4 @@ export default function WalletAddress() {
   );
 }
 
-// Address detail modal moved to WalletAddressDetail.tsx
+// Address detail modal moved to AddressDetail.tsx

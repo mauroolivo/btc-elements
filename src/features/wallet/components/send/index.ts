@@ -1,1 +1,1 @@
-export { default as WalletSend } from './WalletSend';
+export { default as WalletSend } from './Send';

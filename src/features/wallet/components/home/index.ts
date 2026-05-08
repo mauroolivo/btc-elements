@@ -1,5 +1,5 @@
-export { WalletHome } from './WalletHome';
-export { default as WalletHomeBumpFee } from './WalletHomeBumpFee';
-export { default as WalletHomeCPFP } from './WalletHomeCPFP';
-export { default as WalletHomeTxDetail } from './WalletHomeTxDetail';
-export { default as WalletHomeTxList } from './WalletHomeTxList';
+export { WalletHome } from './Home';
+export { default as WalletHomeBumpFee } from './BumpFee';
+export { default as WalletHomeCPFP } from './CPFP';
+export { default as WalletHomeTxDetail } from './TxDetail';
+export { default as WalletHomeTxList } from './TxList';

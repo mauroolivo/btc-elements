@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import WalletUnspentSelect from './WalletUnspentSelect';
+import WalletUnspentSelect from './UnspentSelect';
 import { Utxo } from '@features/wallet/types/wallet';
 
 import { zodResolver } from '@hookform/resolvers/zod';

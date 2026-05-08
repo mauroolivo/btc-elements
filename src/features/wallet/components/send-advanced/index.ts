@@ -1,2 +1,2 @@
-export { default as WalletSendAdvanced } from './WalletSendAdvanced';
-export { default as WalletUnspentSelect } from './WalletUnspentSelect';
+export { default as WalletSendAdvanced } from './SendAdvanced';
+export { default as WalletUnspentSelect } from './UnspentSelect';

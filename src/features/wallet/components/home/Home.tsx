@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useWalletInfo, useTransactions } from '@features/wallet/hooks';
 import { Getwalletinfo, ListTransaction } from '@features/wallet/types/wallet';
-import WalletHomeTxList from './WalletHomeTxList';
+import WalletHomeTxList from './TxList';
 
 export function WalletHome() {
   const [selectedTx, setSelectedTx] = useState<ListTransaction | null>(null);

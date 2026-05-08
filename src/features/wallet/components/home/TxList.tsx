@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ListTransaction } from '@features/wallet/types/wallet';
-import WalletHomeTxDetail from './WalletHomeTxDetail';
-import WalletHomeBumpFee from './WalletHomeBumpFee';
-import WalletHomeCPFP from './WalletHomeCPFP';
+import WalletHomeTxDetail from './TxDetail';
+import WalletHomeBumpFee from './BumpFee';
+import WalletHomeCPFP from './CPFP';
 
 type Props = {
   transactions: ListTransaction[];
