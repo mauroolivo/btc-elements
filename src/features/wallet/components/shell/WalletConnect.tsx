@@ -5,8 +5,8 @@ import {
   useWalletsList,
   useLoadWallet,
   useUnloadWallet,
-} from '@features/wallet/hooks/hooks';
-import { useWalletStore } from '@features/wallet/store/useWalletStore';
+} from '@features/wallet/hooks';
+import { useWalletStore } from '@features/wallet/store';
 
 export function WalletConnect() {
   const [open, setOpen] = useState(false);

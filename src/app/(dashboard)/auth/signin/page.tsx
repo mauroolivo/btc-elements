@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '@features/auth/useAuth';
+import { useAuth } from '@features/auth';
 import {
   FormAuthLoginSchema,
   type FormAuthLoginType,
@@ -15,7 +15,7 @@ import { AuthGithubButton } from '../_components/AuthGithubButton';
 import { AuthGoogleButton } from '../_components/AuthGoogleButton';
 import { AuthSessionPanel } from '../_components/AuthSessionPanel';
 import { PasswordField } from '../_components/PasswordField';
-import { useDemoWalletAccess } from '@features/auth/useDemoWalletAccess';
+import { useDemoWalletAccess } from '@features/auth';
 
 function mapFirebaseError(message: string) {
   if (message.includes('auth/invalid-credential')) {

@@ -2,9 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useAuth } from '@features/auth/useAuth';
-import { useWalletStore } from '@features/wallet/store/useWalletStore';
-import { useCreateWallet, useWalletsDir } from '@features/wallet/hooks/hooks';
+import { useAuth } from './useAuth';
+import { useWalletStore } from '@features/wallet/store';
+import { useCreateWallet, useWalletsDir } from '@features/wallet/hooks';
 import { getUserWallets } from '@/lib/firebase/wallets';
 
 const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';

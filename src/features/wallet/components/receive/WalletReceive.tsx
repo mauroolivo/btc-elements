@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNewAddress } from '@features/wallet/hooks/hooks';
-import { useWalletStore } from '@features/wallet/store/useWalletStore';
+import { useNewAddress } from '@features/wallet/hooks';
+import { useWalletStore } from '@features/wallet/store';
 import { ADDRESS_TYPES } from '@shared/config/bitcoin';
 import QRCode from 'react-qr-code';
 import { zodResolver } from '@hookform/resolvers/zod';

@@ -1,21 +1,21 @@
 'use client';
-import { WalletHome } from './WalletHome/WalletHome';
+import { WalletHome } from '../home';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@features/auth/useAuth';
-import WalletReceive from './WalletReceive';
+import { useAuth } from '@features/auth';
+import { WalletReceive } from '../receive';
 import {
   useBalance,
   useLoadWallet,
   useWalletInfo,
   useWalletsList,
-} from '@features/wallet/hooks/hooks';
-import WalletDescriptor from './WalletDescriptor';
-import { useWalletStore } from '@features/wallet/store/useWalletStore';
-import WalletSend from './WalletSend';
-import WaletAddress from './WalletAddress/WaletAddress';
+} from '@features/wallet/hooks';
+import { WalletDescriptor } from '../descriptors';
+import { useWalletStore } from '@features/wallet/store';
+import { WalletSend } from '../send';
+import { WalletAddress } from '../addresses';
 import { Getwalletinfo } from '@features/wallet/types/wallet';
-import WalletSendAdvanced from './WalletSendAdvanced/WalletSendAdvanced';
+import { WalletSendAdvanced } from '../send-advanced';
 import { getUserWalletById } from '@/lib/firebase/wallets';
 
 const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
@@ -485,7 +485,7 @@ export default function Wallet() {
       ) : currentTab === Tab.SEND_ADVANCED ? (
         <WalletSendAdvanced showTxs={() => setCurrentTab(Tab.TRANSACTIONS)} />
       ) : currentTab === Tab.ADDRESSES ? (
-        <WaletAddress />
+        <WalletAddress />
       ) : currentTab === Tab.DESCRIPTORS ? (
         <WalletDescriptor />
       ) : (

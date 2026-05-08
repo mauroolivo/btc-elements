@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { useUnspent } from '@features/wallet/hooks/hooks';
+import { useUnspent } from '@features/wallet/hooks';
 import { Utxo } from '@features/wallet/types/wallet';
 
 export type WalletUnspentSelectProps = {

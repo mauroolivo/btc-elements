@@ -8,9 +8,9 @@ import {
   Bumpfee,
 } from '@features/wallet/types/wallet';
 import { FormBumpFeeSchema } from '@features/wallet/schemas/forms';
-import { useBumpfee } from '@features/wallet/hooks/hooks';
+import { useBumpfee } from '@features/wallet/hooks';
 import { ParamsDictionary } from '@shared/types/params';
-import { useAuth } from '@features/auth/useAuth';
+import { useAuth } from '@features/auth';
 
 const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
 

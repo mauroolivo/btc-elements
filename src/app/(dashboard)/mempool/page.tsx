@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useRawmempool } from '@features/mempool/hooks';
+import { useRawmempool } from '@features/mempool';
 import { RawMempoolTx } from '@shared/types/transaction';
 
 type FormFields = { ref: string };

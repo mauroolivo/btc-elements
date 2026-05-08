@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useAddressGroupings } from '@features/wallet/hooks/hooks';
+import { useAddressGroupings } from '@features/wallet/hooks';
 import WalletAddressDetail from './WalletAddressDetail';
 
 export default function WalletAddress() {

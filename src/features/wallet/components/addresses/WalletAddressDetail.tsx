@@ -1,5 +1,5 @@
 'use client';
-import { useAddressInfo } from '@features/wallet/hooks/hooks';
+import { useAddressInfo } from '@features/wallet/hooks';
 
 export default function WalletAddressDetail({
   address,

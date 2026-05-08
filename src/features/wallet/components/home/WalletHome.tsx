@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useWalletInfo, useTransactions } from '@features/wallet/hooks/hooks';
+import { useWalletInfo, useTransactions } from '@features/wallet/hooks';
 import { Getwalletinfo, ListTransaction } from '@features/wallet/types/wallet';
 import WalletHomeTxList from './WalletHomeTxList';
 

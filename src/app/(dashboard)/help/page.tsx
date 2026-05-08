@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useHelp } from '@features/help/hooks';
+import { useHelp } from '@features/help';
 
 export default function HelpPage() {
   const [query, setQuery] = useState<string>('');

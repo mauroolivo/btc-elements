@@ -1,5 +1,5 @@
 'use client';
-import ChartCoinGecko from '@features/chart/components/ChartCoinGecko';
+import { ChartCoinGecko } from '@features/chart';
 
 export default function ChartPage() {
   return (

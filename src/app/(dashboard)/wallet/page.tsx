@@ -3,7 +3,7 @@
 // import { listwalletdir } from '@shared/lib/bitcoin-rpc/api';
 // import { listwallets } from '@shared/lib/bitcoin-rpc/api';
 
-import Wallet from '@features/wallet/components/Wallet/Wallet';
+import { Wallet } from '@features/wallet';
 
 export default async function Page() {
   // const blockchainInfo = await getblockchaininfo();

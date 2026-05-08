@@ -2,10 +2,10 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
-  useRawTransaction,
   useBlock,
   useBlockByHeight,
-} from '@features/explorer/hooks';
+  useRawTransaction,
+} from '@features/explorer';
 
 type FormFields = { ref: string };
 

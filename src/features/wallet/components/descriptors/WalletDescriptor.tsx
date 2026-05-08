@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useDescriptorInfo } from '@features/wallet/hooks/hooks';
+import { useDescriptorInfo } from '@features/wallet/hooks';
 
 export default function WalletDescriptor() {
   const [descriptorInput, setDescriptorInput] = useState<string>('');

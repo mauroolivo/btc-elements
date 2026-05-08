@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@features/auth/useAuth';
-import { useWalletStore } from '@features/wallet/store/useWalletStore';
+import { useAuth } from '@features/auth';
+import { useWalletStore } from '@features/wallet/store';
 import {
   addUserWallet,
   deleteUserWalletById,
@@ -12,7 +12,7 @@ import {
   MAX_WALLETS_PER_USER,
   type FirestoreWallet,
 } from '@/lib/firebase/wallets';
-import { useCreateWallet, useWalletsDir } from '@features/wallet/hooks/hooks';
+import { useCreateWallet, useWalletsDir } from '@features/wallet/hooks';
 
 function WalletsLoadingView({
   title,

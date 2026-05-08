@@ -3,10 +3,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Sendtoaddress } from '@features/wallet/types/wallet';
-import { useSendtoaddress } from '@features/wallet/hooks/hooks';
-import { useWalletStore } from '@features/wallet/store/useWalletStore';
+import { useSendtoaddress } from '@features/wallet/hooks';
+import { useWalletStore } from '@features/wallet/store';
 import { FormSendSchema } from '@features/wallet/schemas/forms';
-import { useAuth } from '@features/auth/useAuth';
+import { useAuth } from '@features/auth';
 
 const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
 

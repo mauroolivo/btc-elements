@@ -6,13 +6,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { FormSendAdvancedSchema } from '@features/wallet/schemas/forms';
-import {
-  useChangeAddress,
-  useSendAdvanced,
-} from '@features/wallet/hooks/hooks';
-import { useWalletStore } from '@features/wallet/store/useWalletStore';
+import { useChangeAddress, useSendAdvanced } from '@features/wallet/hooks';
+import { useWalletStore } from '@features/wallet/store';
 import { ParamsDictionary } from '@shared/types/params';
-import { useAuth } from '@features/auth/useAuth';
+import { useAuth } from '@features/auth';
 
 const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
 

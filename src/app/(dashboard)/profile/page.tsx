@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuth } from '@features/auth/useAuth';
+import { useAuth } from '@features/auth';
 
 export default function ProfilePage() {
   const { user, loading, logout } = useAuth();
