@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { gethelp } from '@shared/lib/bitcoin-rpc/api';
-import { Help } from '@shared/types/help';
+import { Help } from './types';
 
 export function useHelp(command?: string | null) {
   const cmd = (command ?? '').trim();

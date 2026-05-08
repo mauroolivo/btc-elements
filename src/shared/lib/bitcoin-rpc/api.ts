@@ -6,6 +6,8 @@ import {
   Getmininginfo,
   Getnetworkinfo,
 } from '@shared/types/blockchain';
+import { Getblock, Getblockhash } from '@features/explorer/types';
+import { Help } from '@features/help/types';
 import { Getrawtransaction, Rawmempool } from '@shared/types/transaction';
 import {
   Createwallet,
@@ -29,8 +31,6 @@ import {
   Bumpfee,
 } from '@features/wallet/types/wallet';
 import { ParamsDictionary } from '@shared/types/params';
-import { Getblock, Getblockhash } from '@shared/types/block';
-import { Help } from '@shared/types/help';
 
 const url = process.env.PUBLIC_NODE_URL || '';
 const API_USER = process.env.PUBLIC_RPC_USER;

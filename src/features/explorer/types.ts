@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { RpcErrorSchema } from '@shared/types/rpc';
 
 export const GetblockSchema = z.object({

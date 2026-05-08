@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { ADDRESS_TYPES } from '@features/wallet/config/bitcoin';
 import { useNewAddress } from '@features/wallet/hooks';
 import { useWalletStore } from '@features/wallet/store';
-import { ADDRESS_TYPES } from '@shared/config/bitcoin';
 import QRCode from 'react-qr-code';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';

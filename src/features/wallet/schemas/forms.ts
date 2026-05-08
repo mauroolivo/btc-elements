@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ADDRESS_TYPES } from '@shared/config/bitcoin';
+import { ADDRESS_TYPES } from '@features/wallet/config/bitcoin';
 import { UtxoSchema } from '@features/wallet/types/wallet';
 
 export const FormNewAddressSchema = z.object({

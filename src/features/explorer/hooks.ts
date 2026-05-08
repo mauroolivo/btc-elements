@@ -4,8 +4,8 @@ import {
   getblock,
   getblockhash,
 } from '@shared/lib/bitcoin-rpc/api';
+import { Getblock, Getblockhash } from '@features/explorer/types';
 import { Getrawtransaction } from '@shared/types/transaction';
-import { Getblock, Getblockhash } from '@shared/types/block';
 
 export function useRawTransaction(
   txid?: string,
