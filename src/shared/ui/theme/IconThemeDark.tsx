@@ -1,4 +1,4 @@
-export default function IconThemeLight() {
+export default function IconThemeDark() {
   return (
     <>
       <svg

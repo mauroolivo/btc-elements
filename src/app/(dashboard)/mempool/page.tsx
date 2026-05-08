@@ -109,7 +109,7 @@ function MempoolLoadingView({
   );
 }
 
-export default function Page() {
+export default function MempoolPage() {
   const [filter, setFilter] = useState<string>('');
   const [lastRefreshAt, setLastRefreshAt] = useState<number | null>(null);
   const { register, handleSubmit, setValue } = useForm<FormFields>({

@@ -48,7 +48,7 @@ function ExplorerLoadingView({
   );
 }
 
-export default function Page() {
+export default function ExplorerPage() {
   const [ref, setRef] = useState<string>('');
   const [page, setPage] = useState<number>(0);
   const { register, handleSubmit, setValue } = useForm<FormFields>({

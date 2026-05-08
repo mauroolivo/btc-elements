@@ -1,4 +1,4 @@
-export default function Loading() {
+export default function MyWalletsLoading() {
   return (
     <div className="mx-auto max-w-5xl px-6 pt-24 pb-8">
       <div className="core-surface rounded-3xl p-8">

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useDemoWalletAccess } from '@features/auth/useDemoWalletAccess';
 
-export default function Page() {
+export default function HomePage() {
   const [blockedDemoAccount, setBlockedDemoAccount] = useState<string | null>(
     null
   );
