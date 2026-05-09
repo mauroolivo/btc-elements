@@ -274,6 +274,49 @@ body::before {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
+.core-scrollbar {
+  color-scheme: dark;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.6) rgba(255, 255, 255, 0.06);
+}
+
+.core-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  -webkit-appearance: none;
+}
+
+.core-scrollbar::-webkit-scrollbar-track {
+  -webkit-appearance: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.core-scrollbar::-webkit-scrollbar-thumb {
+  -webkit-appearance: none;
+  border: 2px solid rgba(7, 17, 27, 0.9);
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(34, 211, 238, 0.9),
+    rgba(34, 197, 94, 0.62)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.core-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.core-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(34, 211, 238, 1),
+    rgba(34, 197, 94, 0.74)
+  );
+}
+
 @keyframes mempoolPulse {
   0%,
   100% {
