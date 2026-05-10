@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { use, type ReactNode } from 'react';
 
 import {
   getblockchaininfo,
@@ -9,6 +9,45 @@ import {
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+type BlockchainInfoPayload = {
+  blockchainInfo: Awaited<ReturnType<typeof getblockchaininfo>> | null;
+  errorMessage: string | null;
+};
+
+type AncillaryStatusPayload = {
+  mempoolInfo: Awaited<ReturnType<typeof getmempoolinfo>> | null;
+  miningInfo: Awaited<ReturnType<typeof getmininginfo>> | null;
+  networkInfo: Awaited<ReturnType<typeof getnetworkinfo>> | null;
+};
+
+async function loadBlockchainInfoPayload(): Promise<BlockchainInfoPayload> {
+  try {
+    return {
+      blockchainInfo: await getblockchaininfo(),
+      errorMessage: null,
+    };
+  } catch (error) {
+    return {
+      blockchainInfo: null,
+      errorMessage: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+async function loadAncillaryStatusPayload(): Promise<AncillaryStatusPayload> {
+  const [mempoolInfo, miningInfo, networkInfo] = await Promise.allSettled([
+    getmempoolinfo(),
+    getmininginfo(),
+    getnetworkinfo(),
+  ]);
+
+  return {
+    mempoolInfo: mempoolInfo.status === 'fulfilled' ? mempoolInfo.value : null,
+    miningInfo: miningInfo.status === 'fulfilled' ? miningInfo.value : null,
+    networkInfo: networkInfo.status === 'fulfilled' ? networkInfo.value : null,
+  };
+}
 
 function formatBytes(bytes?: number) {
   if (!bytes || bytes <= 0) return '0 B';
@@ -92,28 +131,40 @@ function DetailSection({
   );
 }
 
-export default async function Page() {
-  let blockchainInfo;
+export default function Page() {
+  const blockchainInfoPromise = loadBlockchainInfoPayload();
+  const ancillaryStatusPromise = loadAncillaryStatusPayload();
 
-  try {
-    blockchainInfo = await getblockchaininfo();
-  } catch (e) {
+  return (
+    <StatusPageContent
+      blockchainInfoPromise={blockchainInfoPromise}
+      ancillaryStatusPromise={ancillaryStatusPromise}
+    />
+  );
+}
+
+function StatusPageContent({
+  blockchainInfoPromise,
+  ancillaryStatusPromise,
+}: {
+  blockchainInfoPromise: Promise<BlockchainInfoPayload>;
+  ancillaryStatusPromise: Promise<AncillaryStatusPayload>;
+}) {
+  const { blockchainInfo, errorMessage } = use(blockchainInfoPromise);
+
+  if (!blockchainInfo) {
     return (
       <div className="mx-auto max-w-2xl px-6 pt-24 pb-8">
         <div className="core-surface rounded-2xl p-4 text-sm text-red-200">
           Unable to connect to the Bitcoin node. Please ensure that your node is
           running and that the application is properly configured to connect to
-          it ({e instanceof Error ? e.message : String(e)}).
+          it ({errorMessage ?? 'Unknown error'}).
         </div>
       </div>
     );
   }
 
-  const [mempoolInfo, miningInfo, networkInfo] = await Promise.all([
-    getmempoolinfo(),
-    getmininginfo(),
-    getnetworkinfo(),
-  ]);
+  const { mempoolInfo, miningInfo, networkInfo } = use(ancillaryStatusPromise);
 
   const r = blockchainInfo?.result;
   const m = mempoolInfo?.result;
