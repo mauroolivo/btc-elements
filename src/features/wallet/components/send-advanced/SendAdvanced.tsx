@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useReducer } from 'react';
 import WalletUnspentSelect from './UnspentSelect';
+import { produce } from 'immer';
 import { Utxo } from '@features/wallet/types/wallet';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,24 +14,78 @@ import { useAuth } from '@features/auth';
 
 const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
 
+type FormFields = z.infer<typeof FormSendAdvancedSchema>;
+
+type SendAdvancedState = {
+  step: 1 | 2;
+  selectedUtxos: Utxo[];
+  isConfirmOpen: boolean;
+  pendingForm: FormFields | null;
+  successTxid: string | null;
+};
+
+type SendAdvancedAction =
+  | { type: 'selection/set'; utxos: Utxo[] }
+  | { type: 'step/set'; step: SendAdvancedState['step'] }
+  | { type: 'confirm/open'; pendingForm: FormFields }
+  | { type: 'confirm/close' }
+  | { type: 'send/success'; txid: string }
+  | { type: 'send/reset-success' };
+
+const initialState: SendAdvancedState = {
+  step: 1,
+  selectedUtxos: [],
+  isConfirmOpen: false,
+  pendingForm: null,
+  successTxid: null,
+};
+
+const sendAdvancedReducer = produce(
+  (draft: SendAdvancedState, action: SendAdvancedAction) => {
+    switch (action.type) {
+      case 'selection/set':
+        draft.selectedUtxos = action.utxos;
+        return;
+      case 'step/set':
+        draft.step = action.step;
+        return;
+      case 'confirm/open':
+        draft.pendingForm = action.pendingForm;
+        draft.isConfirmOpen = true;
+        return;
+      case 'confirm/close':
+        draft.pendingForm = null;
+        draft.isConfirmOpen = false;
+        return;
+      case 'send/success':
+        draft.successTxid = action.txid;
+        draft.pendingForm = null;
+        draft.isConfirmOpen = false;
+        return;
+      case 'send/reset-success':
+        draft.successTxid = null;
+        draft.step = 1;
+        draft.selectedUtxos = [];
+        return;
+      default:
+        return;
+    }
+  }
+);
+
 export default function WalletSendAdvanced({
   showTxs,
 }: {
   showTxs?: () => void;
 }) {
-  const [step, setStep] = useState(1);
-  const [selectedUtxos, setSelectedUtxos] = useState<Utxo[]>([]);
-  const [open, setOpen] = useState(false);
-  const [pending, setPending] = useState<FormFields | null>(null);
-  const [successTxid, setSuccessTxid] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(sendAdvancedReducer, initialState);
 
   const totalSelectedAmount = useMemo(
-    () => selectedUtxos.reduce((sum, u) => sum + (u?.amount ?? 0), 0),
-    [selectedUtxos]
+    () => state.selectedUtxos.reduce((sum, u) => sum + (u?.amount ?? 0), 0),
+    [state.selectedUtxos]
   );
   const currentWallet = useWalletStore((s) => s.currentWallet);
   const { user } = useAuth();
-  type FormFields = z.infer<typeof FormSendAdvancedSchema>;
 
   const {
     register,
@@ -80,17 +135,16 @@ export default function WalletSendAdvanced({
   }, [changeAddress, setValue]);
 
   useEffect(() => {
-    setValue('utxos', selectedUtxos, { shouldValidate: true });
-  }, [selectedUtxos, setValue]);
+    setValue('utxos', state.selectedUtxos, { shouldValidate: true });
+  }, [state.selectedUtxos, setValue]);
 
   const onSubmit = handleSubmit((data) => {
-    setPending(data);
-    setOpen(true);
+    dispatch({ type: 'confirm/open', pendingForm: data });
   });
 
   function payload(): ParamsDictionary | undefined {
-    if (!pending) return;
-    const inputs = (pending.utxos ?? []).map((utxo) => {
+    if (!state.pendingForm) return;
+    const inputs = (state.pendingForm.utxos ?? []).map((utxo) => {
       const input: ParamsDictionary = {};
       input['txid'] = utxo.txid;
       input['vout'] = utxo.vout;
@@ -99,8 +153,8 @@ export default function WalletSendAdvanced({
     // I originally userd ParamsDictionary[] but found this example using an object and works
     // https://bitcoin.stackexchange.com/questions/80905/bitcoin-cli-createrawtransaction-with-3-outputs-example
     const outputs = {
-      [pending.address]: pending.amount,
-      [pending.addressChange]: pending.amountChange,
+      [state.pendingForm.address]: state.pendingForm.amount,
+      [state.pendingForm.addressChange]: state.pendingForm.amountChange,
     } as ParamsDictionary;
     const payload: ParamsDictionary = {
       inputs,
@@ -110,11 +164,10 @@ export default function WalletSendAdvanced({
   }
 
   async function confirmSend() {
-    if (!pending) return;
+    if (!state.pendingForm) return;
 
     if (user?.email?.toLowerCase() === DEMO_ACCOUNT_EMAIL) {
-      setOpen(false);
-      setPending(null);
+      dispatch({ type: 'confirm/close' });
       setError('root', {
         message:
           'You cannot send funds from the demo account. Please register a new account.',
@@ -132,14 +185,11 @@ export default function WalletSendAdvanced({
       }
       console.log('Sending payload:', data);
       const res = await run(data);
-      setOpen(false);
-      setPending(null);
-      setSuccessTxid(res);
+      dispatch({ type: 'send/success', txid: res });
       // clear();
     } catch (error) {
       // Dismiss confirm panel on error
-      setOpen(false);
-      setPending(null);
+      dispatch({ type: 'confirm/close' });
       setError('root', {
         message: `${(error as Error).message}. Please try again.`,
       });
@@ -150,18 +200,20 @@ export default function WalletSendAdvanced({
     <div className="core-surface mx-auto w-full max-w-2xl rounded-3xl p-6 text-white shadow-lg">
       <div className="mb-4 flex items-center justify-between">
         <div className="text-base font-semibold">Build Transaction</div>
-        <div className="text-xs text-gray-400">Step {step} of 2</div>
+        <div className="text-xs text-gray-400">Step {state.step} of 2</div>
       </div>
-      {!successTxid && (
+      {!state.successTxid && (
         <form noValidate onSubmit={onSubmit} onChange={() => clear()}>
-          {step === 1 && (
+          {state.step === 1 && (
             <div>
               <p className="mb-2 text-sm text-gray-300">
                 Select unspent outputs to fund your transaction.
               </p>
               <WalletUnspentSelect
-                onChange={(sel) => setSelectedUtxos(sel)}
-                defaultSelected={selectedUtxos.map((u) => ({
+                onChange={(sel) =>
+                  dispatch({ type: 'selection/set', utxos: sel })
+                }
+                defaultSelected={state.selectedUtxos.map((u) => ({
                   txid: u.txid,
                   vout: u.vout,
                 }))}
@@ -169,8 +221,8 @@ export default function WalletSendAdvanced({
               <div className="mt-4 flex justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setStep(2)}
-                  disabled={selectedUtxos.length === 0}
+                  onClick={() => dispatch({ type: 'step/set', step: 2 })}
+                  disabled={state.selectedUtxos.length === 0}
                   className="core-button-primary disabled:opacity-50"
                 >
                   Next
@@ -179,12 +231,12 @@ export default function WalletSendAdvanced({
             </div>
           )}
 
-          {step === 2 && (
+          {state.step === 2 && (
             <div className="text-sm text-gray-300">
-              {selectedUtxos.length > 0 && (
+              {state.selectedUtxos.length > 0 && (
                 <div className="core-panel-muted mt-3 rounded-xl p-3 text-xs text-gray-300">
                   <div className="flex items-center justify-between">
-                    <span>Selected: {selectedUtxos.length} UTXO(s)</span>
+                    <span>Selected: {state.selectedUtxos.length} UTXO(s)</span>
                     <span className="font-mono text-white">
                       Total: {totalSelectedAmount.toFixed(8)} BTC
                     </span>
@@ -283,7 +335,7 @@ export default function WalletSendAdvanced({
               <div className="mt-4 flex justify-between">
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={() => dispatch({ type: 'step/set', step: 1 })}
                   className="core-button-secondary"
                 >
                   Back
@@ -307,7 +359,7 @@ export default function WalletSendAdvanced({
         </div>
       )}
 
-      {open && pending && (
+      {state.isConfirmOpen && state.pendingForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="core-surface w-full max-w-md rounded-3xl p-6 text-white shadow-xl">
             <div className="mb-3 text-base font-semibold">
@@ -317,26 +369,32 @@ export default function WalletSendAdvanced({
               <div className="flex items-start justify-between">
                 <span className="text-gray-300">Address</span>
                 <span className="max-w-[60%] text-right font-mono break-all whitespace-normal">
-                  {pending.address}
+                  {state.pendingForm.address}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-300">Amount</span>
-                <span className="font-mono">{pending.amount ?? 0}</span>
+                <span className="font-mono">
+                  {state.pendingForm.amount ?? 0}
+                </span>
               </div>
               <div className="flex items-start justify-between">
                 <span className="text-gray-300">Change Address</span>
                 <span className="max-w-[60%] text-right font-mono break-all whitespace-normal">
-                  {pending.addressChange ?? ''}
+                  {state.pendingForm.addressChange ?? ''}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-300">Change Amount</span>
-                <span className="font-mono">{pending.amountChange ?? 0}</span>
+                <span className="font-mono">
+                  {state.pendingForm.amountChange ?? 0}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-300">Selected UTXOs</span>
-                <span className="font-mono">{pending.utxos?.length ?? 0}</span>
+                <span className="font-mono">
+                  {state.pendingForm.utxos?.length ?? 0}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-300">Total Selected</span>
@@ -354,8 +412,7 @@ export default function WalletSendAdvanced({
             <div className="mt-5 flex gap-3">
               <button
                 onClick={() => {
-                  setOpen(false);
-                  setPending(null);
+                  dispatch({ type: 'confirm/close' });
                 }}
                 className="core-button-secondary"
               >
@@ -384,12 +441,14 @@ export default function WalletSendAdvanced({
               : String(sendError))}
         </div>
       )}
-      {successTxid && (
+      {state.successTxid && (
         <div className="mt-4 rounded border border-green-700 bg-green-900/30 p-3 text-sm text-green-200">
           <div className="flex items-center justify-between">
             <div>
               Transaction submitted. TxID:
-              <span className="ml-1 font-mono break-all">{successTxid}</span>
+              <span className="ml-1 font-mono break-all">
+                {state.successTxid}
+              </span>
             </div>
             <button
               onClick={() => {

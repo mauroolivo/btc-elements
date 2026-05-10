@@ -10,6 +10,7 @@
     "eslint",
     "firebase",
     "husky",
+    "immer",
     "mempool",
     "pm2",
     "swr",
