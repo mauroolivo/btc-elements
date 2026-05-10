@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
+import { produce } from 'immer';
 import { useAuth } from '@features/auth';
 import { useWalletStore } from '@features/wallet/store';
 import {
@@ -64,51 +65,159 @@ function formatWalletCreatedAt(createdAt: FirestoreWallet['createdAt']) {
   }).format(createdAt.toDate());
 }
 
+type MyWalletsState = {
+  wallets: FirestoreWallet[];
+  walletsLoading: boolean;
+  form: {
+    isOpen: boolean;
+    walletName: string;
+    isSaving: boolean;
+  };
+  feedback: {
+    error: string | null;
+    success: string | null;
+    openWalletError: string | null;
+  };
+  openWallet: {
+    isOpening: boolean;
+    walletName: string | null;
+  };
+};
+
+type MyWalletsAction =
+  | { type: 'wallets/load-start' }
+  | { type: 'wallets/load-success'; wallets: FirestoreWallet[] }
+  | { type: 'wallets/load-error'; message: string }
+  | { type: 'session/clear' }
+  | { type: 'form/toggle' }
+  | { type: 'form/close' }
+  | { type: 'form/set-wallet-name'; walletName: string }
+  | { type: 'create/start' }
+  | { type: 'create/success' }
+  | { type: 'create/error'; message: string }
+  | { type: 'open-wallet/clear-error' }
+  | { type: 'open-wallet/start'; walletName: string }
+  | { type: 'open-wallet/error'; message: string };
+
+const initialState: MyWalletsState = {
+  wallets: [],
+  walletsLoading: false,
+  form: {
+    isOpen: false,
+    walletName: '',
+    isSaving: false,
+  },
+  feedback: {
+    error: null,
+    success: null,
+    openWalletError: null,
+  },
+  openWallet: {
+    isOpening: false,
+    walletName: null,
+  },
+};
+
+const myWalletsReducer = produce(
+  (draft: MyWalletsState, action: MyWalletsAction) => {
+    switch (action.type) {
+      case 'wallets/load-start':
+        draft.walletsLoading = true;
+        draft.feedback.error = null;
+        return;
+      case 'wallets/load-success':
+        draft.wallets = action.wallets;
+        draft.walletsLoading = false;
+        return;
+      case 'wallets/load-error':
+        draft.walletsLoading = false;
+        draft.feedback.error = action.message;
+        return;
+      case 'session/clear':
+        draft.wallets = [];
+        draft.form.isOpen = false;
+        draft.form.walletName = '';
+        draft.form.isSaving = false;
+        draft.feedback.error = null;
+        draft.feedback.success = null;
+        draft.feedback.openWalletError = null;
+        draft.openWallet.isOpening = false;
+        draft.openWallet.walletName = null;
+        return;
+      case 'form/toggle':
+        draft.form.isOpen = !draft.form.isOpen;
+        draft.feedback.error = null;
+        draft.feedback.success = null;
+        return;
+      case 'form/close':
+        draft.form.isOpen = false;
+        draft.form.walletName = '';
+        return;
+      case 'form/set-wallet-name':
+        draft.form.walletName = action.walletName;
+        return;
+      case 'create/start':
+        draft.form.isSaving = true;
+        draft.feedback.error = null;
+        draft.feedback.success = null;
+        return;
+      case 'create/success':
+        draft.form.isSaving = false;
+        draft.form.walletName = '';
+        draft.form.isOpen = false;
+        draft.feedback.success = 'Wallet saved.';
+        return;
+      case 'create/error':
+        draft.form.isSaving = false;
+        draft.feedback.error = action.message;
+        return;
+      case 'open-wallet/clear-error':
+        draft.feedback.openWalletError = null;
+        return;
+      case 'open-wallet/start':
+        draft.openWallet.isOpening = true;
+        draft.openWallet.walletName = action.walletName;
+        return;
+      case 'open-wallet/error':
+        draft.feedback.openWalletError = action.message;
+        draft.openWallet.isOpening = false;
+        draft.openWallet.walletName = null;
+        return;
+      default:
+        return;
+    }
+  }
+);
+
 export default function MyWalletsPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const { create: createRpcWallet } = useCreateWallet();
   const { listwalletdir, refresh: refreshWalletDir } = useWalletsDir();
   const { setTargetWallet } = useWalletStore();
-  const [wallets, setWallets] = useState<FirestoreWallet[]>([]);
-  const [walletsLoading, setWalletsLoading] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [walletName, setWalletName] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isOpeningWallet, setIsOpeningWallet] = useState(false);
-  const [openingWalletName, setOpeningWalletName] = useState<string | null>(
-    null
-  );
-  const [openWalletError, setOpenWalletError] = useState<string | null>(null);
-  const hasWallets = wallets.length > 0;
+  const [state, dispatch] = useReducer(myWalletsReducer, initialState);
+  const hasWallets = state.wallets.length > 0;
 
   async function loadWallets(userId: string) {
-    setWalletsLoading(true);
-    setError(null);
+    dispatch({ type: 'wallets/load-start' });
 
     try {
       const nextWallets = await getUserWallets(userId);
-      setWallets(nextWallets);
+      dispatch({ type: 'wallets/load-success', wallets: nextWallets });
     } catch (nextError) {
-      setError(
-        nextError instanceof Error
-          ? nextError.message
-          : 'Failed to load wallets.'
-      );
-    } finally {
-      setWalletsLoading(false);
+      dispatch({
+        type: 'wallets/load-error',
+        message:
+          nextError instanceof Error
+            ? nextError.message
+            : 'Failed to load wallets.',
+      });
     }
   }
 
   useEffect(() => {
     if (!user) {
-      setWallets([]);
-      setIsFormOpen(false);
-      setWalletName('');
-      setError(null);
-      setSuccess(null);
+      dispatch({ type: 'session/clear' });
       return;
     }
 
@@ -117,48 +226,43 @@ export default function MyWalletsPage() {
 
   async function handleCreateWallet() {
     if (!user) {
-      setError('Sign in to save wallets.');
+      dispatch({ type: 'create/error', message: 'Sign in to save wallets.' });
       return;
     }
 
     let createdWalletId: string | null = null;
 
-    setIsSaving(true);
-    setError(null);
-    setSuccess(null);
+    dispatch({ type: 'create/start' });
 
     try {
-      createdWalletId = await addUserWallet(user.uid, walletName);
+      createdWalletId = await addUserWallet(user.uid, state.form.walletName);
       await createRpcWallet(createdWalletId);
-      setWalletName('');
-      setIsFormOpen(false);
-      setSuccess('Wallet saved.');
+      dispatch({ type: 'create/success' });
       await loadWallets(user.uid);
     } catch (nextError) {
       if (createdWalletId) {
         await deleteUserWalletById(user.uid, createdWalletId);
       }
 
-      setError(
-        nextError instanceof Error
-          ? nextError.message
-          : 'Failed to save wallet.'
-      );
-    } finally {
-      setIsSaving(false);
+      dispatch({
+        type: 'create/error',
+        message:
+          nextError instanceof Error
+            ? nextError.message
+            : 'Failed to save wallet.',
+      });
     }
   }
 
   async function handleOpenWallet(walletId: string, walletLabel: string) {
-    setOpenWalletError(null);
+    dispatch({ type: 'open-wallet/clear-error' });
 
     const walletExistsInCore = listwalletdir.result.wallets.some(
       (wallet) => wallet.name === walletId
     );
 
     if (!walletExistsInCore) {
-      setIsOpeningWallet(true);
-      setOpeningWalletName(walletLabel);
+      dispatch({ type: 'open-wallet/start', walletName: walletLabel });
 
       try {
         const created = await createRpcWallet(walletId);
@@ -172,9 +276,10 @@ export default function MyWalletsPage() {
 
         await refreshWalletDir();
       } catch {
-        setOpenWalletError('Cannnot open your wallet at this time, try later.');
-        setIsOpeningWallet(false);
-        setOpeningWalletName(null);
+        dispatch({
+          type: 'open-wallet/error',
+          message: 'Cannnot open your wallet at this time, try later.',
+        });
         return;
       }
     }
@@ -221,7 +326,7 @@ export default function MyWalletsPage() {
       ) : (
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,0.9fr)]">
           <section className="core-surface rounded-2xl p-6">
-            {walletsLoading ? (
+            {state.walletsLoading ? (
               <WalletsLoadingView
                 title="Loading my wallets"
                 description="Syncing your saved wallets and preparing the dashboard..."
@@ -247,12 +352,8 @@ export default function MyWalletsPage() {
                   {hasWallets ? (
                     <button
                       type="button"
-                      onClick={() => {
-                        setIsFormOpen((current) => !current);
-                        setError(null);
-                        setSuccess(null);
-                      }}
-                      disabled={wallets.length >= MAX_WALLETS_PER_USER}
+                      onClick={() => dispatch({ type: 'form/toggle' })}
+                      disabled={state.wallets.length >= MAX_WALLETS_PER_USER}
                       className="core-button-primary disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Add wallet
@@ -260,19 +361,25 @@ export default function MyWalletsPage() {
                   ) : null}
                 </div>
 
-                {error ? (
-                  <p className="mb-4 text-sm text-red-400">{error}</p>
+                {state.feedback.error ? (
+                  <p className="mb-4 text-sm text-red-400">
+                    {state.feedback.error}
+                  </p>
                 ) : null}
-                {openWalletError ? (
-                  <p className="mb-4 text-sm text-red-400">{openWalletError}</p>
+                {state.feedback.openWalletError ? (
+                  <p className="mb-4 text-sm text-red-400">
+                    {state.feedback.openWalletError}
+                  </p>
                 ) : null}
-                {success && hasWallets ? (
-                  <p className="mb-4 text-sm text-green-400">{success}</p>
+                {state.feedback.success && hasWallets ? (
+                  <p className="mb-4 text-sm text-green-400">
+                    {state.feedback.success}
+                  </p>
                 ) : null}
 
                 {!hasWallets ? (
                   <div className="core-surface-hero relative overflow-hidden rounded-[28px] p-6 text-white sm:p-8">
-                    {isSaving ? (
+                    {state.form.isSaving ? (
                       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-950/68 backdrop-blur-sm">
                         <div className="relative h-24 w-24">
                           <div className="absolute inset-0 rounded-full border border-cyan-200/20" />
@@ -319,20 +426,26 @@ export default function MyWalletsPage() {
                           </label>
                           <input
                             type="text"
-                            value={walletName}
+                            value={state.form.walletName}
                             onChange={(event) =>
-                              setWalletName(event.target.value)
+                              dispatch({
+                                type: 'form/set-wallet-name',
+                                walletName: event.target.value,
+                              })
                             }
                             placeholder="My primary wallet"
                             className="core-input w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-gray-100 placeholder:text-gray-400 focus:outline-none"
-                            disabled={isSaving}
+                            disabled={state.form.isSaving}
                           />
                         </div>
 
                         <div className="flex flex-wrap items-center gap-3">
                           <button
                             type="submit"
-                            disabled={isSaving || !walletName.trim()}
+                            disabled={
+                              state.form.isSaving ||
+                              !state.form.walletName.trim()
+                            }
                             className="core-button-primary disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             Create
@@ -343,7 +456,7 @@ export default function MyWalletsPage() {
                   </div>
                 ) : (
                   <>
-                    {isOpeningWallet ? (
+                    {state.openWallet.isOpening ? (
                       <div className="core-panel-muted relative mb-6 overflow-hidden rounded-2xl p-6 text-white">
                         <div className="absolute -top-16 right-2 h-40 w-40 rounded-full bg-cyan-300/10 blur-3xl" />
                         <div className="absolute -bottom-16 left-0 h-36 w-36 rounded-full bg-emerald-300/10 blur-3xl" />
@@ -358,45 +471,45 @@ export default function MyWalletsPage() {
                             Preparing wallet in Bitcoin Core
                           </p>
                           <p className="mt-2 max-w-md text-sm leading-6 text-cyan-50/80">
-                            {openingWalletName
-                              ? `Creating ${openingWalletName} and connecting it to your workspace...`
+                            {state.openWallet.walletName
+                              ? `Creating ${state.openWallet.walletName} and connecting it to your workspace...`
                               : 'Creating the selected wallet and connecting it to your workspace...'}
                           </p>
                         </div>
                       </div>
                     ) : null}
 
-                    {isFormOpen ? (
+                    {state.form.isOpen ? (
                       <div className="core-panel-muted mb-6 rounded-2xl p-4">
                         <label className="mb-2 block text-xs tracking-[0.16em] text-gray-400 uppercase">
                           Wallet name
                         </label>
                         <input
                           type="text"
-                          value={walletName}
+                          value={state.form.walletName}
                           onChange={(event) =>
-                            setWalletName(event.target.value)
+                            dispatch({
+                              type: 'form/set-wallet-name',
+                              walletName: event.target.value,
+                            })
                           }
                           placeholder="Enter wallet name"
                           className="core-input w-full rounded-xl px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none"
-                          disabled={isSaving}
+                          disabled={state.form.isSaving}
                         />
                         <div className="mt-4 flex flex-wrap gap-3">
                           <button
                             type="button"
                             onClick={() => void handleCreateWallet()}
-                            disabled={isSaving}
+                            disabled={state.form.isSaving}
                             className="core-button-primary disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            {isSaving ? 'Saving...' : 'Save'}
+                            {state.form.isSaving ? 'Saving...' : 'Save'}
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
-                              setIsFormOpen(false);
-                              setWalletName('');
-                            }}
-                            disabled={isSaving}
+                            onClick={() => dispatch({ type: 'form/close' })}
+                            disabled={state.form.isSaving}
                             className="core-button-secondary"
                           >
                             Cancel
@@ -406,7 +519,7 @@ export default function MyWalletsPage() {
                     ) : null}
 
                     <div className="space-y-3">
-                      {wallets.map((wallet) => (
+                      {state.wallets.map((wallet) => (
                         <div
                           key={wallet.docId}
                           className="core-panel-muted flex items-center justify-between rounded-2xl p-4"
@@ -424,7 +537,7 @@ export default function MyWalletsPage() {
                             onClick={() =>
                               void handleOpenWallet(wallet.id, wallet.name)
                             }
-                            disabled={isOpeningWallet}
+                            disabled={state.openWallet.isOpening}
                             className="core-button-primary px-4 py-2 text-xs font-semibold"
                           >
                             Open wallet

@@ -1,6 +1,7 @@
 'use client';
 import { WalletHome } from '../home';
-import { useState, useEffect, useRef } from 'react';
+import { useReducer, useEffect, useRef } from 'react';
+import { produce } from 'immer';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@features/auth';
 import { WalletReceive } from '../receive';
@@ -19,6 +20,84 @@ import { WalletSendAdvanced } from '../send-advanced';
 import { getUserWalletById } from '@/lib/firebase/wallets';
 
 const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
+
+enum Tab {
+  TRANSACTIONS,
+  RECEIVE,
+  SEND,
+  SEND_ADVANCED,
+  ADDRESSES,
+  DESCRIPTORS,
+}
+
+type WalletViewState = {
+  currentTab: Tab;
+  isMoreOpen: boolean;
+  isGuideCollapsed: boolean;
+  autoConnectError: string | null;
+  walletLabel: string | null;
+  isWalletLabelLoading: boolean;
+};
+
+type WalletViewAction =
+  | { type: 'tab/set'; tab: Tab }
+  | { type: 'more/toggle' }
+  | { type: 'more/close' }
+  | { type: 'guide/toggle' }
+  | { type: 'autoconnect/clear-error' }
+  | { type: 'autoconnect/set-error'; message: string }
+  | { type: 'label/reset' }
+  | { type: 'label/loading' }
+  | { type: 'label/set'; label: string };
+
+const initialViewState: WalletViewState = {
+  currentTab: Tab.TRANSACTIONS,
+  isMoreOpen: false,
+  isGuideCollapsed: true,
+  autoConnectError: null,
+  walletLabel: null,
+  isWalletLabelLoading: false,
+};
+
+const walletViewReducer = produce(
+  (draft: WalletViewState, action: WalletViewAction) => {
+    switch (action.type) {
+      case 'tab/set':
+        draft.currentTab = action.tab;
+        draft.isMoreOpen = false;
+        return;
+      case 'more/toggle':
+        draft.isMoreOpen = !draft.isMoreOpen;
+        return;
+      case 'more/close':
+        draft.isMoreOpen = false;
+        return;
+      case 'guide/toggle':
+        draft.isGuideCollapsed = !draft.isGuideCollapsed;
+        return;
+      case 'autoconnect/clear-error':
+        draft.autoConnectError = null;
+        return;
+      case 'autoconnect/set-error':
+        draft.autoConnectError = action.message;
+        return;
+      case 'label/reset':
+        draft.walletLabel = null;
+        draft.isWalletLabelLoading = false;
+        return;
+      case 'label/loading':
+        draft.walletLabel = null;
+        draft.isWalletLabelLoading = true;
+        return;
+      case 'label/set':
+        draft.walletLabel = action.label;
+        draft.isWalletLabelLoading = false;
+        return;
+      default:
+        return;
+    }
+  }
+);
 
 function WalletRouteLoader({
   title,
@@ -62,20 +141,7 @@ function WalletRouteLoader({
 }
 
 export default function Wallet() {
-  enum Tab {
-    TRANSACTIONS,
-    RECEIVE,
-    SEND,
-    SEND_ADVANCED,
-    ADDRESSES,
-    DESCRIPTORS,
-  }
-  const [currentTab, setCurrentTab] = useState<Tab>(Tab.TRANSACTIONS);
-  const [isMoreOpen, setIsMoreOpen] = useState<boolean>(false);
-  const [isGuideCollapsed, setIsGuideCollapsed] = useState(true);
-  const [autoConnectError, setAutoConnectError] = useState<string | null>(null);
-  const [walletLabel, setWalletLabel] = useState<string | null>(null);
-  const [isWalletLabelLoading, setIsWalletLabelLoading] = useState(false);
+  const [viewState, dispatch] = useReducer(walletViewReducer, initialViewState);
   const moreRef = useRef<HTMLDivElement | null>(null);
   const autoLoadAttemptRef = useRef<string | null>(null);
   const router = useRouter();
@@ -99,7 +165,7 @@ export default function Wallet() {
 
   useEffect(() => {
     if (!targetWallet) {
-      setAutoConnectError(null);
+      dispatch({ type: 'autoconnect/clear-error' });
       autoLoadAttemptRef.current = null;
       return;
     }
@@ -112,7 +178,7 @@ export default function Wallet() {
       if (currentWallet !== targetWallet) {
         setCurrentWallet(targetWallet);
       }
-      setAutoConnectError(null);
+      dispatch({ type: 'autoconnect/clear-error' });
       autoLoadAttemptRef.current = null;
       return;
     }
@@ -122,18 +188,20 @@ export default function Wallet() {
     }
 
     autoLoadAttemptRef.current = targetWallet;
-    setAutoConnectError(null);
+    dispatch({ type: 'autoconnect/clear-error' });
 
     void (async () => {
       try {
         await loadWallet(targetWallet);
         setCurrentWallet(targetWallet);
       } catch (error) {
-        setAutoConnectError(
-          error instanceof Error
-            ? error.message
-            : 'Failed to load the requested wallet.'
-        );
+        dispatch({
+          type: 'autoconnect/set-error',
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Failed to load the requested wallet.',
+        });
       } finally {
         autoLoadAttemptRef.current = null;
       }
@@ -152,41 +220,40 @@ export default function Wallet() {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (!isMoreOpen) return;
+      if (!viewState.isMoreOpen) return;
       const el = moreRef.current;
       if (el && !el.contains(e.target as Node)) {
-        setIsMoreOpen(false);
+        dispatch({ type: 'more/close' });
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isMoreOpen]);
+  }, [viewState.isMoreOpen]);
 
   useEffect(() => {
     if (!user || !currentWallet) {
-      setWalletLabel(null);
-      setIsWalletLabelLoading(false);
+      dispatch({ type: 'label/reset' });
       return;
     }
 
     let cancelled = false;
-    setWalletLabel(null);
-    setIsWalletLabelLoading(true);
+    dispatch({ type: 'label/loading' });
 
     void (async () => {
       try {
         const savedWallet = await getUserWalletById(user.uid, currentWallet);
 
         if (!cancelled) {
-          setWalletLabel(savedWallet?.name?.trim() || 'Wallet');
-          setIsWalletLabelLoading(false);
+          dispatch({
+            type: 'label/set',
+            label: savedWallet?.name?.trim() || 'Wallet',
+          });
         }
       } catch {
         if (!cancelled) {
-          setWalletLabel('Wallet');
-          setIsWalletLabelLoading(false);
+          dispatch({ type: 'label/set', label: 'Wallet' });
         }
       }
     })();
@@ -200,7 +267,9 @@ export default function Wallet() {
     !targetWallet ||
     (currentWallet === targetWallet &&
       listwallets.result.includes(targetWallet));
-  const walletTitle = isWalletLabelLoading ? null : walletLabel;
+  const walletTitle = viewState.isWalletLabelLoading
+    ? null
+    : viewState.walletLabel;
   const hasWalletInfoBalance =
     typeof walletInfo?.result?.balance === 'number' &&
     !Number.isNaN(walletInfo.result.balance);
@@ -213,12 +282,12 @@ export default function Wallet() {
   const isWalletCardReady =
     !infoLoading &&
     walletInfo !== null &&
-    !isWalletLabelLoading &&
+    !viewState.isWalletLabelLoading &&
     !balanceLoading &&
     displayedBalance !== null;
   const isDemoAccount = user?.email?.toLowerCase() === DEMO_ACCOUNT_EMAIL;
 
-  if (targetWallet && autoConnectError) {
+  if (targetWallet && viewState.autoConnectError) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="core-surface mx-4 w-full max-w-xl rounded-3xl p-6 text-center">
@@ -226,7 +295,7 @@ export default function Wallet() {
             Could not open wallet
           </h2>
           <p className="mt-3 text-sm leading-6 text-gray-400">
-            {autoConnectError}
+            {viewState.autoConnectError}
           </p>
         </div>
       </div>
@@ -289,7 +358,7 @@ export default function Wallet() {
     );
   }
   return (
-    <div className="relative">
+    <div className={`relative ${isDemoAccount ? 'pb-32 sm:pb-0' : ''}`}>
       <div className="mb-6 flex w-full items-center justify-center">
         <div
           className="core-tab-strip inline-flex rounded-xl p-1 shadow-sm"
@@ -299,11 +368,11 @@ export default function Wallet() {
           <button
             type="button"
             role="tab"
-            aria-selected={currentTab === Tab.TRANSACTIONS}
-            tabIndex={currentTab === Tab.TRANSACTIONS ? 0 : -1}
-            onClick={() => setCurrentTab(Tab.TRANSACTIONS)}
+            aria-selected={viewState.currentTab === Tab.TRANSACTIONS}
+            tabIndex={viewState.currentTab === Tab.TRANSACTIONS ? 0 : -1}
+            onClick={() => dispatch({ type: 'tab/set', tab: Tab.TRANSACTIONS })}
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
-              currentTab === Tab.TRANSACTIONS
+              viewState.currentTab === Tab.TRANSACTIONS
                 ? 'core-tab-active text-white shadow'
                 : 'core-tab'
             }`}
@@ -313,11 +382,11 @@ export default function Wallet() {
           <button
             type="button"
             role="tab"
-            aria-selected={currentTab === Tab.RECEIVE}
-            tabIndex={currentTab === Tab.RECEIVE ? 0 : -1}
-            onClick={() => setCurrentTab(Tab.RECEIVE)}
+            aria-selected={viewState.currentTab === Tab.RECEIVE}
+            tabIndex={viewState.currentTab === Tab.RECEIVE ? 0 : -1}
+            onClick={() => dispatch({ type: 'tab/set', tab: Tab.RECEIVE })}
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
-              currentTab === Tab.RECEIVE
+              viewState.currentTab === Tab.RECEIVE
                 ? 'core-tab-active text-white shadow'
                 : 'core-tab'
             }`}
@@ -327,11 +396,11 @@ export default function Wallet() {
           <button
             type="button"
             role="tab"
-            aria-selected={currentTab === Tab.SEND}
-            tabIndex={currentTab === Tab.SEND ? 0 : -1}
-            onClick={() => setCurrentTab(Tab.SEND)}
+            aria-selected={viewState.currentTab === Tab.SEND}
+            tabIndex={viewState.currentTab === Tab.SEND ? 0 : -1}
+            onClick={() => dispatch({ type: 'tab/set', tab: Tab.SEND })}
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
-              currentTab === Tab.SEND
+              viewState.currentTab === Tab.SEND
                 ? 'core-tab-active text-white shadow'
                 : 'core-tab'
             }`}
@@ -341,11 +410,13 @@ export default function Wallet() {
           <button
             type="button"
             role="tab"
-            aria-selected={currentTab === Tab.SEND_ADVANCED}
-            tabIndex={currentTab === Tab.SEND_ADVANCED ? 0 : -1}
-            onClick={() => setCurrentTab(Tab.SEND_ADVANCED)}
+            aria-selected={viewState.currentTab === Tab.SEND_ADVANCED}
+            tabIndex={viewState.currentTab === Tab.SEND_ADVANCED ? 0 : -1}
+            onClick={() =>
+              dispatch({ type: 'tab/set', tab: Tab.SEND_ADVANCED })
+            }
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
-              currentTab === Tab.SEND_ADVANCED
+              viewState.currentTab === Tab.SEND_ADVANCED
                 ? 'core-tab-active text-white shadow'
                 : 'core-tab'
             }`}
@@ -357,10 +428,10 @@ export default function Wallet() {
               type="button"
               role="tab"
               aria-haspopup="menu"
-              aria-expanded={isMoreOpen}
-              onClick={() => setIsMoreOpen((v) => !v)}
+              aria-expanded={viewState.isMoreOpen}
+              onClick={() => dispatch({ type: 'more/toggle' })}
               className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
-                [Tab.ADDRESSES, Tab.DESCRIPTORS].includes(currentTab)
+                [Tab.ADDRESSES, Tab.DESCRIPTORS].includes(viewState.currentTab)
                   ? 'core-tab-active text-white shadow'
                   : 'core-tab'
               }`}
@@ -378,25 +449,23 @@ export default function Wallet() {
                 <span className="sr-only">More options</span>
               </span>
             </button>
-            {isMoreOpen && (
+            {viewState.isMoreOpen && (
               <div className="core-surface absolute right-0 z-20 mt-2 w-44 rounded-2xl shadow-lg">
                 <button
                   type="button"
                   className="core-tab block w-full rounded-t-2xl px-3 py-2 text-left text-sm text-gray-200"
-                  onClick={() => {
-                    setCurrentTab(Tab.ADDRESSES);
-                    setIsMoreOpen(false);
-                  }}
+                  onClick={() =>
+                    dispatch({ type: 'tab/set', tab: Tab.ADDRESSES })
+                  }
                 >
                   ADDRESSES
                 </button>
                 <button
                   type="button"
                   className="core-tab block w-full rounded-b-2xl px-3 py-2 text-left text-sm text-gray-200"
-                  onClick={() => {
-                    setCurrentTab(Tab.DESCRIPTORS);
-                    setIsMoreOpen(false);
-                  }}
+                  onClick={() =>
+                    dispatch({ type: 'tab/set', tab: Tab.DESCRIPTORS })
+                  }
                 >
                   DESCRIPTORS
                 </button>
@@ -476,17 +545,21 @@ export default function Wallet() {
           )}
         </div>
       </div>
-      {currentTab === Tab.TRANSACTIONS ? (
+      {viewState.currentTab === Tab.TRANSACTIONS ? (
         <WalletHome />
-      ) : currentTab === Tab.RECEIVE ? (
+      ) : viewState.currentTab === Tab.RECEIVE ? (
         <WalletReceive />
-      ) : currentTab === Tab.SEND ? (
-        <WalletSend showTxs={() => setCurrentTab(Tab.TRANSACTIONS)} />
-      ) : currentTab === Tab.SEND_ADVANCED ? (
-        <WalletSendAdvanced showTxs={() => setCurrentTab(Tab.TRANSACTIONS)} />
-      ) : currentTab === Tab.ADDRESSES ? (
+      ) : viewState.currentTab === Tab.SEND ? (
+        <WalletSend
+          showTxs={() => dispatch({ type: 'tab/set', tab: Tab.TRANSACTIONS })}
+        />
+      ) : viewState.currentTab === Tab.SEND_ADVANCED ? (
+        <WalletSendAdvanced
+          showTxs={() => dispatch({ type: 'tab/set', tab: Tab.TRANSACTIONS })}
+        />
+      ) : viewState.currentTab === Tab.ADDRESSES ? (
         <WalletAddress />
-      ) : currentTab === Tab.DESCRIPTORS ? (
+      ) : viewState.currentTab === Tab.DESCRIPTORS ? (
         <WalletDescriptor />
       ) : (
         <div>ERROR</div>
@@ -506,18 +579,20 @@ export default function Wallet() {
               </div>
               <button
                 type="button"
-                onClick={() => setIsGuideCollapsed((value) => !value)}
+                onClick={() => dispatch({ type: 'guide/toggle' })}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10"
-                aria-expanded={!isGuideCollapsed}
+                aria-expanded={!viewState.isGuideCollapsed}
                 aria-label={
-                  isGuideCollapsed ? 'Expand demo guide' : 'Collapse demo guide'
+                  viewState.isGuideCollapsed
+                    ? 'Expand demo guide'
+                    : 'Collapse demo guide'
                 }
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  className={`h-5 w-5 transition-transform ${isGuideCollapsed ? '' : 'rotate-180'}`}
+                  className={`h-5 w-5 transition-transform ${viewState.isGuideCollapsed ? '' : 'rotate-180'}`}
                 >
                   <path
                     fillRule="evenodd"
@@ -528,7 +603,7 @@ export default function Wallet() {
               </button>
             </div>
 
-            {!isGuideCollapsed ? (
+            {!viewState.isGuideCollapsed ? (
               <div className="space-y-4 px-4 py-4 text-sm text-gray-200">
                 <ol className="space-y-3">
                   <li className="flex gap-3">
@@ -539,7 +614,9 @@ export default function Wallet() {
                       <div>Click on Receive.</div>
                       <button
                         type="button"
-                        onClick={() => setCurrentTab(Tab.RECEIVE)}
+                        onClick={() =>
+                          dispatch({ type: 'tab/set', tab: Tab.RECEIVE })
+                        }
                         className="mt-2 inline-flex items-center rounded-2xl border border-cyan-200/18 bg-cyan-400/10 px-3 py-2 text-xs font-semibold tracking-wide text-cyan-100 transition-colors hover:bg-cyan-400/16"
                       >
                         Open Receive
@@ -586,7 +663,9 @@ export default function Wallet() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => setCurrentTab(Tab.TRANSACTIONS)}
+                        onClick={() =>
+                          dispatch({ type: 'tab/set', tab: Tab.TRANSACTIONS })
+                        }
                         className="mt-2 inline-flex items-center rounded-2xl border border-white/10 bg-white/6 px-3 py-2 text-xs font-semibold tracking-wide text-white transition-colors hover:bg-white/10"
                       >
                         Open Transactions
