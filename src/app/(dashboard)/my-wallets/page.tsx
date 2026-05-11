@@ -15,6 +15,8 @@ import {
 } from '@/lib/firebase/wallets';
 import { useCreateWallet, useWalletsDir } from '@features/wallet/hooks';
 
+const DEMO_ACCOUNT_EMAIL = process.env.NEXT_PUBLIC_DEMO_EMAIL ?? '';
+
 function WalletsLoadingView({
   title,
   description,
@@ -197,6 +199,7 @@ export default function MyWalletsPage() {
   const { setTargetWallet } = useWalletStore();
   const [state, dispatch] = useReducer(myWalletsReducer, initialState);
   const hasWallets = state.wallets.length > 0;
+  const isDemoAccount = user?.email?.toLowerCase() === DEMO_ACCOUNT_EMAIL;
 
   async function loadWallets(userId: string) {
     dispatch({ type: 'wallets/load-start' });
@@ -227,6 +230,15 @@ export default function MyWalletsPage() {
   async function handleCreateWallet() {
     if (!user) {
       dispatch({ type: 'create/error', message: 'Sign in to save wallets.' });
+      return;
+    }
+
+    if (isDemoAccount) {
+      dispatch({
+        type: 'create/error',
+        message:
+          'The demo account cannot add wallets. Please register a new account.',
+      });
       return;
     }
 
@@ -347,13 +359,22 @@ export default function MyWalletsPage() {
                         view.
                       </p>
                     ) : null}
+                    {isDemoAccount ? (
+                      <p className="mt-2 text-sm leading-6 text-amber-200/90">
+                        The demo account is read-only for wallet creation. Sign
+                        in with your own account to add wallets.
+                      </p>
+                    ) : null}
                   </div>
 
                   {hasWallets ? (
                     <button
                       type="button"
                       onClick={() => dispatch({ type: 'form/toggle' })}
-                      disabled={state.wallets.length >= MAX_WALLETS_PER_USER}
+                      disabled={
+                        isDemoAccount ||
+                        state.wallets.length >= MAX_WALLETS_PER_USER
+                      }
                       className="core-button-primary disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Add wallet
@@ -443,6 +464,7 @@ export default function MyWalletsPage() {
                           <button
                             type="submit"
                             disabled={
+                              isDemoAccount ||
                               state.form.isSaving ||
                               !state.form.walletName.trim()
                             }
@@ -501,7 +523,7 @@ export default function MyWalletsPage() {
                           <button
                             type="button"
                             onClick={() => void handleCreateWallet()}
-                            disabled={state.form.isSaving}
+                            disabled={isDemoAccount || state.form.isSaving}
                             className="core-button-primary disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {state.form.isSaving ? 'Saving...' : 'Save'}
