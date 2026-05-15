@@ -1,35 +1,26 @@
-'use client';
+import { use } from 'react';
 
-import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import {
+  type ExplorerBlockTransactionsPage,
+  type ExplorerTransactionSummary,
+} from '@features/explorer/loadExplorerData';
 
-import { type ExplorerTransactionSummary } from '@features/explorer/loadExplorerData';
+import { BlockTransactionsPager } from './BlockTransactionsPager';
 
 type BlockTransactionsProps = {
   query: string;
-  transactions: ExplorerTransactionSummary[];
-  page: number;
-  totalPages: number;
+  transactionSummariesPromise: Promise<ExplorerBlockTransactionsPage>;
   totalTransactions: number;
 };
 
 export function BlockTransactions({
   query,
-  transactions,
-  page,
-  totalPages,
+  transactionSummariesPromise,
   totalTransactions,
 }: BlockTransactionsProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const previousHref = buildExplorerHref(query, page - 1);
-  const nextHref = buildExplorerHref(query, page + 1);
-
-  function navigateToPage(href: string) {
-    startTransition(() => {
-      router.push(href, { scroll: false });
-    });
-  }
+  const { page, totalPages, transactionSummaries } = use(
+    transactionSummariesPromise
+  );
 
   return (
     <div className="space-y-3">
@@ -37,43 +28,15 @@ export function BlockTransactions({
         <div className="text-sm font-semibold">
           Transactions ({totalTransactions})
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-300">
-          {page > 1 ? (
-            <button
-              type="button"
-              onClick={() => navigateToPage(previousHref)}
-              disabled={isPending}
-              className="core-button-secondary px-2 py-1"
-            >
-              Prev
-            </button>
-          ) : (
-            <span className="core-button-secondary cursor-not-allowed px-2 py-1 opacity-50">
-              Prev
-            </span>
-          )}
-          <div>
-            {isPending ? 'Loading page...' : `Page ${page} of ${totalPages}`}
-          </div>
-          {page < totalPages ? (
-            <button
-              type="button"
-              onClick={() => navigateToPage(nextHref)}
-              disabled={isPending}
-              className="core-button-secondary px-2 py-1"
-            >
-              Next
-            </button>
-          ) : (
-            <span className="core-button-secondary cursor-not-allowed px-2 py-1 opacity-50">
-              Next
-            </span>
-          )}
-        </div>
+        <BlockTransactionsPager
+          query={query}
+          page={page}
+          totalPages={totalPages}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        {transactions.map((transaction) => (
+        {transactionSummaries.map((transaction) => (
           <TxSummary key={transaction.txid} transaction={transaction} />
         ))}
       </div>
@@ -120,9 +83,4 @@ function TxSummary({
       </div>
     </div>
   );
-}
-
-function buildExplorerHref(query: string, page: number) {
-  const params = new URLSearchParams({ ref: query, page: String(page) });
-  return `/explorer?${params.toString()}`;
 }

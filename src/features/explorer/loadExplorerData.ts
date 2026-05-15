@@ -23,6 +23,12 @@ export type ExplorerTransactionSummary = {
   error: boolean;
 };
 
+export type ExplorerBlockTransactionsPage = {
+  page: number;
+  totalPages: number;
+  transactionSummaries: ExplorerTransactionSummary[];
+};
+
 export type ExplorerLookupResult =
   | {
       kind: 'empty';
@@ -39,9 +45,8 @@ export type ExplorerLookupResult =
       query: string;
       page: number;
       block: BlockResult;
-      transactionSummaries: ExplorerTransactionSummary[];
+      transactionSummariesPromise: Promise<ExplorerBlockTransactionsPage>;
       totalTransactions: number;
-      totalPages: number;
     }
   | {
       kind: 'transaction';
@@ -84,11 +89,7 @@ async function loadBlockByHeight(height: number): Promise<BlockResult | null> {
 async function loadPagedTransactionSummaries(
   txids: string[],
   page: number
-): Promise<{
-  page: number;
-  totalPages: number;
-  transactionSummaries: ExplorerTransactionSummary[];
-}> {
+): Promise<ExplorerBlockTransactionsPage> {
   const totalPages = Math.max(
     1,
     Math.ceil(txids.length / TRANSACTIONS_PER_PAGE)
@@ -164,17 +165,16 @@ export async function loadExplorerData(params?: {
       };
     }
 
-    const { page, totalPages, transactionSummaries } =
-      await loadPagedTransactionSummaries(block.tx, requestedPage);
-
     return {
       kind: 'block',
       query,
-      page,
+      page: requestedPage,
       block,
-      transactionSummaries,
+      transactionSummariesPromise: loadPagedTransactionSummaries(
+        block.tx,
+        requestedPage
+      ),
       totalTransactions: block.tx.length,
-      totalPages,
     };
   }
 
@@ -184,20 +184,16 @@ export async function loadExplorerData(params?: {
   ]);
 
   if (!hasRpcError(blockResponse)) {
-    const { page, totalPages, transactionSummaries } =
-      await loadPagedTransactionSummaries(
-        blockResponse.result.tx,
-        requestedPage
-      );
-
     return {
       kind: 'block',
       query,
-      page,
+      page: requestedPage,
       block: blockResponse.result,
-      transactionSummaries,
+      transactionSummariesPromise: loadPagedTransactionSummaries(
+        blockResponse.result.tx,
+        requestedPage
+      ),
       totalTransactions: blockResponse.result.tx.length,
-      totalPages,
     };
   }
 

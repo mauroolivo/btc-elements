@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { loadExplorerData } from '@features/explorer/loadExplorerData';
 
 import { BlockTransactions } from './_components/BlockTransactions';
@@ -93,13 +95,24 @@ export default async function ExplorerPage({
                 </div>
               </div>
             </div>
-            <BlockTransactions
-              query={explorerData.query}
-              transactions={explorerData.transactionSummaries}
-              page={explorerData.page}
-              totalPages={explorerData.totalPages}
-              totalTransactions={explorerData.totalTransactions}
-            />
+
+            <Suspense
+              key={`${explorerData.query}:${explorerData.page}`}
+              fallback={
+                <BlockTransactionsFallback
+                  page={explorerData.page}
+                  totalTransactions={explorerData.totalTransactions}
+                />
+              }
+            >
+              <BlockTransactions
+                query={explorerData.query}
+                transactionSummariesPromise={
+                  explorerData.transactionSummariesPromise
+                }
+                totalTransactions={explorerData.totalTransactions}
+              />
+            </Suspense>
           </div>
         )}
         {explorerData.kind === 'transaction' && (
@@ -245,6 +258,57 @@ export default async function ExplorerPage({
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function BlockTransactionsFallback({
+  page,
+  totalTransactions,
+}: {
+  page: number;
+  totalTransactions: number;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-semibold">
+          Transactions ({totalTransactions})
+        </div>
+        <div className="flex items-center gap-2 text-xs text-gray-300">
+          <span className="core-button-secondary cursor-wait px-2 py-1 opacity-70">
+            Loading...
+          </span>
+          <div>Loading page {page}...</div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className="core-panel-muted rounded-xl p-3">
+            <div className="h-3 w-12 animate-pulse rounded bg-white/10" />
+            <div className="mt-2 h-4 w-full animate-pulse rounded bg-white/8" />
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="space-y-2">
+                <div className="h-3 w-20 animate-pulse rounded bg-white/10" />
+                <div className="h-4 w-14 animate-pulse rounded bg-white/8" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 w-16 animate-pulse rounded bg-white/10" />
+                <div className="h-4 w-18 animate-pulse rounded bg-white/8" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 w-14 animate-pulse rounded bg-white/10" />
+                <div className="h-4 w-12 animate-pulse rounded bg-white/8" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 w-18 animate-pulse rounded bg-white/10" />
+                <div className="h-4 w-16 animate-pulse rounded bg-white/8" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
