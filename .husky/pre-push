@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+set -e
+
+if ! command -v trivy >/dev/null 2>&1; then
+  echo "pre-push: trivy not found, skipping security scan"
+  echo "install trivy locally to enable vulnerability checks before push"
+  exit 0
+fi
+
+npm run security:scan
