@@ -15,7 +15,8 @@
     "pm2",
     "swr",
     "UTXO",
-    "zustand"
+    "zustand",
+    "protobufjs"
   ],
   "ignorePaths": [".next/**", "node_modules/**"]
 }
