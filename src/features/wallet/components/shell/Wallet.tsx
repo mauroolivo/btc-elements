@@ -59,12 +59,21 @@ const initialViewState: WalletViewState = {
   isWalletLabelLoading: false,
 };
 
+function applyViewPatch(
+  draft: WalletViewState,
+  patch: Partial<WalletViewState>
+) {
+  Object.assign(draft, patch);
+}
+
 const walletViewReducer = produce(
   (draft: WalletViewState, action: WalletViewAction) => {
     switch (action.type) {
       case 'tab/set':
-        draft.currentTab = action.tab;
-        draft.isMoreOpen = false;
+        applyViewPatch(draft, {
+          currentTab: action.tab,
+          isMoreOpen: false,
+        });
         return;
       case 'more/toggle':
         draft.isMoreOpen = !draft.isMoreOpen;
@@ -82,16 +91,22 @@ const walletViewReducer = produce(
         draft.autoConnectError = action.message;
         return;
       case 'label/reset':
-        draft.walletLabel = null;
-        draft.isWalletLabelLoading = false;
+        applyViewPatch(draft, {
+          walletLabel: null,
+          isWalletLabelLoading: false,
+        });
         return;
       case 'label/loading':
-        draft.walletLabel = null;
-        draft.isWalletLabelLoading = true;
+        applyViewPatch(draft, {
+          walletLabel: null,
+          isWalletLabelLoading: true,
+        });
         return;
       case 'label/set':
-        draft.walletLabel = action.label;
-        draft.isWalletLabelLoading = false;
+        applyViewPatch(draft, {
+          walletLabel: action.label,
+          isWalletLabelLoading: false,
+        });
         return;
       default:
         return;
