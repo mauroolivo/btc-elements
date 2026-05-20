@@ -2,9 +2,11 @@ import { useMemo, useState, useEffect } from 'react';
 import { useUnspent } from '@features/wallet/hooks';
 import { Utxo } from '@features/wallet/types/wallet';
 
+type SelectedUtxoRef = Pick<Utxo, 'txid' | 'vout'>;
+
 export type WalletUnspentSelectProps = {
   onChange?: (selected: Utxo[]) => void;
-  defaultSelected?: Array<{ txid: string; vout: number }>;
+  defaultSelected?: SelectedUtxoRef[];
 };
 
 export default function WalletUnspentSelect({
