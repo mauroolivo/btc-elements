@@ -42,19 +42,6 @@ const headers = {
   Authorization: 'Basic ' + auth,
 };
 
-// async function fetchData(method: string, params: ParamsDictionary) {
-//   return await fetch(url, {
-//     method: "POST",
-//     headers: headers,
-//     body: JSON.stringify({
-//       jsonrpc: "2.0",
-//       id: "curl",
-//       method: method,
-//       params: params,
-//     }),
-//   });
-// }
-
 export const fetcher = async (
   method: string,
   params: ParamsDictionary,
@@ -82,52 +69,60 @@ export const fetcher = async (
   return fetch(`${url}${w}`, options).then((r) => r.json());
 };
 
+async function rpcCall<TResponse>(
+  method: string,
+  params: ParamsDictionary = {},
+  wallet?: string
+): Promise<TResponse> {
+  return (await fetcher(method, params, wallet)) as TResponse;
+}
+
 export async function getblockchaininfo(): Promise<Getblockchaininfo> {
-  return (await fetcher('getblockchaininfo', {})) as Promise<Getblockchaininfo>;
+  return rpcCall<Getblockchaininfo>('getblockchaininfo');
 }
 
 export async function getrawtransaction(
   txid: string,
   verbose: boolean
 ): Promise<Getrawtransaction> {
-  return await fetcher('getrawtransaction', {
+  return rpcCall<Getrawtransaction>('getrawtransaction', {
     txid: txid,
     verbose: verbose,
   });
 }
 
 export async function listwalletdir(): Promise<Listwalletdir> {
-  return (await fetcher('listwalletdir', {})) as Promise<Listwalletdir>;
+  return rpcCall<Listwalletdir>('listwalletdir');
 }
 
 export async function listwallets(): Promise<Listwallets> {
-  return (await fetcher('listwallets', {})) as Promise<Listwallets>;
+  return rpcCall<Listwallets>('listwallets');
 }
 
 export async function unloadwallet(name: string): Promise<Unloadwallet> {
-  return (await fetcher('unloadwallet', {
+  return rpcCall<Unloadwallet>('unloadwallet', {
     wallet_name: name,
-  })) as Promise<Unloadwallet>;
+  });
 }
 
 export async function loadwallet(name: string): Promise<Loadwallet> {
-  return (await fetcher('loadwallet', {
+  return rpcCall<Loadwallet>('loadwallet', {
     filename: name,
-  })) as Promise<Loadwallet>;
+  });
 }
 
 export async function createwallet(name: string): Promise<Createwallet> {
-  return (await fetcher('createwallet', {
+  return rpcCall<Createwallet>('createwallet', {
     wallet_name: name,
-  })) as Promise<Createwallet>;
+  });
 }
 
 export async function getbalance(wallet: string): Promise<Getbalance> {
-  return (await fetcher('getbalance', {}, wallet)) as Promise<Getbalance>;
+  return rpcCall<Getbalance>('getbalance', {}, wallet);
 }
 
 export async function getwalletinfo(wallet: string): Promise<Getwalletinfo> {
-  return (await fetcher('getwalletinfo', {}, wallet)) as Promise<Getwalletinfo>;
+  return rpcCall<Getwalletinfo>('getwalletinfo', {}, wallet);
 }
 
 export async function listtransactions(
@@ -137,7 +132,7 @@ export async function listtransactions(
   skip: number,
   include_watchonly: boolean
 ): Promise<Listtransactions> {
-  return (await fetcher(
+  return rpcCall<Listtransactions>(
     'listtransactions',
     {
       label: label,
@@ -146,151 +141,140 @@ export async function listtransactions(
       include_watchonly: include_watchonly,
     },
     wallet
-  )) as Promise<Listtransactions>;
+  );
 }
 
 export async function getnewaddress(
   wallet: string,
   addressType: string
 ): Promise<Newaddress> {
-  return (await fetcher(
+  return rpcCall<Newaddress>(
     'getnewaddress',
     {
       address_type: addressType,
     },
     wallet
-  )) as Promise<Newaddress>;
+  );
 }
 
 export async function sendtoaddress(
   payload: ParamsDictionary,
   wallet: string
 ): Promise<Sendtoaddress> {
-  return (await fetcher(
-    'sendtoaddress',
-    payload,
-    wallet
-  )) as Promise<Sendtoaddress>;
+  return rpcCall<Sendtoaddress>('sendtoaddress', payload, wallet);
 }
 
 export async function listUnspent(wallet: string): Promise<Listunspent> {
-  return (await fetcher('listunspent', {}, wallet)) as Promise<Listunspent>;
+  return rpcCall<Listunspent>('listunspent', {}, wallet);
 }
 
 export async function getrawchangeaddress(
   wallet: string
 ): Promise<Getrawchangeaddress> {
-  return (await fetcher(
-    'getrawchangeaddress',
-    {},
-    wallet
-  )) as Promise<Getrawchangeaddress>;
+  return rpcCall<Getrawchangeaddress>('getrawchangeaddress', {}, wallet);
 }
 
 export async function createrawtransaction(
   payload: ParamsDictionary,
   wallet: string
 ): Promise<Createrawtransaction> {
-  return await fetcher('createrawtransaction', payload, wallet);
+  return rpcCall<Createrawtransaction>('createrawtransaction', payload, wallet);
 }
 
 export async function signrawtransactionwithwallet(
   payload: ParamsDictionary,
   wallet: string
 ): Promise<Signrawtransactionwithwallet> {
-  return (await fetcher(
+  return rpcCall<Signrawtransactionwithwallet>(
     'signrawtransactionwithwallet',
     payload,
     wallet
-  )) as Promise<Signrawtransactionwithwallet>;
+  );
 }
+
 export async function sendrawtransaction(
   payload: ParamsDictionary,
   wallet: string
 ): Promise<BroadcastResponse> {
-  return (await fetcher(
-    'sendrawtransaction',
-    payload,
-    wallet
-  )) as Promise<BroadcastResponse>;
+  return rpcCall<BroadcastResponse>('sendrawtransaction', payload, wallet);
 }
 
 export async function getblock(
   blockid: string,
   verbosity: number
 ): Promise<Getblock> {
-  return (await fetcher('getblock', {
+  return rpcCall<Getblock>('getblock', {
     blockhash: blockid,
     verbosity: verbosity,
-  })) as Promise<Getblock>;
+  });
 }
 
 export async function getblockhash(height: number): Promise<Getblockhash> {
-  return (await fetcher('getblockhash', {
+  return rpcCall<Getblockhash>('getblockhash', {
     height: height,
-  })) as Promise<Getblockhash>;
+  });
 }
 
 export async function getRawmempool(verbose: boolean): Promise<Rawmempool> {
-  return (await fetcher('getrawmempool', {
+  return rpcCall<Rawmempool>('getrawmempool', {
     verbose: verbose,
-  })) as Promise<Rawmempool>;
+  });
 }
 
 export async function getmempoolinfo(): Promise<Getmempoolinfo> {
-  return (await fetcher('getmempoolinfo', {})) as Promise<Getmempoolinfo>;
+  return rpcCall<Getmempoolinfo>('getmempoolinfo');
 }
 
 export async function getmininginfo(): Promise<Getmininginfo> {
-  return (await fetcher('getmininginfo', {})) as Promise<Getmininginfo>;
+  return rpcCall<Getmininginfo>('getmininginfo');
 }
 
 export async function getnetworkinfo(): Promise<Getnetworkinfo> {
-  return (await fetcher('getnetworkinfo', {})) as Promise<Getnetworkinfo>;
+  return rpcCall<Getnetworkinfo>('getnetworkinfo');
 }
 
 export async function gethelp(command?: string): Promise<Help> {
   if (command && command.length > 0) {
-    return (await fetcher('help', { command })) as Promise<Help>;
+    return rpcCall<Help>('help', { command });
   }
-  return (await fetcher('help', {})) as Promise<Help>;
+  return rpcCall<Help>('help');
 }
 
 export async function listaddressgroupings(
   wallet: string
 ): Promise<Listaddressgroupings> {
-  return (await fetcher(
-    'listaddressgroupings',
-    {},
-    wallet
-  )) as Promise<Listaddressgroupings>;
+  return rpcCall<Listaddressgroupings>('listaddressgroupings', {}, wallet);
 }
 
 export async function getaddressinfo(
   address: string,
   wallet: string
 ): Promise<Getaddressinfo> {
-  return (await fetcher(
+  return rpcCall<Getaddressinfo>(
     'getaddressinfo',
     { address: address },
     wallet
-  )) as Promise<Getaddressinfo>;
+  );
 }
 
 export async function getdescriptorinfo(
   descriptor: string,
   wallet: string
 ): Promise<Getdescriptorinfo> {
-  return await fetcher('getdescriptorinfo', { descriptor: descriptor }, wallet);
+  return rpcCall<Getdescriptorinfo>(
+    'getdescriptorinfo',
+    { descriptor: descriptor },
+    wallet
+  );
 }
 
 export async function help(): Promise<Help> {
-  return await fetcher('help', {});
+  return rpcCall<Help>('help');
 }
 
 export async function bumpfee(
   payload: ParamsDictionary,
   wallet: string
 ): Promise<Bumpfee> {
-  return await fetcher('bumpfee', payload, wallet);
+  return rpcCall<Bumpfee>('bumpfee', payload, wallet);
 }
