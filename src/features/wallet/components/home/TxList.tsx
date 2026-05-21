@@ -5,7 +5,7 @@ import WalletHomeBumpFee from './BumpFee';
 import WalletHomeCPFP from './CPFP';
 
 type Props = {
-  transactions: ListTransaction[];
+  transactions: readonly ListTransaction[];
   txLoading: boolean;
   txValidating: boolean;
   hasMore: boolean;
