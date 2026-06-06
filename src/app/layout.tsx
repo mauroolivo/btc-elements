@@ -33,7 +33,7 @@ export default function RootLayout({
         <AxeDevTools />
         <AuthProvider>
           <Header />
-          {children}
+          <main id="main-content">{children}</main>
         </AuthProvider>
       </body>
     </html>

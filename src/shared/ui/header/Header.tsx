@@ -41,10 +41,13 @@ export function Header() {
       : base;
   }
   return (
-    <div className="fixed inset-x-0 top-0 z-10 border-b border-black/5 dark:border-white/10">
+    <header className="fixed inset-x-0 top-0 z-10 border-b border-black/5 dark:border-white/10">
       <div className="bg-[linear-gradient(180deg,rgba(7,17,27,0.78),rgba(7,17,27,0.55))] backdrop-blur-xl">
         <div className="flex h-14 items-center justify-between gap-4 px-4 sm:px-6">
-          <div className="hidden items-center gap-4 lg:flex">
+          <nav
+            className="hidden items-center gap-4 lg:flex"
+            aria-label="Primary"
+          >
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -55,7 +58,7 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-          </div>
+          </nav>
 
           <div className="flex min-w-0 items-center gap-3 lg:hidden">
             <span className="truncate text-sm font-medium tracking-[0.18em] text-gray-200 uppercase">
@@ -117,9 +120,10 @@ export function Header() {
         </div>
 
         {isMobileMenuOpen ? (
-          <div
+          <nav
             id="mobile-site-menu"
             className="border-t border-white/10 px-4 py-4 lg:hidden"
+            aria-label="Mobile"
           >
             <div className="flex flex-col gap-2">
               {navItems.map((item) => (
@@ -168,9 +172,9 @@ export function Header() {
                 </Link>
               )}
             </div>
-          </div>
+          </nav>
         ) : null}
       </div>
-    </div>
+    </header>
   );
 }
