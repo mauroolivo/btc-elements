@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 import prettier from 'eslint-config-prettier';
 
 const explicitLayerAliasPatterns = [
@@ -21,6 +22,10 @@ const explicitLayerAliasPatterns = [
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: jsxA11y.configs.recommended.rules,
+  },
   {
     files: ['src/**/*.{ts,tsx}'],
     rules: {

@@ -109,8 +109,14 @@ export default function WalletHomeCPFP({ tx, onBack, onSuccess }: Props) {
           className="space-y-3 text-sm text-gray-300"
         >
           <div>
-            <label className="mb-1 block text-xs text-gray-400">Address</label>
+            <label
+              htmlFor="cpfp-address"
+              className="mb-1 block text-xs text-gray-400"
+            >
+              Address
+            </label>
             <input
+              id="cpfp-address"
               type="text"
               {...register('address')}
               className="w-full rounded border border-gray-600 bg-gray-800 p-2 text-white focus:border-blue-500 focus:outline-none"
@@ -124,8 +130,14 @@ export default function WalletHomeCPFP({ tx, onBack, onSuccess }: Props) {
           </div>
 
           <div>
-            <label className="mb-1 block text-xs text-gray-400">Amount</label>
+            <label
+              htmlFor="cpfp-amount"
+              className="mb-1 block text-xs text-gray-400"
+            >
+              Amount
+            </label>
             <input
+              id="cpfp-amount"
               // type="number"
               step="any"
               {...register('amount', { valueAsNumber: true })}

@@ -266,15 +266,15 @@ export default function WalletHomeTxList({
       })}
 
       {selectedTx && (
-        <div
-          className="fixed inset-0 z-40 overflow-hidden bg-slate-950/72 p-3 backdrop-blur-sm sm:p-6"
-          onClick={closeDetailsModal}
-        >
-          <div className="flex min-h-full items-start justify-center sm:items-center">
-            <div
-              className="flex max-h-[calc(100vh-1.5rem)] w-full max-w-4xl flex-col overflow-hidden rounded-4xl border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(15,23,42,0.92))] text-white shadow-[0_32px_90px_rgba(2,8,23,0.58),inset_0_1px_0_rgba(255,255,255,0.06)] sm:max-h-[calc(100vh-3rem)]"
-              onClick={(event) => event.stopPropagation()}
-            >
+        <div className="fixed inset-0 z-40 overflow-hidden bg-slate-950/72 p-3 backdrop-blur-sm sm:p-6">
+          <button
+            type="button"
+            aria-label="Close transaction details"
+            onClick={closeDetailsModal}
+            className="absolute inset-0 z-0 cursor-default border-0 bg-transparent p-0"
+          />
+          <div className="pointer-events-none relative z-10 flex min-h-full items-start justify-center sm:items-center">
+            <div className="pointer-events-auto flex max-h-[calc(100vh-1.5rem)] w-full max-w-4xl flex-col overflow-hidden rounded-4xl border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(15,23,42,0.92))] text-white shadow-[0_32px_90px_rgba(2,8,23,0.58),inset_0_1px_0_rgba(255,255,255,0.06)] sm:max-h-[calc(100vh-3rem)]">
               <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-white/8 bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(15,23,42,0.94))] px-4 py-4 backdrop-blur-xl sm:px-6">
                 <div>
                   <div className="text-[11px] font-semibold tracking-[0.24em] text-cyan-100/65 uppercase">

@@ -21,8 +21,11 @@ export default function WalletDescriptor() {
           }}
         >
           <div>
-            <label className="text-xs text-gray-400">Descriptor</label>
+            <label htmlFor="descriptor-input" className="text-xs text-gray-400">
+              Descriptor
+            </label>
             <input
+              id="descriptor-input"
               type="text"
               value={descriptorInput}
               onChange={(e) => setDescriptorInput(e.target.value)}

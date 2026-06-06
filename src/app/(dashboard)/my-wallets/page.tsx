@@ -442,10 +442,14 @@ export default function MyWalletsPage() {
                         }}
                       >
                         <div>
-                          <label className="mb-2 block text-xs tracking-[0.16em] text-cyan-100/70 uppercase">
+                          <label
+                            htmlFor="create-wallet-name"
+                            className="mb-2 block text-xs tracking-[0.16em] text-cyan-100/70 uppercase"
+                          >
                             Wallet name
                           </label>
                           <input
+                            id="create-wallet-name"
                             type="text"
                             value={state.form.walletName}
                             onChange={(event) =>
@@ -503,10 +507,14 @@ export default function MyWalletsPage() {
 
                     {state.form.isOpen ? (
                       <div className="core-panel-muted mb-6 rounded-2xl p-4">
-                        <label className="mb-2 block text-xs tracking-[0.16em] text-gray-400 uppercase">
+                        <label
+                          htmlFor="open-wallet-name"
+                          className="mb-2 block text-xs tracking-[0.16em] text-gray-400 uppercase"
+                        >
                           Wallet name
                         </label>
                         <input
+                          id="open-wallet-name"
                           type="text"
                           value={state.form.walletName}
                           onChange={(event) =>
