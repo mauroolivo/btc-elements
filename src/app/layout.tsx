@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { IBM_Plex_Mono, Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@features/auth/AuthProvider';
+import { AxeDevTools } from '@shared/ui/a11y/AxeDevTools';
 import { Header } from '@shared/ui/header/Header';
 
 const inter = Inter({
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${ibmPlexMono.variable} antialiased`}>
+        <AxeDevTools />
         <AuthProvider>
           <Header />
           {children}

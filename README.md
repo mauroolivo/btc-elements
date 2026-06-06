@@ -85,6 +85,19 @@ src/
   lib/        External service integrations
 ```
 
+## Accessibility Checks
+
+This project runs runtime accessibility checks in development with
+`@axe-core/react`.
+
+- Triggered automatically when running `npm run dev`
+- Runs only in development mode (`NODE_ENV=development`)
+- Reports violations in the browser console while you interact with pages,
+  dialogs, and forms
+
+Static accessibility linting is also enabled through ESLint with
+`eslint-plugin-jsx-a11y`.
+
 ## License
 
 MIT
