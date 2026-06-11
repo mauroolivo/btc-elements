@@ -384,7 +384,6 @@ export default function Wallet() {
             type="button"
             role="tab"
             aria-selected={viewState.currentTab === Tab.TRANSACTIONS}
-            tabIndex={viewState.currentTab === Tab.TRANSACTIONS ? 0 : -1}
             onClick={() => dispatch({ type: 'tab/set', tab: Tab.TRANSACTIONS })}
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               viewState.currentTab === Tab.TRANSACTIONS
@@ -398,7 +397,6 @@ export default function Wallet() {
             type="button"
             role="tab"
             aria-selected={viewState.currentTab === Tab.RECEIVE}
-            tabIndex={viewState.currentTab === Tab.RECEIVE ? 0 : -1}
             onClick={() => dispatch({ type: 'tab/set', tab: Tab.RECEIVE })}
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               viewState.currentTab === Tab.RECEIVE
@@ -412,7 +410,6 @@ export default function Wallet() {
             type="button"
             role="tab"
             aria-selected={viewState.currentTab === Tab.SEND}
-            tabIndex={viewState.currentTab === Tab.SEND ? 0 : -1}
             onClick={() => dispatch({ type: 'tab/set', tab: Tab.SEND })}
             className={`rounded-lg px-3 py-1 text-sm font-semibold tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 ${
               viewState.currentTab === Tab.SEND
@@ -426,7 +423,6 @@ export default function Wallet() {
             type="button"
             role="tab"
             aria-selected={viewState.currentTab === Tab.SEND_ADVANCED}
-            tabIndex={viewState.currentTab === Tab.SEND_ADVANCED ? 0 : -1}
             onClick={() =>
               dispatch({ type: 'tab/set', tab: Tab.SEND_ADVANCED })
             }
