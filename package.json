@@ -10,6 +10,9 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:unit": "jest --testPathPattern='\\.unit\\.' --coverage",
+    "test:functional": "jest --testPathPattern='\\.functional\\.' --coverage",
+    "test:changed": "jest --onlyChanged --coverage",
     "security:scan": "trivy fs --scanners vuln --severity HIGH,CRITICAL --exit-code 1 --pkg-types library .",
     "security:scan:hook": "node ./scripts/trivyPrePush.mjs",
     "prepare": "node -e \"if (process.env.CI === 'true' || process.env.NODE_ENV === 'production') process.exit(0); import('husky').then((mod) => mod.default()).catch(() => process.exit(0))\""
