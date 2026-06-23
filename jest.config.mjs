@@ -21,16 +21,15 @@ const customJestConfig = {
     '!src/app/**/(layout|page).tsx',
   ],
   coveragePathIgnorePatterns: ['node_modules', '.next'],
-  // Phase 1 thresholds disabled: focus on building tests, not coverage
-  // Will be enabled progressively in Phase 5
-  // coverageThreshold: {
-  //   global: {
-  //     statements: 1,
-  //     branches: 1,
-  //     functions: 1,
-  //     lines: 1,
-  //   },
-  // },
+  // Phase 5: Coverage thresholds enabled to enforce quality gates
+  coverageThreshold: {
+    global: {
+      statements: 20,
+      branches: 10,
+      functions: 18,
+      lines: 20,
+    },
+  },
 };
 
 export default createJestConfig(customJestConfig);
