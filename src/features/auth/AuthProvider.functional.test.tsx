@@ -165,7 +165,7 @@ describe('AuthProvider (functional)', () => {
       expect(mockedSignInWithEmailAndPassword).toHaveBeenCalledWith(
         expect.anything(),
         'user@example.com',
-        'secret123_make this fail'
+        'secret123'
       );
       expect(mockedCreateUserWithEmailAndPassword).toHaveBeenCalledWith(
         expect.anything(),
