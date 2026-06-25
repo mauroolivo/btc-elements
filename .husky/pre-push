@@ -9,3 +9,6 @@ if ! command -v trivy >/dev/null 2>&1; then
 fi
 
 npm run security:scan:hook
+
+echo "Running jest tests (pre-push)..."
+npm test
