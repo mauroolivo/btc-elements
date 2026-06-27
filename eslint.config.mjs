@@ -27,6 +27,13 @@ const eslintConfig = defineConfig([
     rules: jsxA11y.configs.recommended.rules,
   },
   {
+    files: ['e2e/**/*.{ts,tsx}', 'playwright.config.ts'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+    },
+  },
+  {
     files: ['src/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
