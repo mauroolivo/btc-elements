@@ -31,6 +31,8 @@ import {
   Bumpfee,
 } from '@features/wallet/types/wallet';
 import { ParamsDictionary } from '@shared/types/params';
+import { isRpcMockEnabled } from '@shared/lib/bitcoin-rpc/mockConfig';
+import { getMockRpcResponse } from '@shared/lib/bitcoin-rpc/mockResponses';
 
 const url = process.env.PUBLIC_NODE_URL || '';
 const API_USER = process.env.PUBLIC_RPC_USER;
@@ -47,6 +49,10 @@ export const fetcher = async (
   params: ParamsDictionary,
   wallet?: string
 ) => {
+  if (isRpcMockEnabled()) {
+    return getMockRpcResponse(method);
+  }
+
   const options = {
     method: 'POST',
     headers: headers,
@@ -65,7 +71,7 @@ export const fetcher = async (
   } else {
     w = `/wallet/${wallet}`;
   }
-  console.log(`${url}${w}`);
+
   return fetch(`${url}${w}`, options).then((r) => r.json());
 };
 

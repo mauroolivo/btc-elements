@@ -1,0 +1,12 @@
+{
+  "routes": {
+    "home": "/",
+    "signIn": "/auth/signin",
+    "myWallets": "/my-wallets",
+    "explorer": "/explorer"
+  },
+  "auth": {
+    "credentialsApi": "/api/demo-credentials",
+    "storageStatePath": "e2e/.auth/demo-user.json"
+  }
+}
