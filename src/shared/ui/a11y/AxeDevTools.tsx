@@ -22,7 +22,11 @@ export function AxeDevTools() {
         const ReactDOM = reactDomModule.default ?? reactDomModule;
 
         if (!isUnmounted) {
-          void axe(React, ReactDOM, AXE_RUN_DELAY_MS);
+          // Some third-party auth flows can create transient documents/iframes
+          // that report missing titles even when app pages are titled correctly.
+          void axe(React, ReactDOM, AXE_RUN_DELAY_MS, {
+            rules: [{ id: 'document-title', enabled: false }],
+          });
         }
       } catch (error) {
         // Keep axe failures non-blocking in development.
