@@ -43,7 +43,6 @@ describe('bitcoin-rpc api', () => {
 
   it('fetcher posts to base node url when wallet is undefined', async () => {
     const fetchSpy = installFetchMock({ result: true });
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     const api = await loadApiModule();
     await api.fetcher('getblockchaininfo', {});
@@ -53,14 +52,10 @@ describe('bitcoin-rpc api', () => {
       'http://127.0.0.1:48332',
       expect.objectContaining({ method: 'POST' })
     );
-    expect(logSpy).toHaveBeenCalledWith('http://127.0.0.1:48332');
-
-    logSpy.mockRestore();
   });
 
   it('fetcher appends /wallet/ when wallet is an empty string', async () => {
     const fetchSpy = installFetchMock({ result: true });
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     const api = await loadApiModule();
     await api.fetcher('listwallets', {}, '');
@@ -69,14 +64,10 @@ describe('bitcoin-rpc api', () => {
       'http://127.0.0.1:48332/wallet/',
       expect.objectContaining({ method: 'POST' })
     );
-    expect(logSpy).toHaveBeenCalledWith('http://127.0.0.1:48332/wallet/');
-
-    logSpy.mockRestore();
   });
 
   it('fetcher appends /wallet/{name} when wallet is provided', async () => {
     const fetchSpy = installFetchMock({ result: true });
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     const api = await loadApiModule();
     await api.fetcher('getwalletinfo', {}, 'primary-wallet');
@@ -85,11 +76,6 @@ describe('bitcoin-rpc api', () => {
       'http://127.0.0.1:48332/wallet/primary-wallet',
       expect.objectContaining({ method: 'POST' })
     );
-    expect(logSpy).toHaveBeenCalledWith(
-      'http://127.0.0.1:48332/wallet/primary-wallet'
-    );
-
-    logSpy.mockRestore();
   });
 
   it('getrawtransaction sends expected JSON-RPC method and params', async () => {
