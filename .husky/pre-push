@@ -12,3 +12,6 @@ npm run security:scan:hook
 
 echo "Running jest tests (pre-push)..."
 npm test
+
+echo "Running Playwright e2e tests (pre-push)..."
+npm run test:e2e
