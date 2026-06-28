@@ -4,6 +4,7 @@ import { test as base, expect } from '@playwright/test';
 
 import { getAuthStatePath, getE2EConfig } from '../config/testConfig';
 import { BasePage } from '../pages/basePage';
+import { ChartPage } from '../pages/chartPage';
 import { ExplorerPage } from '../pages/explorerPage';
 import { HomePage } from '../pages/homePage';
 import { MyWalletsPage } from '../pages/myWalletsPage';
@@ -12,6 +13,7 @@ import { SignInPage } from '../pages/signInPage';
 type Fixtures = {
   authStatePath: string;
   basePage: BasePage;
+  chartPage: ChartPage;
   homePage: HomePage;
   explorerPage: ExplorerPage;
   signInPage: SignInPage;
@@ -27,6 +29,9 @@ export const test = base.extend<Fixtures>({
   },
   basePage: async ({ page }, use) => {
     await use(new BasePage(page));
+  },
+  chartPage: async ({ page }, use) => {
+    await use(new ChartPage(page));
   },
   homePage: async ({ page }, use) => {
     await use(new HomePage(page));
