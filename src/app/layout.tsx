@@ -17,7 +17,10 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'BTC Elements',
+  title: {
+    default: 'BTC Elements',
+    template: '%s',
+  },
   description:
     'BTC Elements is a Bitcoin Core interface for wallet flows, node status, explorer, mempool, and authenticated profile access.',
 };

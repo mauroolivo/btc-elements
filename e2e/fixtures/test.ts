@@ -6,6 +6,7 @@ import { getAuthStatePath, getE2EConfig } from '../config/testConfig';
 import { BasePage } from '../pages/basePage';
 import { ExplorerPage } from '../pages/explorerPage';
 import { HomePage } from '../pages/homePage';
+import { MyWalletsPage } from '../pages/myWalletsPage';
 import { SignInPage } from '../pages/signInPage';
 
 type Fixtures = {
@@ -14,6 +15,7 @@ type Fixtures = {
   homePage: HomePage;
   explorerPage: ExplorerPage;
   signInPage: SignInPage;
+  myWalletsPage: MyWalletsPage;
   authenticatedContext: BrowserContext;
   authenticatedPage: Page;
   authenticatedHomePage: HomePage;
@@ -34,6 +36,9 @@ export const test = base.extend<Fixtures>({
   },
   signInPage: async ({ page }, use) => {
     await use(new SignInPage(page));
+  },
+  myWalletsPage: async ({ page }, use) => {
+    await use(new MyWalletsPage(page));
   },
   authenticatedContext: async ({ authStatePath, baseURL, browser }, use) => {
     if (!existsSync(authStatePath)) {

@@ -14,14 +14,14 @@ export class ExplorerPage extends BasePage {
   }
 
   get searchField(): Locator {
-    return this.page.locator('input[name="ref"]');
+    return this.main.locator('input[name="ref"]').last();
   }
 
   get searchButton(): Locator {
-    return this.page.getByRole('button', { name: 'Search' });
+    return this.main.locator('button:has-text("Search")').last();
   }
 
   get clearButton(): Locator {
-    return this.page.getByRole('button', { name: 'Clear' });
+    return this.main.locator('button:has-text("Clear")').last();
   }
 }
