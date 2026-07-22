@@ -5,10 +5,12 @@ set -e
 if ! command -v trivy >/dev/null 2>&1; then
   echo "pre-push: trivy not found, skipping security scan"
   echo "install trivy locally to enable vulnerability checks before push"
-  exit 0
+else
+  npm run security:scan:hook
 fi
 
-npm run security:scan:hook
+echo "Running npm audit (pre-push)..."
+npm run security:scan:audit
 
 echo "Running jest tests (pre-push)..."
 npm test

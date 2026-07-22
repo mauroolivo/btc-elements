@@ -19,6 +19,7 @@
     "test:e2e:auth": "playwright test --project=chromium-auth",
     "security:scan": "trivy fs --scanners vuln --severity HIGH,CRITICAL --exit-code 1 --pkg-types library .",
     "security:scan:hook": "node ./scripts/trivyPrePush.mjs",
+    "security:scan:audit": "npm audit --omit=dev --audit-level=high",
     "prepare": "node -e \"if (process.env.CI === 'true' || process.env.NODE_ENV === 'production') process.exit(0); import('husky').then((mod) => mod.default()).catch(() => process.exit(0))\""
   },
   "dependencies": {
@@ -63,5 +64,11 @@
     "prettier-plugin-tailwindcss": "^0.7.4",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "sharp": "^0.35.3"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.35.3"
   }
 }
