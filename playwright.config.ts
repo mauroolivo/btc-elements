@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:3000';
+const e2ePort = process.env.PLAYWRIGHT_PORT ?? '3401';
+const baseURL =
+  process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${e2ePort}`;
 const authStatePath = 'e2e/.auth/demo-user.json';
 
 export default defineConfig({
@@ -39,9 +41,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'BTC_ELEMENTS_MOCK_RPC=1 npm run dev -- --hostname 127.0.0.1',
+    command: `BTC_ELEMENTS_MOCK_RPC=1 npm run dev -- --hostname 127.0.0.1 --port ${e2ePort}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    // Always boot this project's server to avoid attaching to unrelated local apps.
+    reuseExistingServer: false,
     timeout: 120000,
   },
 });
